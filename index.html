@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>SplitShare - Track Your Strength</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Bebas+Neue&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -207,7 +207,15 @@
 
         /* Add bottom padding to main content to account for fixed nav */
         main {
-            padding-bottom: 100px;
+            padding-bottom: 120px;
+        }
+        
+        /* Ensure all page sections have bottom padding */
+        .feed-page,
+        .progress-page,
+        .groups-page,
+        .profile-page {
+            padding-bottom: 40px;
         }
 
         /* Hero Stats */
@@ -1719,10 +1727,12 @@
 
         .profile-content {
             animation: fadeInUp 0.8s ease-out 0.2s backwards;
+            padding-bottom: 40px;
         }
 
         .profile-tab-content {
             display: none;
+            min-height: 200px;
         }
 
         .profile-tab-content.active {
@@ -1733,7 +1743,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
-            margin-bottom: 40px;
+            margin-bottom: 60px;
         }
 
         .achievement-card {
@@ -2043,11 +2053,11 @@
                                 <div class="profile-stat-number" id="profileWorkoutCount">0</div>
                                 <div class="profile-stat-label">Workouts</div>
                             </div>
-                            <div class="profile-stat-item">
+                            <div class="profile-stat-item" onclick="openFollowersModal()" style="cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                                 <div class="profile-stat-number" id="profileFollowers">0</div>
                                 <div class="profile-stat-label">Followers</div>
                             </div>
-                            <div class="profile-stat-item">
+                            <div class="profile-stat-item" onclick="openFollowingModal()" style="cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                                 <div class="profile-stat-number" id="profileFollowing">0</div>
                                 <div class="profile-stat-label">Following</div>
                             </div>
@@ -2117,11 +2127,11 @@
                                 <div class="profile-stat-number" id="viewUserWorkoutCount">0</div>
                                 <div class="profile-stat-label">Workouts</div>
                             </div>
-                            <div class="profile-stat-item">
+                            <div class="profile-stat-item" onclick="openFollowersModalForUser(viewingUserId)" style="cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                                 <div class="profile-stat-number" id="viewUserFollowers">0</div>
                                 <div class="profile-stat-label">Followers</div>
                             </div>
-                            <div class="profile-stat-item">
+                            <div class="profile-stat-item" onclick="openFollowingModalForUser(viewingUserId)" style="cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                                 <div class="profile-stat-number" id="viewUserFollowing">0</div>
                                 <div class="profile-stat-label">Following</div>
                             </div>
@@ -2190,6 +2200,17 @@
 
                     <button type="button" class="submit-btn" onclick="handleSaveProfile()">Save Changes</button>
                 </form>
+            </div>
+        </div>
+
+        <!-- Followers/Following Modal -->
+        <div class="modal" id="followModal">
+            <div class="modal-content" style="max-width:600px;">
+                <button class="modal-close" onclick="closeFollowModal()">×</button>
+                <h2 id="followModalTitle">Followers</h2>
+                <div id="followModalContent" style="max-height:500px;overflow-y:auto;margin-top:20px;">
+                    <!-- Users loaded by JS -->
+                </div>
             </div>
         </div>
 
@@ -3483,6 +3504,100 @@
             // Update follower count
             const followers = await sb(`follows?following_id=eq.${viewingUserId}&select=follower_id`);
             document.getElementById('viewUserFollowers').textContent = followers?.length || 0;
+        }
+
+        // ── FOLLOWERS/FOLLOWING MODAL ─────────────────────────────────────────
+        async function openFollowersModal() {
+            await openFollowModalForUser(window._sbUserId, 'followers');
+        }
+
+        async function openFollowingModal() {
+            await openFollowModalForUser(window._sbUserId, 'following');
+        }
+
+        async function openFollowersModalForUser(userId) {
+            await openFollowModalForUser(userId, 'followers');
+        }
+
+        async function openFollowingModalForUser(userId) {
+            await openFollowModalForUser(userId, 'following');
+        }
+
+        async function openFollowModalForUser(userId, type) {
+            if (!userId) return;
+            
+            const modal = document.getElementById('followModal');
+            const title = document.getElementById('followModalTitle');
+            const content = document.getElementById('followModalContent');
+            
+            title.textContent = type === 'followers' ? 'Followers' : 'Following';
+            content.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">Loading...</div>';
+            modal.classList.add('active');
+            
+            try {
+                let users;
+                if (type === 'followers') {
+                    // Get people who follow this user
+                    const follows = await sb(`follows?following_id=eq.${userId}&select=follower_id,profiles!follows_follower_id_fkey(id,full_name,username,initials,avatar_url)`);
+                    users = follows.map(f => f.profiles);
+                } else {
+                    // Get people this user follows
+                    const follows = await sb(`follows?follower_id=eq.${userId}&select=following_id,profiles!follows_following_id_fkey(id,full_name,username,initials,avatar_url)`);
+                    users = follows.map(f => f.profiles);
+                }
+                
+                if (!users || users.length === 0) {
+                    content.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#999;">
+                        <div style="font-size:48px;margin-bottom:15px;">👥</div>
+                        <h3 style="font-family:'Bebas Neue',cursive;font-size:24px;color:var(--primary);margin-bottom:10px;">No ${type} yet</h3>
+                    </div>`;
+                    return;
+                }
+                
+                content.innerHTML = users.map(u => {
+                    if (!u) return '';
+                    const isMe = u.id === window._sbUserId;
+                    const isFollowing = userFollowing.has(u.id);
+                    const avatarContent = u.avatar_url 
+                        ? `<img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">`
+                        : (u.initials || '?');
+                    
+                    return `<div onclick="closeFollowModal();viewUserProfile('${u.id}')" style="display:flex;align-items:center;gap:15px;padding:18px;border-bottom:1px solid #333;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,107,53,0.08)'" onmouseout="this.style.background='transparent'">
+                        <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:20px;flex-shrink:0;overflow:hidden;">${avatarContent}</div>
+                        <div style="flex:1;">
+                            <div style="font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;color:#fff;">${u.full_name}</div>
+                            <div style="font-size:13px;color:var(--primary);font-family:'Roboto Mono',monospace;">@${u.username}</div>
+                        </div>
+                        ${isMe ? '<span style="color:#666;font-size:12px;font-family:\'Oswald\',sans-serif;text-transform:uppercase;">You</span>' : `<button onclick="event.stopPropagation();toggleFollowInModal('${u.id}',this)" 
+                            style="background:${isFollowing?'transparent':'var(--primary)'};border:2px solid var(--primary);color:${isFollowing?'var(--primary)':'#fff'};padding:8px 18px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all 0.2s;flex-shrink:0;">
+                            ${isFollowing ? 'Unfollow' : 'Follow'}
+                        </button>`}
+                    </div>`;
+                }).join('');
+                
+            } catch(e) {
+                content.innerHTML = `<div style="text-align:center;padding:40px;color:#ff6b35;">Error loading ${type}</div>`;
+                console.warn('Follow modal error:', e.message);
+            }
+        }
+
+        async function toggleFollowInModal(targetId, btn) {
+            const isFollowing = userFollowing.has(targetId);
+            if (isFollowing) {
+                await unfollowUser(targetId);
+                btn.textContent = 'Follow';
+                btn.style.background = 'var(--primary)';
+                btn.style.color = '#fff';
+            } else {
+                await followUser(targetId);
+                btn.textContent = 'Unfollow';
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--primary)';
+            }
+        }
+
+        function closeFollowModal() {
+            document.getElementById('followModal').classList.remove('active');
         }
 
         // ── SESSION CHECK ON LOAD ─────────────────────────────────────────────
