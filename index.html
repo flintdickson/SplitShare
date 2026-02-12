@@ -2,8 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>SplitShare - Track Your Strength</title>
+    
+    <!-- iOS Web App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SplitShare">
+    
+    <!-- iOS App Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23ff6b35' width='180' height='180'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='Arial,sans-serif' font-size='80' font-weight='bold' fill='white'>SS</text></svg>">
+    
+    <!-- Prevent iOS text size adjustment -->
+    <meta name="format-detection" content="telephone=no">
+    
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Bebas+Neue&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -25,6 +37,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: rgba(255, 107, 53, 0.2);
+            -webkit-touch-callout: none;
         }
 
         body {
@@ -32,6 +46,13 @@
             background: var(--black);
             color: var(--white);
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* iOS scrolling */
+        main {
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Animated Background */
@@ -207,7 +228,8 @@
 
         /* Add bottom padding to main content to account for fixed nav */
         main {
-            padding-bottom: 120px;
+            padding-bottom: calc(120px + env(safe-area-inset-bottom));
+            padding-top: env(safe-area-inset-top);
         }
         
         /* Ensure all page sections have bottom padding */
@@ -509,6 +531,14 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            padding: 10px;
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .action-btn:active {
+            color: var(--primary);
+            transform: scale(0.95);
         }
 
         .action-btn:hover {
@@ -817,73 +847,129 @@
             max-height: 1000px;
         }
 
-        /* Responsive */
+        /* ── RESPONSIVE / MOBILE ─────────────────────────────────────────── */
         @media (max-width: 1024px) {
-            .hero-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .workout-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .activity-feed {
-                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            }
+            .activity-feed { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+            .workout-stats  { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media (max-width: 768px) {
-            .logo {
-                font-size: 32px;
-            }
+            /* Feed single column */
+            .activity-feed { grid-template-columns: 1fr; gap: 16px; }
 
-            nav a {
-                font-size: 10px;
-                padding: 5px 8px;
-                max-width: 80px;
-            }
+            /* Header */
+            .logo { font-size: 26px; letter-spacing: 2px; }
+            header { padding: 12px 0; }
+            .container { padding: 0 14px; }
 
-            nav a::before {
-                font-size: 20px;
-            }
+            /* Section header */
+            .section-header { flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+            .section-title { font-size: 26px; }
 
-            .log-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-                margin-top: -25px;
-            }
+            /* Filter tabs full width */
+            .filter-tabs { width: 100%; gap: 6px; }
+            .filter-tab  { flex: 1; padding: 8px 6px; font-size: 11px; text-align: center; border-radius: 8px; }
 
-            .hero-stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
+            /* Nav */
+            nav a         { font-size: 9px; padding: 4px 4px; max-width: 64px; gap: 2px; }
+            nav a::before { font-size: 18px; }
+            .log-btn      { width: 46px; height: 46px; font-size: 20px; margin-top: -23px; }
 
-            .stat-card {
-                padding: 15px;
-            }
+            /* Cards */
+            .activity-card    { border-radius: 10px; }
+            .activity-header  { padding: 12px 14px; gap: 10px; }
+            .user-avatar      { width: 38px; height: 38px; font-size: 15px; }
+            .activity-user-info h3 { font-size: 14px; }
+            .activity-time    { font-size: 11px; }
+            .workout-title    { font-size: 16px; padding: 10px 14px; }
+            .workout-photo    { height: 200px; }
+            .workout-caption  { font-size: 13px; padding: 10px 14px; }
 
-            .stat-value {
-                font-size: 28px;
-            }
-            
-            .activity-feed {
-                grid-template-columns: 1fr;
-            }
+            /* Workout stats */
+            .workout-stats    { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 10px; }
+            .workout-stat     { padding: 8px; border-radius: 6px; }
+            .workout-stat-value { font-size: 18px; }
+            .workout-stat-label { font-size: 9px; }
 
-            .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 20px;
-            }
+            /* Exercise list */
+            .exercise-item    { padding: 8px 10px; }
+            .exercise-name    { font-size: 12px; }
+            .exercise-details { font-size: 11px; }
 
-            .workout-stats {
-                grid-template-columns: 1fr;
-            }
+            /* Action buttons */
+            .activity-actions { padding: 10px 14px; gap: 8px; }
+            .action-btn       { font-size: 11px; min-height: 40px; padding: 6px 8px; }
 
-            .exercise-inputs {
-                grid-template-columns: 1fr;
+            /* Modal slides up from bottom */
+            .modal { padding: 0; align-items: flex-end; }
+            .modal-content {
+                width: 100%; max-width: 100%;
+                border-radius: 20px 20px 0 0;
+                padding: 24px 18px calc(24px + env(safe-area-inset-bottom));
+                max-height: 92vh; overflow-y: auto;
+                border-left: none; border-right: none; border-bottom: none;
             }
+            .modal h2 { font-size: 26px; margin-bottom: 18px; }
+            .form-group { margin-bottom: 14px; }
+            .form-group input, .form-group select, .form-group textarea { padding: 12px; font-size: 15px; }
+            .exercise-inputs { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .submit-btn { padding: 15px; font-size: 15px; border-radius: 10px; }
+
+            /* Auth — sheet slides up from bottom */
+            .auth-page { align-items: flex-end; }
+            .auth-container { width: 100%; max-width: 100%; }
+            .auth-logo { margin-bottom: 16px; padding-top: 30px; }
+            .auth-logo-text { font-size: 40px; letter-spacing: 3px; }
+            .auth-tagline { font-size: 12px; margin-top: 6px; }
+            .auth-form {
+                padding: 26px 18px calc(30px + env(safe-area-inset-bottom));
+                border-radius: 20px 20px 0 0;
+                border-left: none; border-right: none; border-bottom: none;
+            }
+            .auth-title { font-size: 24px; margin-bottom: 18px; }
+            .auth-input-group { margin-bottom: 12px; }
+            .auth-input-group input { padding: 13px; font-size: 15px; border-radius: 8px; }
+            .auth-input-group label { font-size: 11px; margin-bottom: 5px; }
+            .auth-submit-btn { padding: 15px; font-size: 15px; border-radius: 10px; margin-top: 6px; }
+            .auth-switch { font-size: 13px; margin-top: 16px; }
+
+            /* Profile */
+            .profile-header      { padding: 18px 14px; }
+            .profile-top         { gap: 14px; }
+            .profile-avatar-large { width: 72px; height: 72px; font-size: 28px; }
+            .profile-name        { font-size: 26px; }
+            .profile-username    { font-size: 13px; }
+            .profile-bio         { font-size: 13px; }
+            .profile-stats-row   { gap: 14px; }
+            .profile-stat-number { font-size: 20px; }
+            .profile-tab         { padding: 10px 12px; font-size: 12px; }
+            .edit-profile-btn, .logout-btn { padding: 10px 20px; font-size: 13px; }
+
+            /* Progress */
+            .progress-header  { margin: 16px 0; }
+            .progress-title   { font-size: 30px; }
+            .chart-container  { padding: 18px 14px; border-radius: 10px; }
+            .chart-wrapper    { height: 250px; padding: 10px; }
+            .stats-grid       { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .stat-box         { padding: 10px 6px; border-radius: 8px; }
+            .stat-box-value   { font-size: 22px; }
+            .stat-box-label   { font-size: 10px; }
+            .exercise-selector { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .exercise-btn     { padding: 12px 8px; font-size: 13px; }
+            .history-table th, .history-table td { padding: 8px 6px; font-size: 11px; }
+
+            /* Groups */
+            .groups-header    { margin: 16px 0; flex-direction: column; align-items: flex-start; gap: 12px; }
+            .groups-grid      { grid-template-columns: 1fr; gap: 14px; }
+            .group-header-banner { padding: 18px; border-radius: 10px 10px 0 0; }
+            .group-name       { font-size: 20px; }
+            .group-body       { padding: 14px; }
+            .create-group-btn { padding: 12px 24px; font-size: 14px; }
+            .group-detail-header { padding: 18px 14px; }
+            .group-detail-title  { font-size: 28px; }
+
+            /* Search */
+            #userSearchInput { font-size: 14px; padding: 12px 14px; }
         }
 
         /* Progress Page Styles */
@@ -1859,8 +1945,8 @@
             <div class="section-header">
                 <h2 class="section-title">Activity Feed</h2>
                 <div class="filter-tabs">
-                    <button class="filter-tab active" onclick="switchFeedTab('following', this)">Following</button>
-                    <button class="filter-tab" onclick="switchFeedTab('everyone', this)">Everyone</button>
+                    <button class="filter-tab" onclick="switchFeedTab('following', this)">Following</button>
+                    <button class="filter-tab active" onclick="switchFeedTab('everyone', this)">Everyone</button>
                     <button class="filter-tab" onclick="switchFeedTab('mine', this)">My Workouts</button>
                 </div>
             </div>
@@ -3648,7 +3734,21 @@
                     }
                 }
             } catch(e) { console.warn('Session restore failed:', e.message); }
-            showSignup();
+            
+            // Show feed by default — always load Everyone tab
+            currentFeedTab = 'everyone';
+            navigateToFeed();
+            // Highlight the Everyone button
+            document.querySelectorAll('.filter-tab').forEach(t => {
+                t.classList.remove('active');
+                if (t.textContent.trim() === 'Everyone') t.classList.add('active');
+            });
+            // Load public feed
+            try {
+                await loadFeedFromSupabase();
+            } catch(e) {
+                console.warn('Could not load public feed:', e.message);
+            }
         })();
 
         // ── PROFILE TAB SWITCHING ─────────────────────────────────────────────
@@ -3992,7 +4092,7 @@
 
         // ── FEED FROM SUPABASE ────────────────────────────────────────────────
         // ── FOLLOW SYSTEM ────────────────────────────────────────────────────
-        let currentFeedTab = 'following';
+        let currentFeedTab = 'everyone';
         let userFollowing = new Set(); // set of user_ids we follow
 
         async function loadFollowing() {
@@ -4098,7 +4198,6 @@
 
         // ── FEED LOADER ───────────────────────────────────────────────────────
         async function loadFeedFromSupabase() {
-            await loadFollowing(); // always sync follow state first
             const feed = document.getElementById('mainFeed');
             const emptyState = document.getElementById('feedEmptyState');
             const emptyMsg = document.getElementById('feedEmptyMsg');
@@ -4109,6 +4208,20 @@
 
             try {
                 let workouts;
+                
+                // Check if user is logged in for Following/Mine tabs
+                if ((currentFeedTab === 'following' || currentFeedTab === 'mine') && !window._sbUserId) {
+                    if (emptyState) {
+                        emptyState.style.display = 'block';
+                        if (emptyMsg) emptyMsg.innerHTML = `<a href="#" onclick="showLogin();return false;" style="color:var(--primary);text-decoration:underline;">Log in</a> or <a href="#" onclick="showSignup();return false;" style="color:var(--primary);text-decoration:underline;">sign up</a> to see this feed.`;
+                    }
+                    return;
+                }
+
+                // Load follow state if logged in
+                if (window._sbUserId) {
+                    await loadFollowing();
+                }
 
                 if (currentFeedTab === 'following') {
                     if (userFollowing.size === 0) {
@@ -4125,7 +4238,7 @@
                     workouts = await sb(`workouts?user_id=eq.${window._sbUserId}&order=created_at.desc&limit=50&select=*,profiles(id,full_name,initials,username,avatar_url)`);
 
                 } else {
-                    // Everyone
+                    // Everyone - show all workouts (works even when logged out)
                     workouts = await sb(`workouts?order=created_at.desc&limit=50&select=*,profiles(id,full_name,initials,username,avatar_url)`);
                 }
 
@@ -4143,32 +4256,40 @@
 
                 if (emptyState) emptyState.style.display = 'none';
                 
-                // Load likes and comments counts for all workouts
+                // Load likes and comments — gracefully skip if tables don't exist yet
                 const workoutIds = workouts.map(w => w.id).join(',');
-                const [likes, comments] = await Promise.all([
-                    sb(`workout_likes?workout_id=in.(${workoutIds})&select=workout_id,user_id`),
-                    sb(`workout_comments?workout_id=in.(${workoutIds})&select=workout_id`)
-                ]);
+                let likes = [], comments = [];
+                try {
+                    [likes, comments] = await Promise.all([
+                        sb(`workout_likes?workout_id=in.(${workoutIds})&select=workout_id,user_id`),
+                        sb(`workout_comments?workout_id=in.(${workoutIds})&select=workout_id`)
+                    ]);
+                } catch(e) {
+                    console.warn('Likes/comments tables not set up yet:', e.message);
+                }
                 
                 // Group by workout_id
                 const likesMap = {};
                 const commentsMap = {};
-                likes?.forEach(l => {
+                (likes || []).forEach(l => {
                     if (!likesMap[l.workout_id]) likesMap[l.workout_id] = [];
                     likesMap[l.workout_id].push(l.user_id);
                 });
-                comments?.forEach(c => {
+                (comments || []).forEach(c => {
                     commentsMap[c.workout_id] = (commentsMap[c.workout_id] || 0) + 1;
                 });
                 
-                // Check PRs for each workout
-                const workoutsWithPRs = await Promise.all(workouts.map(async w => {
-                    const prExercises = await detectPRs(w, userId);
-                    return { ...w, prExercises, likes: likesMap[w.id] || [], commentCount: commentsMap[w.id] || 0 };
-                }));
-                
+                // Build cards — skip PR detection to keep feed fast
                 const frag = document.createDocumentFragment();
-                workoutsWithPRs.forEach(w => frag.appendChild(buildWorkoutCard(w, w.profiles)));
+                workouts.forEach(w => {
+                    const enriched = { 
+                        ...w, 
+                        prExercises: [], 
+                        likes: likesMap[w.id] || [], 
+                        commentCount: commentsMap[w.id] || 0 
+                    };
+                    frag.appendChild(buildWorkoutCard(enriched, w.profiles));
+                });
                 feed.insertBefore(frag, feed.firstChild);
 
             } catch(e) { console.warn('Feed load error:', e.message); }
