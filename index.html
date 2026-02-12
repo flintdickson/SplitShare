@@ -785,19 +785,18 @@
         /* Workout Photo in Activity Cards */
         .workout-photo {
             width: 100%;
-            height: 300px;
+            aspect-ratio: 9/16;
             object-fit: cover;
             margin: 0;
             border: none;
+            display: block;
         }
 
         .workout-caption {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #fff;
-            padding: 15px 20px;
-            font-style: normal;
-            font-weight: 400;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #ddd;
+            padding: 10px 14px 0;
         }
 
         /* Workout Details Section */
@@ -4327,80 +4326,134 @@
         }
 
         function buildWorkoutCard(w, profile) {
-            const name     = profile?.full_name || 'Unknown';
-            const initials = profile?.initials  || '??';
+            const name      = profile?.full_name || 'Unknown';
+            const initials  = profile?.initials  || '??';
             const avatarUrl = profile?.avatar_url;
-            const userId   = profile?.id;
-            const isMe     = userId === window._sbUserId;
+            const userId    = profile?.id;
+            const isMe      = userId === window._sbUserId;
             const isFollowing = userId && userFollowing.has(userId);
             const exercises = w.exercises || [];
-            const photoHTML   = w.photo_url ? `<img src="${w.photo_url}" class="workout-photo" alt="">` : '';
-            const captionHTML = w.caption   ? `<p class="workout-caption">"${w.caption}"</p>` : '';
-            
-            // Likes and comments data
-            const likes = w.likes || [];
-            const likeCount = likes.length;
-            const hasLiked = likes.includes(window._sbUserId);
+
+            // Likes and comments
+            const likes      = w.likes || [];
+            const likeCount  = likes.length;
+            const hasLiked   = likes.includes(window._sbUserId);
             const commentCount = w.commentCount || 0;
-            
-            // PR exercises
+
+            // PRs
             const prExercises = w.prExercises || [];
             const hasPR = prExercises.length > 0;
-            
-            const exHTML = exercises.length
-                ? exercises.map(ex => {
-                    const isPR = prExercises.includes(ex.name);
-                    return `<div class="exercise-item">
-                        <span class="exercise-name">${ex.name}${isPR ? ' <span style="color:var(--accent);font-size:11px;">🔥 PR!</span>' : ''}</span>
-                        <span class="exercise-details">${ex.sets||'?'} × ${ex.reps||'?'}${ex.weight?' @ '+ex.weight+' lbs':''}</span>
-                    </div>`;
-                  }).join('')
-                : '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
+
             const dateStr = new Date(w.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
-            // Avatar - show photo if exists, else initials
-            const avatarHTML = avatarUrl 
+            // Avatar HTML
+            const avatarHTML = avatarUrl
                 ? `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">`
                 : initials;
 
-            const followBtn = (!isMe && userId) ? `<button onclick="toggleFollowFromCard('${userId}',this)"
-                style="margin-left:auto;background:${isFollowing?'transparent':'var(--primary)'};border:2px solid var(--primary);color:${isFollowing?'var(--primary)':'#fff'};padding:6px 14px;font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all 0.2s;" data-uid="${userId}">
-                ${isFollowing ? 'Following' : '+ Follow'}
-            </button>` : '';
+            // Follow button — small pill style
+            const followBtn = (!isMe && userId) ? `
+                <button onclick="toggleFollowFromCard('${userId}',this)" data-uid="${userId}"
+                    style="margin-left:auto;background:${isFollowing?'transparent':'var(--primary)'};border:2px solid var(--primary);
+                    color:${isFollowing?'var(--primary)':'#fff'};padding:5px 12px;border-radius:20px;
+                    font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;text-transform:uppercase;
+                    letter-spacing:1px;cursor:pointer;transition:all 0.2s;white-space:nowrap;">
+                    ${isFollowing ? 'Following' : '+ Follow'}
+                </button>` : '';
+
+            // Exercise rows — always visible
+            const exHTML = exercises.length
+                ? exercises.map(ex => {
+                    const isPR = prExercises.includes(ex.name);
+                    return `<div style="display:flex;justify-content:space-between;align-items:center;
+                        padding:9px 12px;background:rgba(0,0,0,0.25);border-radius:8px;
+                        border-left:3px solid ${isPR ? 'var(--accent)' : 'var(--sweat)'};">
+                        <span style="font-family:'Roboto Mono',monospace;font-size:12px;color:#eee;">
+                            ${ex.name}${isPR ? ' <span style="color:var(--accent);font-size:10px;">🔥PR</span>' : ''}
+                        </span>
+                        <span style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--sweat);white-space:nowrap;margin-left:8px;">
+                            ${ex.sets||'?'}×${ex.reps||'?'}${ex.weight?' @ '+ex.weight+'lb':''}
+                        </span>
+                    </div>`;
+                  }).join('')
+                : `<div style="color:#666;font-size:12px;padding:8px 0;">No exercises logged</div>`;
+
+            // Stats row
+            const statsHTML = `
+                <div style="display:flex;gap:8px;margin-bottom:10px;">
+                    ${exercises.length ? `<div style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:8px;padding:6px 12px;text-align:center;flex:1;">
+                        <div style="font-family:'Bebas Neue',cursive;font-size:20px;color:var(--primary);">${exercises.length}</div>
+                        <div style="font-size:9px;color:#999;text-transform:uppercase;letter-spacing:1px;">Exercises</div>
+                    </div>` : ''}
+                    ${w.duration ? `<div style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:8px;padding:6px 12px;text-align:center;flex:1;">
+                        <div style="font-family:'Bebas Neue',cursive;font-size:20px;color:var(--primary);">${w.duration}</div>
+                        <div style="font-size:9px;color:#999;text-transform:uppercase;letter-spacing:1px;">Minutes</div>
+                    </div>` : ''}
+                    ${hasPR ? `<div style="background:rgba(255,179,71,0.15);border:1px solid rgba(255,179,71,0.4);border-radius:8px;padding:6px 12px;text-align:center;flex:1;">
+                        <div style="font-size:18px;">🔥</div>
+                        <div style="font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;font-weight:700;">PR!</div>
+                    </div>` : ''}
+                </div>`;
+
+            // Photo — 9:16 vertical ratio
+            const photoHTML = w.photo_url ? `
+                <div style="position:relative;width:100%;padding-bottom:177.78%;overflow:hidden;background:#111;">
+                    <img src="${w.photo_url}" alt="Workout" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+                </div>` : '';
+
+            const captionHTML = w.caption
+                ? `<p style="font-size:14px;color:#ddd;padding:10px 14px 0;line-height:1.5;">"${w.caption}"</p>`
+                : '';
 
             const card = document.createElement('div');
             card.className = 'activity-card';
             card.dataset.workoutId = w.id;
             card.innerHTML = `
-                <div class="activity-header">
-                    <div class="user-avatar" onclick="${!isMe && userId ? `viewUserProfile('${userId}')` : ''}" style="${!isMe && userId ? 'cursor:pointer;' : ''}">${avatarHTML}</div>
-                    <div class="activity-user-info" onclick="${!isMe && userId ? `viewUserProfile('${userId}')` : ''}" style="${!isMe && userId ? 'cursor:pointer;' : ''}">
-                        <h3>${name}</h3>
-                        <span class="activity-time">${dateStr}</span>
+                <!-- Small header -->
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;">
+                    <div onclick="${!isMe && userId ? `viewUserProfile('${userId}')` : ''}"
+                        style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
+                        display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;
+                        font-size:14px;flex-shrink:0;overflow:hidden;${!isMe && userId ? 'cursor:pointer;' : ''}">
+                        ${avatarHTML}
+                    </div>
+                    <div onclick="${!isMe && userId ? `viewUserProfile('${userId}')` : ''}"
+                        style="flex:1;${!isMe && userId ? 'cursor:pointer;' : ''}">
+                        <div style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;line-height:1.2;">${name}</div>
+                        <div style="font-size:11px;color:#666;">${dateStr}</div>
                     </div>
                     ${followBtn}
                 </div>
-                <h2 class="workout-title">${w.name.toUpperCase()}${hasPR ? ' <span style="color:var(--accent);font-size:20px;margin-left:8px;">🔥 PR!</span>' : ''}</h2>
-                ${photoHTML}${captionHTML}
-                <div class="workout-details">
-                    <button class="details-toggle" onclick="toggleDetails(this)">
-                        <span>View Workout Details</span><span class="details-toggle-icon">▼</span>
-                    </button>
-                    <div class="workout-details-content">
-                        <div class="workout-stats">
-                            <div class="workout-stat"><div class="workout-stat-value">${exercises.length}</div><div class="workout-stat-label">Exercises</div></div>
-                            <div class="workout-stat"><div class="workout-stat-value">${w.duration||'—'}</div><div class="workout-stat-label">Minutes</div></div>
-                        </div>
-                        <div class="exercise-list">${exHTML}</div>
+
+                <!-- Workout title bar -->
+                <div style="padding:6px 14px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333;">
+                    <span style="font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1.5px;color:#fff;">
+                        ${w.name.toUpperCase()}
+                    </span>
+                </div>
+
+                <!-- 9:16 Photo -->
+                ${photoHTML}
+                ${captionHTML}
+
+                <!-- Workout details — always visible -->
+                <div style="padding:12px 14px;">
+                    ${statsHTML}
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        ${exHTML}
                     </div>
                 </div>
-                <div class="activity-actions">
-                    <button class="action-btn" onclick="toggleLike('${w.id}',this)" data-liked="${hasLiked}" style="color:${hasLiked?'var(--primary)':'#999'}">
-                        <span class="action-icon">${hasLiked?'❤️':'🤍'}</span>
+
+                <!-- Actions -->
+                <div style="display:flex;gap:0;border-top:1px solid #2a2a2a;">
+                    <button class="action-btn" onclick="toggleLike('${w.id}',this)" data-liked="${hasLiked}"
+                        style="flex:1;justify-content:center;color:${hasLiked?'var(--primary)':'#777'};border-right:1px solid #2a2a2a;border-radius:0 0 0 10px;">
+                        <span style="font-size:16px;">${hasLiked?'❤️':'🤍'}</span>
                         <span>${likeCount} ${likeCount===1?'Like':'Likes'}</span>
                     </button>
-                    <button class="action-btn" onclick="openComments('${w.id}')">
-                        <span class="action-icon">💬</span>
+                    <button class="action-btn" onclick="openComments('${w.id}')"
+                        style="flex:1;justify-content:center;color:#777;border-radius:0 0 10px 0;">
+                        <span style="font-size:16px;">💬</span>
                         <span>${commentCount} ${commentCount===1?'Comment':'Comments'}</span>
                     </button>
                 </div>`;
