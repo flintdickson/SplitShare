@@ -840,7 +840,7 @@
         /* Workout Photo in Activity Cards */
         .workout-photo {
             width: 100%;
-            aspect-ratio: 9/16;
+            aspect-ratio: 4/5;
             object-fit: cover;
             margin: 0;
             border: none;
@@ -935,7 +935,7 @@
             .activity-user-info h3 { font-size: 14px; }
             .activity-time    { font-size: 11px; }
             .workout-title    { font-size: 16px; padding: 10px 14px; }
-            .workout-photo    { height: 200px; }
+            .workout-photo    { aspect-ratio: 4/5; height: auto; }
             .workout-caption  { font-size: 13px; padding: 10px 14px; }
 
             /* Workout stats */
@@ -987,27 +987,24 @@
             .auth-switch { font-size: 13px; margin-top: 16px; }
 
             /* Profile */
-            .profile-header      { padding: 16px 14px; margin: 0 -14px 0; width: calc(100% + 28px); }
-            .profile-top         { gap: 12px; }
+            .profile-header      { padding: 16px 16px; margin: 0 -20px 0; width: calc(100% + 40px); overflow: visible; }
+            .profile-top         { gap: 12px; overflow: visible; }
             .profile-avatar-large { width: 76px; height: 76px; min-width: 76px; font-size: 30px; }
             .profile-name        { font-size: 20px; letter-spacing: 1px; }
             .profile-username    { font-size: 11px; }
             .profile-bio         { font-size: 12px; -webkit-line-clamp: 2; }
             .profile-stats-row   { gap: 0; }
-            .profile-stat-number { font-size: 18px; }
+            .profile-stat-number { font-size: 20px; }
             .profile-stat-label  { font-size: 9px; }
             .edit-profile-btn, .logout-btn { font-size: 12px; padding: 9px 0; border-radius: 6px; }
-            .profile-tabs        { margin: 0 -14px 16px; width: calc(100% + 28px); }
-            .profile-tab         { padding: 11px 14px; font-size: 11px; }
-            .profile-stat-number { font-size: 20px; }
-            .profile-tab         { padding: 10px 12px; font-size: 12px; }
-            .edit-profile-btn, .logout-btn { padding: 10px 20px; font-size: 13px; }
+            .profile-tabs        { margin: 0 -20px 16px; width: calc(100% + 40px); overflow: visible; }
+            .profile-tab         { padding: 11px 2px; font-size: 11px; flex: 1; text-align: center; }
 
             /* Progress */
             .progress-header  { margin: 16px 0; }
             .progress-title   { font-size: 30px; }
             .chart-container  { padding: 18px 14px; border-radius: 10px; }
-            .chart-wrapper    { height: 250px; padding: 10px; }
+            .chart-wrapper    { height: 280px; padding: 10px; overflow: visible; }
             .stats-grid       { grid-template-columns: repeat(3, 1fr); gap: 8px; }
             .stat-box         { padding: 10px 6px; border-radius: 8px; }
             .stat-box-value   { font-size: 22px; }
@@ -1132,11 +1129,12 @@
 
         .chart-wrapper {
             position: relative;
-            height: 450px;
+            height: 280px;
             margin-bottom: 20px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 8px;
-            padding: 20px;
+            padding: 10px;
+            overflow: visible;
         }
 
         .chart-canvas {
@@ -1186,11 +1184,18 @@
         }
 
         .workout-history {
-            margin-top: 40px;
+            margin-top: 20px;
+        }
+
+        .history-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .history-table {
             width: 100%;
+            min-width: 520px;
             border-collapse: collapse;
         }
 
@@ -1745,9 +1750,9 @@
         .profile-header {
             background: linear-gradient(135deg, var(--steel), var(--iron));
             padding: 20px 16px;
-            margin: 0 -20px 0;   /* break out of .container padding */
+            margin: 0 -20px 0;
             border-bottom: 3px solid var(--primary);
-            overflow: hidden;
+            overflow: visible;
             width: calc(100% + 40px);
             box-sizing: border-box;
         }
@@ -1758,7 +1763,7 @@
             gap: 14px;
             margin-bottom: 14px;
             width: 100%;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .profile-avatar-large {
@@ -1891,10 +1896,8 @@
             gap: 0;
             border-bottom: 2px solid #333;
             margin: 0 -20px 20px;
-            padding: 0 4px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
+            padding: 0;
+            overflow: visible;
             width: calc(100% + 40px);
             box-sizing: border-box;
         }
@@ -1904,17 +1907,18 @@
             background: transparent;
             border: none;
             color: #999;
-            padding: 13px 20px;
+            padding: 13px 4px;
             font-family: 'Oswald', sans-serif;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             cursor: pointer;
             transition: all 0.3s ease;
             border-bottom: 3px solid transparent;
             white-space: nowrap;
-            flex-shrink: 0;
+            flex: 1;
+            text-align: center;
         }
 
         .profile-tab.active {
@@ -2041,9 +2045,9 @@
                         style="width:100%;padding:14px 16px 14px 42px;background:var(--steel);border:2px solid #333;color:var(--white);font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:0.5px;transition:border-color 0.3s;border-radius:10px;"
                         oninput="handleUserSearch(this.value)"
                         onfocus="this.style.borderColor='var(--primary)'"
-                        onblur="setTimeout(()=>document.getElementById('userSearchResults').style.display='none',200)">
+                        onblur="setTimeout(()=>{ if(!window._searchTapped) document.getElementById('userSearchResults').style.display='none'; window._searchTapped=false; },350)">
                 </div>
-                <div id="userSearchResults" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--steel);border:2px solid var(--primary);border-top:none;z-index:500;max-height:320px;overflow-y:auto;"></div>
+                <div id="userSearchResults" ontouchstart="window._searchTapped=true" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1e1e1e;border:2px solid var(--primary);border-radius:12px;z-index:600;max-height:320px;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,107,53,0.3);"></div>
             </div>
 
             <div class="section-header">
@@ -2120,6 +2124,7 @@
 
             <div id="progressHistoryContainer" class="workout-history" style="display:none;">
                 <h2 class="chart-title">Exercise History</h2>
+                <div class="history-table-wrapper">
                 <table class="history-table">
                     <thead>
                         <tr>
@@ -2133,6 +2138,7 @@
                     </thead>
                     <tbody id="historyTableBody"></tbody>
                 </table>
+                </div>
             </div>
         </div>
         <!-- End Progress Page -->
@@ -2510,7 +2516,7 @@
             <span>Progress</span>
         </button>
         <div class="log-btn-container">
-            <button class="log-btn" onclick="openModal()">
+            <button class="log-btn" onclick="openLogPicker()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" style="width:22px;height:22px;pointer-events:none;">
                     <line x1="12" y1="5" x2="12" y2="19"/>
                     <line x1="5" y1="12" x2="19" y2="12"/>
@@ -2537,79 +2543,160 @@
     </nav>
 
     <!-- Log Workout Modal -->
-    <div class="modal" id="workoutModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal()">×</button>
-            <h2>Log New Workout</h2>
-            <form id="workoutForm">
-                <div class="form-group">
-                    <label>Workout Name</label>
-                    <input id="workoutName" type="text" placeholder="e.g., PUSH DAY - CHEST & TRICEPS" required>
+    <!-- ── LOG WORKOUT MODAL (2-step) ───────────────────────────────────── -->
+    <div class="modal" id="workoutModal" style="align-items:flex-end;padding:0;">
+        <div style="width:100%;max-width:600px;margin:0 auto;background:var(--iron);border-radius:20px 20px 0 0;
+            border-top:3px solid var(--primary);max-height:92vh;overflow-y:auto;position:relative;">
+
+            <!-- Step indicator + close -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 0;">
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <div id="stepDot1" style="width:28px;height:4px;border-radius:2px;background:var(--primary);transition:all 0.3s;"></div>
+                    <div id="stepDot2" style="width:28px;height:4px;border-radius:2px;background:#333;transition:all 0.3s;"></div>
                 </div>
-                
-                <div class="form-group">
-                    <label>Workout Type</label>
-                    <select id="workoutType" required>
+                <div style="font-family:'Oswald',sans-serif;font-size:12px;color:#666;text-transform:uppercase;letter-spacing:1px;" id="stepLabel">Step 1 of 2</div>
+                <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);border:none;color:#fff;
+                    width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;
+                    align-items:center;justify-content:center;">✕</button>
+            </div>
+
+            <!-- ── STEP 1: Name + Type + Exercises ── -->
+            <div id="logStep1" style="padding:16px 20px 24px;">
+                <!-- Mode tag -->
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                    <h2 style="font-family:'Bebas Neue',cursive;font-size:32px;letter-spacing:2px;color:var(--primary);margin:0;">
+                        Log Workout
+                    </h2>
+                    <span id="logModeTag" style="display:none;background:rgba(255,107,53,0.15);border:1px solid rgba(255,107,53,0.35);
+                        border-radius:20px;padding:4px 12px;font-family:'Oswald',sans-serif;font-size:12px;
+                        color:var(--primary);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;
+                        overflow:hidden;text-overflow:ellipsis;max-width:160px;"></span>
+                </div>
+
+                <!-- Workout Name -->
+                <div style="margin-bottom:16px;">
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:8px;">Workout Name</label>
+                    <input id="workoutName" type="text" placeholder="e.g., Push Day · Chest & Triceps"
+                        style="width:100%;padding:14px 16px;background:#252525;border:1.5px solid #333;border-radius:10px;
+                        color:#fff;font-family:'Oswald',sans-serif;font-size:16px;outline:none;transition:border-color 0.2s;"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#333'">
+                </div>
+
+                <!-- Workout Type -->
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:8px;">Workout Type</label>
+                    <select id="workoutType"
+                        style="width:100%;padding:14px 16px;background:#252525;border:1.5px solid #333;border-radius:10px;
+                        color:#fff;font-family:'Oswald',sans-serif;font-size:16px;outline:none;appearance:none;
+                        background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23ff6b35%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>');
+                        background-repeat:no-repeat;background-position:right 14px center;background-size:18px;">
                         <option value="">Select type</option>
-                        <option value="push">Push (Chest, Shoulders, Triceps)</option>
-                        <option value="pull">Pull (Back, Biceps)</option>
+                        <option value="push">Push — Chest, Shoulders, Triceps</option>
+                        <option value="pull">Pull — Back, Biceps</option>
                         <option value="legs">Legs</option>
                         <option value="upper">Upper Body</option>
                         <option value="lower">Lower Body</option>
                         <option value="full">Full Body</option>
+                        <option value="cardio">Cardio</option>
+                        <option value="hiit">HIIT</option>
+                        <option value="sport">Sport</option>
+                        <option value="other">Other</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label>Add Photo (Optional)</label>
-                    <div class="photo-upload-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
-                        <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-                        <div class="upload-text">Click to upload workout photo</div>
-                        <img id="previewImage" class="preview-image" alt="Workout preview">
-                        <button type="button" class="remove-photo" id="removePhoto">×</button>
-                    </div>
-                    <input type="file" id="photoInput" accept="image/*">
+                <!-- Duration -->
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:8px;">Duration (minutes)</label>
+                    <input id="workoutDuration" type="number" placeholder="60" value="60"
+                        style="width:100%;padding:14px 16px;background:#252525;border:1.5px solid #333;border-radius:10px;
+                        color:#fff;font-family:'Oswald',sans-serif;font-size:16px;outline:none;transition:border-color 0.2s;"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#333'">
                 </div>
 
-                <div class="form-group">
-                    <label>Caption (Optional)</label>
-                    <textarea id="captionInput" rows="2" placeholder="Feeling strong today!"0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1l-1 4H9l-1-4H7a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3h1V6a4 4 0 0 1 4-4z" stroke="var(--primary)" fill="rgba(255,107,53,0.2)" stroke-width="1.5"/></svg>"></textarea>
+                <!-- Exercises -->
+                <div style="margin-bottom:8px;">
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:12px;">Exercises</label>
+                    <div id="exerciseContainer" style="display:flex;flex-direction:column;gap:10px;"></div>
+                    <button type="button" onclick="addExercise()"
+                        style="width:100%;margin-top:10px;padding:12px;background:transparent;border:1.5px dashed #444;
+                        border-radius:10px;color:#666;font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;
+                        text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all 0.2s;"
+                        onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
+                        onmouseout="this.style.borderColor='#444';this.style.color='#666'">
+                        + Add Exercise
+                    </button>
                 </div>
 
-                <div class="form-group">
-                    <label>Duration (minutes)</label>
-                    <input id="workoutDuration" type="number" placeholder="60" required>
+                <!-- Next button -->
+                <button onclick="goToStep2()"
+                    style="width:100%;margin-top:20px;padding:16px;background:var(--primary);border:none;border-radius:12px;
+                    color:#fff;font-family:'Oswald',sans-serif;font-size:17px;font-weight:600;text-transform:uppercase;
+                    letter-spacing:2px;cursor:pointer;transition:all 0.2s;">
+                    Continue →
+                </button>
+            </div>
+
+            <!-- ── STEP 2: Photo + Caption + Group + Post ── -->
+            <div id="logStep2" style="display:none;padding:16px 20px 24px;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                    <button onclick="goToStep1()"
+                        style="background:rgba(255,255,255,0.06);border:none;color:#fff;width:34px;height:34px;
+                        border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
+                    <h2 id="logStep2Title" style="font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;color:var(--primary);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Share It</h2>
                 </div>
 
-                <div class="form-group">
-                    <label>Exercises</label>
-                    <div id="exerciseContainer">
-                        <div class="exercise-inputs">
-                            <input type="text" placeholder="Exercise name" required>
-                            <input type="number" placeholder="Sets" required>
-                            <input type="number" placeholder="Reps" required>
-                            <input type="number" placeholder="Weight (lbs)" required>
+                <!-- Workout summary pill -->
+                <div id="step2Summary" style="background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);
+                    border-radius:10px;padding:12px 16px;margin-bottom:20px;font-family:'Oswald',sans-serif;font-size:13px;color:#ccc;"></div>
+
+                <!-- Photo upload -->
+                <div style="margin-bottom:16px;">
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:8px;">Photo (Optional)</label>
+                    <div id="photoZone" onclick="document.getElementById('photoInput').click()"
+                        style="border:1.5px dashed rgba(255,107,53,0.35);border-radius:12px;padding:30px;text-align:center;
+                        background:rgba(255,107,53,0.04);cursor:pointer;transition:all 0.2s;position:relative;"
+                        onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='rgba(255,107,53,0.35)'">
+                        <div id="photoZoneInner">
+                            <div style="font-size:36px;margin-bottom:8px;">📸</div>
+                            <div style="font-family:'Oswald',sans-serif;font-size:12px;color:#666;text-transform:uppercase;letter-spacing:1px;">Tap to add photo</div>
                         </div>
+                        <img id="previewImage" style="display:none;width:100%;border-radius:10px;max-height:300px;object-fit:cover;" alt="">
+                        <button type="button" id="removePhoto" onclick="event.stopPropagation();removeWorkoutPhoto()"
+                            style="display:none;position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.7);
+                            border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;">✕</button>
                     </div>
-                    <button type="button" class="add-exercise-btn" onclick="addExercise()">+ Add Exercise</button>
+                    <input type="file" id="photoInput" accept="image/*" style="display:none;" onchange="handlePhotoSelect(this)">
                 </div>
 
-                <div class="form-group">
-                    <label>Notes (optional)</label>
-                    <textarea rows="3" placeholder="How did you feel? Any PRs?"></textarea>
+                <!-- Caption -->
+                <div style="margin-bottom:16px;">
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:8px;">Caption (Optional)</label>
+                    <textarea id="captionInput" rows="3" placeholder="How did the session feel? Any PRs?"
+                        style="width:100%;padding:14px 16px;background:#252525;border:1.5px solid #333;border-radius:10px;
+                        color:#fff;font-family:'Oswald',sans-serif;font-size:15px;outline:none;resize:none;transition:border-color 0.2s;box-sizing:border-box;"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#333'"></textarea>
                 </div>
 
-                <!-- Post to Group option -->
-                <div class="form-group" id="postToGroupSection" style="display:none;">
-                    <label>Post to Group <span style="color:#666;font-weight:400;text-transform:none;letter-spacing:0;font-size:12px;">(admin only)</span></label>
-                    <select id="postToGroupSelect" style="background:var(--iron);border:2px solid #333;color:var(--white);padding:14px;font-family:'Oswald',sans-serif;font-size:15px;width:100%;">
+                <!-- Post to Group -->
+                <div id="postToGroupSection" style="display:none;margin-bottom:16px;">
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:8px;">Post to Group</label>
+                    <select id="postToGroupSelect"
+                        style="width:100%;padding:14px 16px;background:#252525;border:1.5px solid #333;border-radius:10px;
+                        color:#fff;font-family:'Oswald',sans-serif;font-size:15px;outline:none;appearance:none;
+                        background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23ff6b35%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>');
+                        background-repeat:no-repeat;background-position:right 14px center;background-size:18px;">
                         <option value="">— Don't post to a group —</option>
                     </select>
-                    <p style="color:#888;font-size:12px;margin-top:6px;line-height:1.5;">This will create a workout challenge in the selected group for all members to complete.</p>
                 </div>
 
-                <button type="button" class="submit-btn" onclick="handleLogWorkout()">Log Workout</button>
-            </form>
+                <!-- Post button -->
+                <button onclick="handleLogWorkout()"
+                    style="width:100%;padding:16px;background:var(--primary);border:none;border-radius:12px;
+                    color:#fff;font-family:'Oswald',sans-serif;font-size:17px;font-weight:600;text-transform:uppercase;
+                    letter-spacing:2px;cursor:pointer;transition:all 0.2s;">
+                    Post Workout
+                </button>
+            </div>
         </div>
     </div>
 
@@ -2706,7 +2793,10 @@
                     loadFeedFromSupabase();
                 } else if (page === 'progress' && progressPage) {
                     progressPage.classList.add('active');
-                    setTimeout(() => loadProgressPage(), 100);
+                    // Destroy old chart so it re-renders at correct size
+                    if (window.progressChart) { window.progressChart.destroy(); window.progressChart = null; }
+                    if (window.demoChart) { window.demoChart.destroy(); window.demoChart = null; }
+                    setTimeout(() => loadProgressPage(), 120);
                 } else if (page === 'groups' && groupsPage) {
                     groupsPage.classList.add('active');
                     closeGroupDetail();
@@ -3322,10 +3412,14 @@
                 window.progressChart = null;
             }
 
-            // Reset canvas dimensions
+            // Reset canvas to explicit size — offsetWidth returns 0 when page was hidden
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
             const wrapper = canvas.parentElement;
-            canvas.width = wrapper.offsetWidth || 400;
-            canvas.height = wrapper.offsetHeight || 320;
+            const w = wrapper.clientWidth || wrapper.offsetWidth || window.innerWidth - 40 || 340;
+            const h = 280;
+            canvas.width = w;
+            canvas.height = h;
 
             const ctx = canvas.getContext('2d');
 
@@ -3468,80 +3562,293 @@
             content.classList.toggle('active');
         }
 
-        // Photo Upload Functionality
-        const photoInput = document.getElementById('photoInput');
-        const photoZone = document.getElementById('photoZone');
-        const previewImage = document.getElementById('previewImage');
-        const removePhoto = document.getElementById('removePhoto');
+        // ── EXERCISE PRESETS ──────────────────────────────────────────────────
+        const EXERCISE_PRESETS = [
+            'Bench Press','Incline Bench Press','Decline Bench Press','Dumbbell Press','Incline Dumbbell Press',
+            'Cable Flyes','Chest Dips','Push-Ups',
+            'Overhead Press','Arnold Press','Lateral Raises','Front Raises','Face Pulls',
+            'Tricep Pushdowns','Skull Crushers','Tricep Dips','Close-Grip Bench',
+            'Deadlift','Romanian Deadlift','Pull-Ups','Chin-Ups','Barbell Rows','Seated Cable Rows',
+            'Lat Pulldown','Single-Arm Row','Shrugs',
+            'Barbell Curls','Dumbbell Curls','Hammer Curls','Preacher Curls','Cable Curls',
+            'Back Squat','Front Squat','Hack Squat','Leg Press','Lunges','Walking Lunges',
+            'Romanian Deadlift','Leg Curl','Leg Extension','Calf Raises','Hip Thrust',
+            'Running','Cycling','Jump Rope','Rowing Machine','Stairmaster',
+            'Plank','Ab Wheel','Crunches','Hanging Leg Raises','Russian Twists'
+        ];
 
-        if (photoInput && photoZone && previewImage && removePhoto) {
-            photoInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImage.src = e.target.result;
-                        previewImage.classList.add('active');
-                        photoZone.classList.add('has-image');
-                        removePhoto.classList.add('active');
-                        const uploadIcon = photoZone.querySelector('.upload-icon');
-                        const uploadText = photoZone.querySelector('.upload-text');
-                        if (uploadIcon) uploadIcon.style.display = 'none';
-                        if (uploadText) uploadText.style.display = 'none';
-                    }
-                    reader.readAsDataURL(file);
+        // ── PHOTO HELPERS ────────────────────────────────────────────────────
+        function handlePhotoSelect(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.getElementById('previewImage');
+                const inner = document.getElementById('photoZoneInner');
+                const removeBtn = document.getElementById('removePhoto');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                if (inner) inner.style.display = 'none';
+                if (removeBtn) removeBtn.style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeWorkoutPhoto() {
+            const input = document.getElementById('photoInput');
+            const img = document.getElementById('previewImage');
+            const inner = document.getElementById('photoZoneInner');
+            const removeBtn = document.getElementById('removePhoto');
+            if (input) input.value = '';
+            if (img) { img.src = ''; img.style.display = 'none'; }
+            if (inner) inner.style.display = 'block';
+            if (removeBtn) removeBtn.style.display = 'none';
+        }
+
+        // ── MODAL OPEN/CLOSE ─────────────────────────────────────────────────
+        // Track which mode we're in: 'personal' or 'group'
+        window._logMode = 'personal';
+        window._logGroupId = null;
+        window._logGroupName = null;
+
+        function openLogPicker() {
+            document.getElementById('logPickerSheet').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            // Animate in
+            requestAnimationFrame(() => {
+                document.getElementById('logPickerSheet').style.background = 'rgba(0,0,0,0.7)';
+                document.getElementById('logPickerInner').style.transform = 'translateY(0)';
+            });
+            // Load groups for the group option
+            loadPickerGroups();
+        }
+
+        function closeLogPicker() {
+            const sheet = document.getElementById('logPickerSheet');
+            const inner = document.getElementById('logPickerInner');
+            sheet.style.background = 'rgba(0,0,0,0)';
+            inner.style.transform = 'translateY(100%)';
+            setTimeout(() => { sheet.style.display = 'none'; document.body.style.overflow = ''; }, 280);
+        }
+
+        async function loadPickerGroups() {
+            const container = document.getElementById('pickerGroupList');
+            if (!window._sbUserId) { container.innerHTML = ''; return; }
+            container.innerHTML = '<div style="color:#444;font-size:12px;font-family:Oswald,sans-serif;padding:8px 0;">Loading groups...</div>';
+            try {
+                const memberships = await sb(`group_members?user_id=eq.${window._sbUserId}&select=group_id,role,groups(id,name,cover_url)`);
+                if (!memberships || memberships.length === 0) {
+                    container.innerHTML = '<div style="color:#444;font-size:12px;font-family:Oswald,sans-serif;padding:4px 0;">No groups yet</div>';
+                    return;
                 }
-            });
+                container.innerHTML = memberships.map(m => `
+                    <button onclick="startGroupLog('${m.groups.id}','${m.groups.name.replace(/'/g,'&#39;')}')"
+                        style="display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;
+                        background:rgba(255,255,255,0.04);border:1px solid #2a2a2a;border-radius:10px;
+                        color:#fff;cursor:pointer;transition:all 0.2s;text-align:left;margin-bottom:8px;"
+                        onmouseover="this.style.borderColor='var(--primary)';this.style.background='rgba(255,107,53,0.06)'"
+                        onmouseout="this.style.borderColor='#2a2a2a';this.style.background='rgba(255,255,255,0.04)'">
+                        <div style="width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));
+                            display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;">
+                            ${m.groups.cover_url ? `<img src="${m.groups.cover_url}" style="width:100%;height:100%;object-fit:cover;">` : '&#x1F4AA;'}
+                        </div>
+                        <div>
+                            <div style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;">${m.groups.name}</div>
+                            <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.5px;">${m.role}</div>
+                        </div>
+                        <div style="margin-left:auto;color:var(--primary);font-size:18px;">›</div>
+                    </button>`).join('');
+            } catch(e) {
+                container.innerHTML = '<div style="color:#444;font-size:12px;font-family:Oswald,sans-serif;">Could not load groups</div>';
+            }
+        }
 
-            removePhoto.addEventListener('click', function(e) {
-                e.stopPropagation();
-                photoInput.value = '';
-                previewImage.classList.remove('active');
-                photoZone.classList.remove('has-image');
-                removePhoto.classList.remove('active');
-                const uploadIcon = photoZone.querySelector('.upload-icon');
-                const uploadText = photoZone.querySelector('.upload-text');
-                if (uploadIcon) uploadIcon.style.display = 'block';
-                if (uploadText) uploadText.style.display = 'block';
-            });
+        function startPersonalLog() {
+            window._logMode = 'personal';
+            window._logGroupId = null;
+            window._logGroupName = null;
+            closeLogPicker();
+            openModal();
+        }
+
+        function startGroupLog(groupId, groupName) {
+            window._logMode = 'group';
+            window._logGroupId = groupId;
+            window._logGroupName = groupName;
+            closeLogPicker();
+            openModal();
         }
 
         async function openModal() {
-            document.getElementById('workoutModal').classList.add('active');
-            // Populate "post to group" dropdown for groups where user is creator/admin
-            if (window._sbUserId) {
-                try {
-                    const memberships = await sb(`group_members?user_id=eq.${window._sbUserId}&role=in.(creator,admin)&select=group_id,role,groups(id,name)`);
-                    const section = document.getElementById('postToGroupSection');
-                    const select  = document.getElementById('postToGroupSelect');
-                    if (memberships && memberships.length > 0) {
-                        select.innerHTML = '<option value="">-- No group --</option>' +
-                            memberships.map(m => `<option value="${m.groups.id}">${m.groups.name}</option>`).join('');
-                        section.style.display = 'block';
-                    } else {
-                        section.style.display = 'none';
-                    }
-                } catch(e) {
-                    document.getElementById('postToGroupSection').style.display = 'none';
+            // Reset to step 1
+            goToStep1(true);
+            // Clear form
+            document.getElementById('workoutName').value = '';
+            document.getElementById('workoutDuration').value = '60';
+            document.getElementById('workoutType').value = '';
+            document.getElementById('captionInput').value = '';
+            removeWorkoutPhoto();
+            // Seed one empty exercise row
+            const container = document.getElementById('exerciseContainer');
+            container.innerHTML = '';
+            addExercise();
+
+            // Update modal header to show mode
+            const modeTag = document.getElementById('logModeTag');
+            if (modeTag) {
+                if (window._logMode === 'group') {
+                    modeTag.style.display = 'inline-flex';
+                    modeTag.textContent = window._logGroupName;
+                } else {
+                    modeTag.style.display = 'none';
                 }
             }
+
+            // Update step 2 post button label
+            const step2Title = document.getElementById('logStep2Title');
+            if (step2Title) {
+                step2Title.textContent = window._logMode === 'group'
+                    ? `Post to ${window._logGroupName}`
+                    : 'Share It';
+            }
+
+            // Hide/show "post to group" dropdown in step 2
+            if (window._logMode === 'group') {
+                document.getElementById('postToGroupSection').style.display = 'none'; // locked to chosen group
+            } else {
+                loadAdminGroupsForModal(); // show optional dropdown
+            }
+
+            document.getElementById('workoutModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
             document.getElementById('workoutModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function goToStep1(silent) {
+            document.getElementById('logStep1').style.display = 'block';
+            document.getElementById('logStep2').style.display = 'none';
+            document.getElementById('stepDot1').style.background = 'var(--primary)';
+            document.getElementById('stepDot2').style.background = '#333';
+            document.getElementById('stepLabel').textContent = 'Step 1 of 2';
+        }
+
+        function goToStep2() {
+            const name = document.getElementById('workoutName').value.trim();
+            if (!name) {
+                document.getElementById('workoutName').style.borderColor = 'var(--primary)';
+                document.getElementById('workoutName').focus();
+                return;
+            }
+            // Build summary
+            const exercises = getExercisesFromForm();
+            const duration = document.getElementById('workoutDuration').value;
+            const parts = [];
+            if (duration) parts.push(duration + ' min');
+            if (exercises.length) parts.push(exercises.length + ' exercise' + (exercises.length>1?'s':''));
+            document.getElementById('step2Summary').innerHTML =
+                `<strong style="color:#fff;">${name.toUpperCase()}</strong>` +
+                (parts.length ? `<span style="color:#666;margin-left:8px;">· ${parts.join(' · ')}</span>` : '');
+            document.getElementById('logStep1').style.display = 'none';
+            document.getElementById('logStep2').style.display = 'block';
+            document.getElementById('stepDot1').style.background = 'var(--primary)';
+            document.getElementById('stepDot2').style.background = 'var(--primary)';
+            document.getElementById('stepLabel').textContent = 'Step 2 of 2';
+        }
+
+        async function loadAdminGroupsForModal() {
+            if (!window._sbUserId) return;
+            try {
+                const memberships = await sb(`group_members?user_id=eq.${window._sbUserId}&role=in.(creator,admin)&select=group_id,role,groups(id,name)`);
+                const section = document.getElementById('postToGroupSection');
+                const select  = document.getElementById('postToGroupSelect');
+                if (memberships && memberships.length > 0) {
+                    select.innerHTML = '<option value="">— No group —</option>' +
+                        memberships.map(m => `<option value="${m.groups.id}">${m.groups.name}</option>`).join('');
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            } catch(e) { document.getElementById('postToGroupSection').style.display = 'none'; }
+        }
+
+        function getExercisesFromForm() {
+            const exercises = [];
+            document.querySelectorAll('#exerciseContainer .ex-row').forEach(row => {
+                const name   = row.querySelector('.ex-name-input')?.value.trim() ||
+                               row.querySelector('.ex-name-select')?.value.trim();
+                const sets   = row.querySelector('[data-field=sets]')?.value;
+                const reps   = row.querySelector('[data-field=reps]')?.value;
+                const weight = row.querySelector('[data-field=weight]')?.value;
+                if (name) exercises.push({ name, sets, reps, weight });
+            });
+            return exercises;
         }
 
         function addExercise() {
             const container = document.getElementById('exerciseContainer');
-            const newExercise = document.createElement('div');
-            newExercise.className = 'exercise-inputs';
-            newExercise.innerHTML = `
-                <input type="text" placeholder="Exercise name" required>
-                <input type="number" placeholder="Sets" required>
-                <input type="number" placeholder="Reps" required>
-                <input type="number" placeholder="Weight (lbs)" required>
+            const idx = container.querySelectorAll('.ex-row').length;
+            const row = document.createElement('div');
+            row.className = 'ex-row';
+            row.style.cssText = 'background:#1e1e1e;border-radius:10px;padding:12px;border:1px solid #2a2a2a;position:relative;';
+
+            // Build exercise name options
+            const options = EXERCISE_PRESETS.map(e =>
+                `<option value="${e}">${e}</option>`
+            ).join('');
+
+            row.innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                    <span style="font-family:'Oswald',sans-serif;font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;">Exercise ${idx+1}</span>
+                    ${idx > 0 ? `<button type="button" onclick="this.closest('.ex-row').remove()" style="background:none;border:none;color:#444;font-size:18px;cursor:pointer;padding:0;line-height:1;">✕</button>` : ''}
+                </div>
+                <select class="ex-name-select" onchange="handleExerciseSelect(this)"
+                    style="width:100%;padding:11px 14px;background:#252525;border:1.5px solid #333;border-radius:8px;
+                    color:#fff;font-family:'Oswald',sans-serif;font-size:14px;margin-bottom:8px;outline:none;appearance:none;
+                    background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23ff6b35%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>');
+                    background-repeat:no-repeat;background-position:right 12px center;background-size:16px;">
+                    <option value="">Select exercise...</option>
+                    ${options}
+                    <option value="__custom__">+ Type my own</option>
+                </select>
+                <input class="ex-name-input" type="text" placeholder="Exercise name"
+                    style="display:none;width:100%;padding:11px 14px;background:#252525;border:1.5px solid #333;border-radius:8px;
+                    color:#fff;font-family:'Oswald',sans-serif;font-size:14px;margin-bottom:8px;outline:none;box-sizing:border-box;"
+                    onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#333'">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                    <input data-field="sets" type="number" placeholder="Sets" min="1"
+                        style="padding:11px 10px;background:#252525;border:1.5px solid #333;border-radius:8px;
+                        color:#fff;font-family:'Oswald',sans-serif;font-size:14px;outline:none;width:100%;box-sizing:border-box;text-align:center;"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#333'">
+                    <input data-field="reps" type="number" placeholder="Reps" min="1"
+                        style="padding:11px 10px;background:#252525;border:1.5px solid #333;border-radius:8px;
+                        color:#fff;font-family:'Oswald',sans-serif;font-size:14px;outline:none;width:100%;box-sizing:border-box;text-align:center;"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#333'">
+                    <input data-field="weight" type="number" placeholder="lbs" min="0"
+                        style="padding:11px 10px;background:#252525;border:1.5px solid #333;border-radius:8px;
+                        color:#fff;font-family:'Oswald',sans-serif;font-size:14px;outline:none;width:100%;box-sizing:border-box;text-align:center;"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#333'">
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:6px;">
+                    <span style="font-size:10px;color:#555;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.5px;">Sets</span>
+                    <span style="font-size:10px;color:#555;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.5px;">Reps</span>
+                    <span style="font-size:10px;color:#555;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.5px;">Weight</span>
+                </div>
             `;
-            container.appendChild(newExercise);
+            container.appendChild(row);
+        }
+
+        function handleExerciseSelect(sel) {
+            const row = sel.closest('.ex-row');
+            const customInput = row.querySelector('.ex-name-input');
+            if (sel.value === '__custom__') {
+                sel.style.display = 'none';
+                customInput.style.display = 'block';
+                customInput.focus();
+            }
         }
 
         async function handleLogWorkout() {
@@ -3549,7 +3856,7 @@
             const duration    = parseInt(document.getElementById('workoutDuration')?.value) || 0;
             const caption     = document.getElementById('captionInput')?.value.trim();
             const previewImg  = document.getElementById('previewImage');
-            const photoSrc    = previewImg?.classList.contains('active') ? previewImg.src : null;
+            const photoSrc    = (previewImg?.src && previewImg.style.display !== 'none') ? previewImg.src : null;
 
             if (!workoutName) { alert('Please enter a workout name.'); return; }
 
@@ -3557,21 +3864,12 @@
             if (!user) { alert('Please log in first.'); return; }
 
             // Gather exercises
-            const exercises = [];
-            document.querySelectorAll('#exerciseContainer .exercise-inputs').forEach(row => {
-                const inputs = row.querySelectorAll('input');
-                const name = inputs[0]?.value.trim();
-                if (name) exercises.push({
-                    name,
-                    sets:   inputs[1]?.value || '',
-                    reps:   inputs[2]?.value || '',
-                    weight: inputs[3]?.value || ''
-                });
-            });
+            const exercises = getExercisesFromForm();
 
             // Show saving state
-            const submitBtn = document.querySelector('.submit-btn');
-            if (submitBtn) { submitBtn.textContent = 'Saving...'; submitBtn.disabled = true; }
+            // Disable the post button while saving
+            const submitBtns = document.querySelectorAll('#logStep2 button:last-child');
+            submitBtns.forEach(b => { b.textContent = 'Posting...'; b.disabled = true; });
 
             try {
                 const workoutRecord = {
@@ -3596,45 +3894,44 @@
                 // Refresh progress data so new exercise shows up immediately
                 progressExerciseData = buildProgressFromWorkouts(user.workouts);
 
-                // Post to group as a workout challenge if admin selected a group
-                const groupSelect = document.getElementById('postToGroupSelect');
-                const selectedGroupId = groupSelect?.value;
-                if (selectedGroupId) {
+                // ── Post to group ───────────────────────────────────────────────
+                // Group mode: use the pre-selected group; personal mode: use optional dropdown
+                const groupId = window._logMode === 'group'
+                    ? window._logGroupId
+                    : document.getElementById('postToGroupSelect')?.value || null;
+
+                if (groupId) {
                     try {
                         await sb('group_challenges', { method: 'POST', body: {
-                            group_id: selectedGroupId,
+                            group_id: groupId,
                             creator_id: window._sbUserId,
                             title: workoutName,
                             description: caption || null,
-                            exercises: exercises.map(e => ({ name: e.name, sets: e.sets, reps: e.reps, notes: e.weight ? e.weight + ' lbs' : '' }))
+                            exercises: exercises.map(e => ({
+                                name: e.name, sets: e.sets, reps: e.reps,
+                                notes: e.weight ? e.weight + ' lbs' : ''
+                            }))
                         }});
-                        // Toast notification
-                        const toast = document.createElement('div');
-                        toast.style.cssText = 'position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:12px 24px;border-radius:30px;font-family:Oswald,sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;z-index:9999;text-transform:uppercase;box-shadow:0 4px 20px rgba(255,107,53,0.4);white-space:nowrap;';
-                        toast.textContent = '✓ Posted to group!';
-                        document.body.appendChild(toast);
-                        setTimeout(() => toast.remove(), 2500);
-                    } catch(e) { console.warn('Failed to post to group:', e.message); }
+                        showToast(window._logMode === 'group'
+                            ? `Posted to ${window._logGroupName}!`
+                            : 'Posted to group!');
+                    } catch(e) { console.warn('Group post failed:', e.message); }
                 }
 
+                // Reset group mode
+                window._logMode = 'personal';
+                window._logGroupId = null;
+                window._logGroupName = null;
+
                 // Reset form
-                document.getElementById('workoutForm').reset();
-                const pImg = document.getElementById('previewImage');
-                const pZone = document.getElementById('photoZone');
-                const rPhoto = document.getElementById('removePhoto');
-                if (pImg) pImg.classList.remove('active');
-                if (pZone) pZone.classList.remove('has-image');
-                if (rPhoto) rPhoto.classList.remove('active');
-                const uIcon = pZone?.querySelector('.upload-icon');
-                const uText = pZone?.querySelector('.upload-text');
-                if (uIcon) uIcon.style.display = 'block';
-                if (uText) uText.style.display = 'block';
-                document.getElementById('exerciseContainer').innerHTML = `<div class="exercise-inputs">
-                    <input type="text" placeholder="Exercise name">
-                    <input type="number" placeholder="Sets">
-                    <input type="number" placeholder="Reps">
-                    <input type="number" placeholder="Weight (lbs)">
-                </div>`;
+                document.getElementById('workoutName').value = '';
+                document.getElementById('workoutDuration').value = '60';
+                document.getElementById('workoutType').value = '';
+                document.getElementById('captionInput').value = '';
+                removeWorkoutPhoto();
+                const container = document.getElementById('exerciseContainer');
+                container.innerHTML = '';
+                addExercise();
 
                 closeModal();
                 navigateToFeed();
@@ -3645,7 +3942,10 @@
             } catch(e) {
                 alert('Failed to save workout: ' + e.message);
             } finally {
-                if (submitBtn) { submitBtn.textContent = 'Log Workout'; submitBtn.disabled = false; }
+                document.querySelectorAll('#logStep2 button:last-child').forEach(b => {
+                    b.textContent = window._logMode === 'group' ? `Post to Group` : 'Post Workout';
+                    b.disabled = false;
+                });
             }
         }
 
@@ -3988,14 +4288,28 @@
 
         async function viewUserProfile(userId) {
             viewingUserId = userId;
-            
-            // Hide search results
+
+            // Hide search results immediately
             document.getElementById('userSearchResults').style.display = 'none';
             document.getElementById('userSearchInput').value = '';
-            
-            // Hide main pages, show user profile view
+            document.getElementById('userSearchInput').blur();
+
+            // Hide all pages, show user profile view
             document.querySelectorAll('.feed-page, .progress-page, .groups-page, .profile-page').forEach(p => p.classList.remove('active'));
-            document.getElementById('userProfileView').style.display = 'block';
+            const profileView = document.getElementById('userProfileView');
+            profileView.style.display = 'block';
+
+            // Clear stale data immediately so user never sees wrong profile
+            document.getElementById('viewUserName').textContent = 'Loading...';
+            document.getElementById('viewUserUsername').textContent = '';
+            document.getElementById('viewUserBio').textContent = '';
+            document.getElementById('viewUserAvatar').textContent = '...';
+            document.getElementById('viewUserWorkoutCount').textContent = '—';
+            document.getElementById('viewUserFollowers').textContent = '—';
+            document.getElementById('viewUserFollowing').textContent = '—';
+            document.getElementById('viewUserWorkoutFeed').innerHTML = '<div style="text-align:center;padding:40px;color:#666;font-family:Oswald,sans-serif;">Loading...</div>';
+            // Scroll to top
+            profileView.scrollIntoView({ behavior: 'instant', block: 'start' });
             
             try {
                 // Load user data
@@ -4324,60 +4638,332 @@
             if (!feed) return;
             const workouts = user.workouts || [];
             if (workouts.length === 0) {
-                feed.innerHTML = `<div style="text-align:center; padding:60px 20px; color:#999;">
-                    <div style="font-size:48px; margin-bottom:15px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/><rect x="7" y="8" width="2" height="8" rx="1"/><rect x="15" y="8" width="2" height="8" rx="1"/><line x1="9" y1="12" x2="15" y2="12" stroke-width="2.5"/></svg></div>
-                    <h3 style="font-family:'Bebas Neue',cursive; font-size:28px; color:var(--primary); margin-bottom:10px;">No Workouts Yet</h3>
+                feed.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#999;">
+                    <div style="font-size:48px;margin-bottom:15px;">&#x1F3CB;</div>
+                    <h3 style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">No Workouts Yet</h3>
                     <p>Hit the + button to log your first workout!</p>
                 </div>`;
                 return;
             }
-            feed.innerHTML = workouts.map(w => {
-                const exerciseListHTML = (w.exercises || []).map(ex =>
-                    `<div class="exercise-item">
-                        <span class="exercise-name">${ex.name}</span>
-                        <span class="exercise-details">${ex.sets||'?'} × ${ex.reps||'?'}${ex.weight ? ' @ '+ex.weight+' lbs' : ''}</span>
-                    </div>`).join('') || '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
-                const captionHTML = w.caption ? `<p class="workout-caption">"${w.caption}"</p>` : '';
-                const dateStr = new Date(w.created_at || w.date).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-                const displayName = user.full_name || user.fullName || user.username || 'You';
-                return `<div class="activity-card">
-                    <div class="activity-header">
-                        <div class="user-avatar">${user.initials}</div>
-                        <div class="activity-user-info">
-                            <h3>${displayName}</h3>
-                            <span class="activity-time">${dateStr}</span>
-                        </div>
+            const displayName = user.full_name || user.fullName || user.username || 'You';
+            feed.innerHTML = '';
+            workouts.forEach(w => {
+                const card = buildProfileWorkoutCard(w, user, displayName);
+                feed.appendChild(card);
+            });
+        }
+
+        function buildProfileWorkoutCard(w, user, displayName) {
+            const exercises = w.exercises || [];
+            const dateStr = new Date(w.created_at || w.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+            const photoHTML = w.photo_url
+                ? `<div style="position:relative;width:100%;padding-bottom:125%;overflow:hidden;background:#111;">
+                    <img src="${w.photo_url}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"></div>` : '';
+            const captionHTML = w.caption ? `<p style="font-size:14px;color:#ddd;padding:10px 14px 4px;line-height:1.5;">"${w.caption}"</p>` : '';
+
+            // Exercise name pills
+            const exPills = exercises.length
+                ? exercises.map(ex => `<span style="display:inline-flex;align-items:center;background:rgba(255,255,255,0.06);border-radius:20px;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:12px;color:#ccc;border:1px solid rgba(255,255,255,0.08);">${ex.name}</span>`).join('')
+                : '';
+            const durationPill = w.duration ? `<span style="display:inline-flex;align-items:center;background:rgba(255,107,53,0.12);border-radius:20px;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:12px;color:var(--primary);border:1px solid rgba(255,107,53,0.25);">${w.duration} MIN</span>` : '';
+
+            // Encode workout data for the view button
+            const wData = JSON.stringify(w).replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+
+            const card = document.createElement('div');
+            card.className = 'activity-card';
+            card.dataset.workoutId = w.id;
+            card.innerHTML = `
+                <!-- Header with 3-dot menu -->
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;">
+                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
+                        display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:14px;flex-shrink:0;overflow:hidden;">
+                        ${user.avatar_url ? `<img src="${user.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : (user.initials||'?')}
                     </div>
-                    <h2 class="workout-title">${w.name.toUpperCase()}</h2>
-                    ${captionHTML}
-                    <div class="workout-details">
-                        <button class="details-toggle" onclick="toggleDetails(this)">
-                            <span>View Workout Details</span>
-                            <span class="details-toggle-icon">▼</span>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;line-height:1.2;">${displayName}</div>
+                        <div style="font-size:11px;color:#666;">${dateStr}</div>
+                    </div>
+                    <!-- 3-dot menu button -->
+                    <button onclick="toggleWorkoutMenu('${w.id}',this)" style="background:none;border:none;color:#555;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1;flex-shrink:0;" title="Options">⋯</button>
+                    <!-- Dropdown menu -->
+                    <div id="wMenu_${w.id}" style="display:none;position:absolute;right:14px;top:52px;background:#1e1e1e;border:1px solid #333;border-radius:10px;
+                        min-width:160px;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,0.6);overflow:hidden;">
+                        <button onclick="openEditWorkout('${w.id}')" style="width:100%;padding:13px 16px;background:none;border:none;border-bottom:1px solid #2a2a2a;
+                            color:#fff;font-family:'Oswald',sans-serif;font-size:14px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;"
+                            onmouseover="this.style.background='rgba(255,107,53,0.1)'" onmouseout="this.style.background='none'">
+                            ✏️ Edit Workout
                         </button>
-                        <div class="workout-details-content">
-                            <div class="workout-stats">
-                                <div class="workout-stat">
-                                    <div class="workout-stat-value">${w.exercises?.length || 0}</div>
-                                    <div class="workout-stat-label">Exercises</div>
-                                </div>
-                                <div class="workout-stat">
-                                    <div class="workout-stat-value">${w.duration || '—'}</div>
-                                    <div class="workout-stat-label">Minutes</div>
-                                </div>
-                            </div>
-                            <div class="exercise-list">${exerciseListHTML}</div>
-                        </div>
-                    </div>
-                    <div class="activity-actions">
-                        <button class="action-btn" onclick="handleRespect(this)">
-                            <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M14 2c0-1.1.9-2 2-2h.5A2.5 2.5 0 0 1 19 2.5V3c1.1 0 2 .9 2 2v1c1.1 0 2 .9 2 2v5a7 7 0 0 1-7 7H8A6 6 0 0 1 2 14V9c0-1.1.9-2 2-2h1V5c0-1.1.9-2 2-2h1V2c0-1.1.9-2 2-2h4z"/></svg></span><span>0 Respect</span>
+                        <button onclick="confirmDeleteWorkout('${w.id}')" style="width:100%;padding:13px 16px;background:none;border:none;
+                            color:#f87171;font-family:'Oswald',sans-serif;font-size:14px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:10px;"
+                            onmouseover="this.style.background='rgba(248,113,113,0.1)'" onmouseout="this.style.background='none'">
+                            🗑 Delete Workout
                         </button>
-                        <button class="action-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span>0 Comments</span></button>
-                        <button class="action-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-4-2-7-2-10-2 2-4 3-4 6 0-5 4-8 4-14-2 2-4 5-4 4z" fill="var(--primary)" stroke="var(--primary-dark)" stroke-width="1"/></svg></span><span>PR!</span></button>
                     </div>
+                </div>
+
+                <!-- Title -->
+                <div style="padding:4px 14px 10px;">
+                    <span style="font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:1.5px;color:#fff;">${w.name.toUpperCase()}</span>
+                </div>
+
+                <!-- Photo -->
+                ${photoHTML}${captionHTML}
+
+                <!-- Pills -->
+                <div style="display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px 4px;">${durationPill}${exPills}</div>
+
+                <!-- View Full Workout -->
+                <div style="padding:8px 14px 12px;">
+                    <button onclick="openWorkoutModal(this)" data-workout='${wData}'
+                        style="width:100%;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.3);
+                        color:var(--primary);padding:10px;border-radius:8px;font-family:'Oswald',sans-serif;
+                        font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;
+                        display:flex;align-items:center;justify-content:center;gap:8px;">
+                        📊 View Full Workout
+                    </button>
+                </div>
+
+                <!-- Actions -->
+                <div style="display:flex;border-top:1px solid #2a2a2a;">
+                    <button class="action-btn like-btn" onclick="toggleLike('${w.id}',this)"
+                        data-liked="false" data-wid="${w.id}"
+                        style="flex:1;justify-content:center;color:#777;border-right:1px solid #2a2a2a;border-radius:0 0 0 10px;">
+                        <span class="like-icon" style="font-size:16px;">&#x1F90D;</span>
+                        <span class="like-label">0 Likes</span>
+                    </button>
+                    <button class="action-btn" onclick="openWorkoutDetail('${w.id}',this)"
+                        style="flex:1;justify-content:center;color:#777;border-radius:0 0 10px 0;">
+                        <span style="font-size:15px;">💬</span>
+                        <span class="comment-label-${w.id}">0 Comments</span>
+                    </button>
                 </div>`;
-            }).join('');
+            // Make header relative for dropdown positioning
+            const header = card.querySelector('div:first-child');
+            if (header) header.style.position = 'relative';
+            return card;
+        }
+
+        function toggleWorkoutMenu(workoutId, btn) {
+            // Close all other menus first
+            document.querySelectorAll('[id^="wMenu_"]').forEach(m => {
+                if (m.id !== 'wMenu_' + workoutId) m.style.display = 'none';
+            });
+            const menu = document.getElementById('wMenu_' + workoutId);
+            if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            // Close on outside click
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if (!btn.contains(e.target)) {
+                        if (menu) menu.style.display = 'none';
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 10);
+        }
+
+        async function confirmDeleteWorkout(workoutId) {
+            // Close menu
+            const menu = document.getElementById('wMenu_' + workoutId);
+            if (menu) menu.style.display = 'none';
+
+            // Show confirm sheet
+            const sheet = document.createElement('div');
+            sheet.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:4000;display:flex;align-items:flex-end;justify-content:center;';
+            sheet.innerHTML = `<div style="width:100%;max-width:600px;background:#1a1a1a;border-radius:20px 20px 0 0;border-top:2px solid #333;padding:24px 20px 40px;">
+                <div style="font-family:'Bebas Neue',cursive;font-size:24px;letter-spacing:1px;color:#fff;margin-bottom:8px;">Delete Workout?</div>
+                <p style="color:#888;font-size:14px;margin-bottom:24px;font-family:'Oswald',sans-serif;">This can't be undone. The post will be removed from your profile and the feed.</p>
+                <div style="display:flex;gap:10px;">
+                    <button onclick="this.closest('div[style*=position]').remove()"
+                        style="flex:1;padding:14px;background:rgba(255,255,255,0.06);border:1px solid #333;border-radius:10px;
+                        color:#fff;font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;cursor:pointer;">Cancel</button>
+                    <button onclick="executeDeleteWorkout('${workoutId}',this.closest('div[style*=position]'))"
+                        style="flex:1;padding:14px;background:#ef4444;border:none;border-radius:10px;
+                        color:#fff;font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;cursor:pointer;">Delete</button>
+                </div>
+            </div>`;
+            document.body.appendChild(sheet);
+            requestAnimationFrame(() => sheet.querySelector('div').style.transform = 'translateY(0)');
+        }
+
+        async function executeDeleteWorkout(workoutId, sheet) {
+            if (sheet) sheet.remove();
+            try {
+                await sb(`workouts?id=eq.${workoutId}`, { method: 'DELETE' });
+                // Remove from local user cache
+                const user = getCurrentUser();
+                if (user && user.workouts) {
+                    user.workouts = user.workouts.filter(w => w.id !== workoutId);
+                    setCurrentUser(user);
+                    refreshProfileWorkouts(user);
+                    refreshProfileStats(user);
+                }
+                // Remove from feed
+                const feedCard = document.querySelector(`.activity-feed [data-workout-id="${workoutId}"]`);
+                if (feedCard) feedCard.remove();
+                showToast('Workout deleted');
+            } catch(e) {
+                alert('Delete failed: ' + e.message);
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.style.cssText = `position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1e1e1e;border:1px solid #333;
+                color:#fff;padding:10px 20px;border-radius:20px;font-family:'Oswald',sans-serif;font-size:14px;z-index:5000;
+                white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.4);`;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2200);
+        }
+
+        // ── EDIT WORKOUT ─────────────────────────────────────────────────────
+        let _editingWorkoutId = null;
+
+        async function openEditWorkout(workoutId) {
+            const menu = document.getElementById('wMenu_' + workoutId);
+            if (menu) menu.style.display = 'none';
+            const user = getCurrentUser();
+            const w = user?.workouts?.find(x => x.id === workoutId);
+            if (!w) return;
+            _editingWorkoutId = workoutId;
+
+            // Populate edit modal
+            document.getElementById('editWorkoutName').value = w.name || '';
+            document.getElementById('editWorkoutCaption').value = w.caption || '';
+            document.getElementById('editWorkoutDuration').value = w.duration || '';
+
+            // Exercises
+            const ec = document.getElementById('editExerciseContainer');
+            ec.innerHTML = '';
+            (w.exercises || []).forEach(ex => addEditExercise(ex));
+            if (!w.exercises || w.exercises.length === 0) addEditExercise();
+
+            // Photo preview
+            const img = document.getElementById('editPreviewImage');
+            const inner = document.getElementById('editPhotoZoneInner');
+            const removeBtn = document.getElementById('editRemovePhoto');
+            if (w.photo_url) {
+                img.src = w.photo_url; img.style.display = 'block';
+                if (inner) inner.style.display = 'none';
+                if (removeBtn) removeBtn.style.display = 'flex';
+            } else {
+                img.src = ''; img.style.display = 'none';
+                if (inner) inner.style.display = 'block';
+                if (removeBtn) removeBtn.style.display = 'none';
+            }
+
+            document.getElementById('editWorkoutModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editWorkoutModal').style.display = 'none';
+            document.body.style.overflow = '';
+            _editingWorkoutId = null;
+        }
+
+        function addEditExercise(ex) {
+            const ec = document.getElementById('editExerciseContainer');
+            const idx = ec.querySelectorAll('.ex-edit-row').length;
+            const row = document.createElement('div');
+            row.className = 'ex-edit-row';
+            row.style.cssText = 'background:#1a1a1a;border-radius:10px;padding:12px;border:1px solid #2a2a2a;margin-bottom:8px;';
+            row.innerHTML = `
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="font-family:'Oswald',sans-serif;font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;">Exercise ${idx+1}</span>
+                    ${idx > 0 ? `<button type="button" onclick="this.closest('.ex-edit-row').remove()" style="background:none;border:none;color:#444;font-size:16px;cursor:pointer;">✕</button>` : ''}
+                </div>
+                <input type="text" class="ex-edit-name" value="${ex?.name||''}" placeholder="Exercise name"
+                    style="width:100%;padding:10px 12px;background:#252525;border:1.5px solid #2a2a2a;border-radius:8px;
+                    color:#fff;font-family:'Oswald',sans-serif;font-size:14px;outline:none;margin-bottom:8px;box-sizing:border-box;">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                    <input type="number" class="ex-edit-sets" value="${ex?.sets||''}" placeholder="Sets"
+                        style="padding:10px;background:#252525;border:1.5px solid #2a2a2a;border-radius:8px;color:#fff;font-family:'Oswald',sans-serif;font-size:14px;outline:none;text-align:center;box-sizing:border-box;">
+                    <input type="number" class="ex-edit-reps" value="${ex?.reps||''}" placeholder="Reps"
+                        style="padding:10px;background:#252525;border:1.5px solid #2a2a2a;border-radius:8px;color:#fff;font-family:'Oswald',sans-serif;font-size:14px;outline:none;text-align:center;box-sizing:border-box;">
+                    <input type="number" class="ex-edit-weight" value="${ex?.weight||''}" placeholder="lbs"
+                        style="padding:10px;background:#252525;border:1.5px solid #2a2a2a;border-radius:8px;color:#fff;font-family:'Oswald',sans-serif;font-size:14px;outline:none;text-align:center;box-sizing:border-box;">
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                    <span style="font-size:10px;color:#444;font-family:'Oswald',sans-serif;text-transform:uppercase;">Sets</span>
+                    <span style="font-size:10px;color:#444;font-family:'Oswald',sans-serif;text-transform:uppercase;">Reps</span>
+                    <span style="font-size:10px;color:#444;font-family:'Oswald',sans-serif;text-transform:uppercase;">Weight</span>
+                </div>`;
+            ec.appendChild(row);
+        }
+
+        async function saveEditWorkout() {
+            if (!_editingWorkoutId) return;
+            const name     = document.getElementById('editWorkoutName').value.trim();
+            const caption  = document.getElementById('editWorkoutCaption').value.trim();
+            const duration = parseInt(document.getElementById('editWorkoutDuration').value) || 0;
+            if (!name) { document.getElementById('editWorkoutName').focus(); return; }
+
+            // Gather exercises
+            const exercises = [];
+            document.querySelectorAll('#editExerciseContainer .ex-edit-row').forEach(row => {
+                const n = row.querySelector('.ex-edit-name')?.value.trim();
+                if (n) exercises.push({
+                    name: n,
+                    sets:   row.querySelector('.ex-edit-sets')?.value  || '',
+                    reps:   row.querySelector('.ex-edit-reps')?.value  || '',
+                    weight: row.querySelector('.ex-edit-weight')?.value || ''
+                });
+            });
+
+            // Photo
+            const img = document.getElementById('editPreviewImage');
+            const photoUrl = (img?.src && img.style.display !== 'none') ? img.src : null;
+
+            const saveBtn = document.getElementById('editSaveBtn');
+            saveBtn.textContent = 'Saving...'; saveBtn.disabled = true;
+
+            try {
+                const updates = { name, caption: caption||null, duration, exercises, photo_url: photoUrl };
+                await sb(`workouts?id=eq.${_editingWorkoutId}`, { method:'PATCH', body: updates, prefer:'return=minimal' });
+
+                // Update local cache
+                const user = getCurrentUser();
+                if (user && user.workouts) {
+                    const idx = user.workouts.findIndex(w => w.id === _editingWorkoutId);
+                    if (idx !== -1) Object.assign(user.workouts[idx], updates);
+                    setCurrentUser(user);
+                    refreshProfileWorkouts(user);
+                }
+                // Also refresh feed card
+                await loadFeedFromSupabase();
+                closeEditModal();
+                showToast('Workout updated!');
+            } catch(e) {
+                alert('Save failed: ' + e.message);
+                saveBtn.textContent = 'Save Changes'; saveBtn.disabled = false;
+            }
+        }
+
+        function handleEditPhotoSelect(input) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.getElementById('editPreviewImage');
+                const inner = document.getElementById('editPhotoZoneInner');
+                const removeBtn = document.getElementById('editRemovePhoto');
+                img.src = e.target.result; img.style.display = 'block';
+                if (inner) inner.style.display = 'none';
+                if (removeBtn) removeBtn.style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeEditPhoto() {
+            const img = document.getElementById('editPreviewImage');
+            const inner = document.getElementById('editPhotoZoneInner');
+            const removeBtn = document.getElementById('editRemovePhoto');
+            const input = document.getElementById('editPhotoInput');
+            if (img) { img.src=''; img.style.display='none'; }
+            if (inner) inner.style.display = 'block';
+            if (removeBtn) removeBtn.style.display = 'none';
+            if (input) input.value = '';
         }
 
         function refreshAchievements(user) {
@@ -4642,14 +5228,14 @@
                         const avatarContent = u.avatar_url 
                             ? `<img src="${u.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">`
                             : (u.initials || '?');
-                        return `<div onclick="viewUserProfile('${u.id}')" style="display:flex;align-items:center;gap:15px;padding:14px 18px;border-bottom:1px solid #333;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,107,53,0.08)'" onmouseout="this.style.background='transparent'">
-                            <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:18px;flex-shrink:0;overflow:hidden;">${avatarContent}</div>
-                            <div style="flex:1;">
-                                <div style="font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;">${u.full_name}</div>
+                        return `<div ontouchstart="void(0)" onclick="viewUserProfile('${u.id}')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #2a2a2a;cursor:pointer;-webkit-tap-highlight-color:rgba(255,107,53,0.15);active:background:rgba(255,107,53,0.15);" onmousedown="this.style.background='rgba(255,107,53,0.15)'" onmouseup="this.style.background='transparent'" onmouseleave="this.style.background='transparent'">
+                            <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:18px;flex-shrink:0;overflow:hidden;border:2px solid rgba(255,107,53,0.4);">${avatarContent}</div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.full_name}</div>
                                 <div style="font-size:12px;color:var(--primary);font-family:'Roboto Mono',monospace;">@${u.username}</div>
                             </div>
-                            ${isMe ? '<span style="color:#666;font-size:12px;font-family:\'Oswald\',sans-serif;text-transform:uppercase;">You</span>' : `<button onclick="event.stopPropagation();toggleFollow('${u.id}',this)" 
-                                style="background:${isFollowing?'transparent':'var(--primary)'};border:2px solid var(--primary);color:${isFollowing?'var(--primary)':'#fff'};padding:7px 16px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all 0.2s;flex-shrink:0;" data-uid="${u.id}">
+                            ${isMe ? '<span style="color:#666;font-size:12px;font-family:\'Oswald\',sans-serif;text-transform:uppercase;flex-shrink:0;">You</span>' : `<button onclick="event.stopPropagation();toggleFollow('${u.id}',this)" 
+                                style="background:${isFollowing?'transparent':'var(--primary)'};border:2px solid var(--primary);color:${isFollowing?'var(--primary)':'#fff'};padding:8px 18px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all 0.2s;flex-shrink:0;border-radius:6px;" data-uid="${u.id}">
                                 ${isFollowing ? 'Unfollow' : 'Follow'}
                             </button>`}
                         </div>`;
@@ -4830,25 +5416,18 @@
             const isMe      = userId === window._sbUserId;
             const isFollowing = userId && userFollowing.has(userId);
             const exercises = w.exercises || [];
-
-            // Likes and comments
             const likes      = w.likes || [];
             const likeCount  = likes.length;
             const hasLiked   = likes.includes(window._sbUserId);
             const commentCount = w.commentCount || 0;
-
-            // PRs
             const prExercises = w.prExercises || [];
             const hasPR = prExercises.length > 0;
-
             const dateStr = new Date(w.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
-            // Avatar HTML
             const avatarHTML = avatarUrl
                 ? `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">`
                 : initials;
 
-            // Follow button — small pill style
             const followBtn = (!isMe && userId) ? `
                 <button onclick="toggleFollowFromCard('${userId}',this)" data-uid="${userId}"
                     style="margin-left:auto;background:${isFollowing?'transparent':'var(--primary)'};border:2px solid var(--primary);
@@ -4858,55 +5437,43 @@
                     ${isFollowing ? 'Following' : '+ Follow'}
                 </button>` : '';
 
-            // Exercise rows — always visible
-            const exHTML = exercises.length
+            // Simple exercise pill list — just names
+            const exNamesHTML = exercises.length
                 ? exercises.map(ex => {
                     const isPR = prExercises.includes(ex.name);
-                    return `<div style="display:flex;justify-content:space-between;align-items:center;
-                        padding:9px 12px;background:rgba(0,0,0,0.25);border-radius:8px;
-                        border-left:3px solid ${isPR ? 'var(--accent)' : 'var(--sweat)'};">
-                        <span style="font-family:'Roboto Mono',monospace;font-size:12px;color:#eee;">
-                            ${ex.name}${isPR ? ' <span style="color:var(--accent);font-size:10px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-4-2-7-2-10-2 2-4 3-4 6 0-5 4-8 4-14-2 2-4 5-4 4z" fill="var(--primary)" stroke="var(--primary-dark)" stroke-width="1"/></svg>PR</span>' : ''}
-                        </span>
-                        <span style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--sweat);white-space:nowrap;margin-left:8px;">
-                            ${ex.sets||'?'}×${ex.reps||'?'}${ex.weight?' @ '+ex.weight+'lb':''}
-                        </span>
-                    </div>`;
-                  }).join('')
-                : `<div style="color:#666;font-size:12px;padding:8px 0;">No exercises logged</div>`;
+                    return `<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);
+                        border-radius:20px;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:12px;
+                        color:${isPR?'var(--accent)':'#ccc'};border:1px solid ${isPR?'rgba(255,179,71,0.3)':'rgba(255,255,255,0.08)'};">
+                        ${ex.name}${isPR?' ★':''}
+                    </span>`;
+                }).join('')
+                : '';
 
-            // Stats row
-            const statsHTML = `
-                <div style="display:flex;gap:8px;margin-bottom:10px;">
-                    ${exercises.length ? `<div style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:8px;padding:6px 12px;text-align:center;flex:1;">
-                        <div style="font-family:'Bebas Neue',cursive;font-size:20px;color:var(--primary);">${exercises.length}</div>
-                        <div style="font-size:9px;color:#999;text-transform:uppercase;letter-spacing:1px;">Exercises</div>
-                    </div>` : ''}
-                    ${w.duration ? `<div style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:8px;padding:6px 12px;text-align:center;flex:1;">
-                        <div style="font-family:'Bebas Neue',cursive;font-size:20px;color:var(--primary);">${w.duration}</div>
-                        <div style="font-size:9px;color:#999;text-transform:uppercase;letter-spacing:1px;">Minutes</div>
-                    </div>` : ''}
-                    ${hasPR ? `<div style="background:rgba(255,179,71,0.15);border:1px solid rgba(255,179,71,0.4);border-radius:8px;padding:6px 12px;text-align:center;flex:1;">
-                        <div style="font-size:18px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-4-2-7-2-10-2 2-4 3-4 6 0-5 4-8 4-14-2 2-4 5-4 4z" fill="var(--primary)" stroke="var(--primary-dark)" stroke-width="1"/></svg></div>
-                        <div style="font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;font-weight:700;">PR!</div>
-                    </div>` : ''}
-                </div>`;
+            // Duration pill
+            const durationPill = w.duration
+                ? `<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,107,53,0.12);
+                    border-radius:20px;padding:5px 12px;font-family:'Oswald',sans-serif;font-size:12px;
+                    color:var(--primary);border:1px solid rgba(255,107,53,0.25);">
+                    ${w.duration} MIN
+                  </span>` : '';
 
-            // Photo — 9:16 vertical ratio
             const photoHTML = w.photo_url ? `
-                <div style="position:relative;width:100%;padding-bottom:177.78%;overflow:hidden;background:#111;">
+                <div style="position:relative;width:100%;padding-bottom:125%;overflow:hidden;background:#111;">
                     <img src="${w.photo_url}" alt="Workout" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
                 </div>` : '';
 
             const captionHTML = w.caption
-                ? `<p style="font-size:14px;color:#ddd;padding:10px 14px 0;line-height:1.5;">"${w.caption}"</p>`
+                ? `<p style="font-size:14px;color:#ddd;padding:10px 14px 4px;line-height:1.5;">"${w.caption}"</p>`
                 : '';
+
+            // Store workout data for modal
+            const wData = JSON.stringify(w).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 
             const card = document.createElement('div');
             card.className = 'activity-card';
             card.dataset.workoutId = w.id;
             card.innerHTML = `
-                <!-- Small header -->
+                <!-- Header -->
                 <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;">
                     <div onclick="${!isMe && userId ? `viewUserProfile('${userId}')` : ''}"
                         style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
@@ -4915,43 +5482,53 @@
                         ${avatarHTML}
                     </div>
                     <div onclick="${!isMe && userId ? `viewUserProfile('${userId}')` : ''}"
-                        style="flex:1;${!isMe && userId ? 'cursor:pointer;' : ''}">
-                        <div style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;line-height:1.2;">${name}</div>
+                        style="flex:1;min-width:0;${!isMe && userId ? 'cursor:pointer;' : ''}">
+                        <div style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
                         <div style="font-size:11px;color:#666;">${dateStr}</div>
                     </div>
                     ${followBtn}
                 </div>
 
-                <!-- Workout title bar -->
-                <div style="padding:6px 14px 8px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333;">
-                    <span style="font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1.5px;color:#fff;">
-                        ${w.name.toUpperCase()}
-                    </span>
+                <!-- Title -->
+                <div style="padding:4px 14px 10px;">
+                    <span style="font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:1.5px;color:#fff;">${w.name.toUpperCase()}</span>
+                    ${hasPR ? '<span style="background:var(--accent);color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:8px;vertical-align:middle;">PR</span>' : ''}
                 </div>
 
-                <!-- 9:16 Photo -->
+                <!-- Photo -->
                 ${photoHTML}
                 ${captionHTML}
 
-                <!-- Workout details — always visible -->
-                <div style="padding:12px 14px;">
-                    ${statsHTML}
-                    <div style="display:flex;flex-direction:column;gap:6px;">
-                        ${exHTML}
-                    </div>
+                <!-- Simple pills row: duration + exercise names -->
+                <div style="display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px 4px;">
+                    ${durationPill}
+                    ${exNamesHTML}
+                </div>
+
+                <!-- View Full Workout button -->
+                <div style="padding:8px 14px 12px;">
+                    <button onclick="openWorkoutModal(this)" data-workout='${wData}'
+                        style="width:100%;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.3);
+                        color:var(--primary);padding:10px;border-radius:8px;font-family:'Oswald',sans-serif;
+                        font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;
+                        transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                        View Full Workout
+                    </button>
                 </div>
 
                 <!-- Actions -->
                 <div style="display:flex;gap:0;border-top:1px solid #2a2a2a;">
-                    <button class="action-btn" onclick="toggleLike('${w.id}',this)" data-liked="${hasLiked}"
+                    <button class="action-btn like-btn" onclick="toggleLike('${w.id}',this)"
+                        data-liked="${hasLiked}" data-wid="${w.id}"
                         style="flex:1;justify-content:center;color:${hasLiked?'var(--primary)':'#777'};border-right:1px solid #2a2a2a;border-radius:0 0 0 10px;">
-                        <span style="font-size:16px;">${hasLiked?'❤️':'🤍'}</span>
-                        <span>${likeCount} ${likeCount===1?'Like':'Likes'}</span>
+                        <span class="like-icon" style="font-size:16px;">${hasLiked?'❤️':'🤍'}</span>
+                        <span class="like-label">${likeCount} ${likeCount===1?'Like':'Likes'}</span>
                     </button>
-                    <button class="action-btn" onclick="openComments('${w.id}')"
+                    <button class="action-btn" onclick="openWorkoutDetail('${w.id}',this)"
                         style="flex:1;justify-content:center;color:#777;border-radius:0 0 10px 0;">
-                        <span style="font-size:16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-                        <span>${commentCount} ${commentCount===1?'Comment':'Comments'}</span>
+                        <span style="font-size:15px;">💬</span>
+                        <span class="comment-label-${w.id}">${commentCount} ${commentCount===1?'Comment':'Comments'}</span>
                     </button>
                 </div>`;
             return card;
@@ -4975,34 +5552,43 @@
 
         // ── LIKES & COMMENTS ──────────────────────────────────────────────────
         async function toggleLike(workoutId, btn) {
+            if (!window._sbUserId) return;
             const hasLiked = btn.dataset.liked === 'true';
-            
+            // Optimistic UI update immediately
+            const newLiked = !hasLiked;
+            btn.dataset.liked = String(newLiked);
+            updateLikeBtn(btn, newLiked);
+
             try {
                 if (hasLiked) {
-                    // Unlike
                     await sb(`workout_likes?workout_id=eq.${workoutId}&user_id=eq.${window._sbUserId}`, { method: 'DELETE' });
-                    btn.dataset.liked = 'false';
-                    btn.style.color = '#999';
-                    btn.querySelector('.action-icon').textContent = '🤍';
                 } else {
-                    // Like
-                    await sb('workout_likes', {
-                        method: 'POST',
-                        body: { workout_id: workoutId, user_id: window._sbUserId }
-                    });
-                    btn.dataset.liked = 'true';
-                    btn.style.color = 'var(--primary)';
-                    btn.querySelector('.action-icon').textContent = '❤️';
+                    await sb('workout_likes', { method: 'POST', body: { workout_id: workoutId, user_id: window._sbUserId } });
                 }
-                
-                // Update count
+                // Sync real count
                 const likes = await sb(`workout_likes?workout_id=eq.${workoutId}&select=user_id`);
                 const count = likes?.length || 0;
-                btn.querySelector('span:last-child').textContent = `${count} ${count===1?'Like':'Likes'}`;
-                
+                // Update ALL like buttons for this workout (feed + profile + detail modal)
+                document.querySelectorAll(`[data-workout-id="${workoutId}"] .like-btn, .like-btn[data-wid="${workoutId}"]`).forEach(b => {
+                    b.dataset.liked = String(newLiked);
+                    updateLikeBtn(b, newLiked, count);
+                });
+                // Also update the one that was clicked directly
+                updateLikeBtn(btn, newLiked, count);
             } catch(e) {
+                // Revert on error
+                btn.dataset.liked = String(hasLiked);
+                updateLikeBtn(btn, hasLiked);
                 console.warn('Like error:', e.message);
             }
+        }
+
+        function updateLikeBtn(btn, liked, count) {
+            const icon = btn.querySelector('.like-icon');
+            const label = btn.querySelector('.like-label');
+            if (icon) icon.textContent = liked ? '❤️' : '🤍';
+            if (label && count !== undefined) label.textContent = count + (count === 1 ? ' Like' : ' Likes');
+            btn.style.color = liked ? 'var(--primary)' : '#777';
         }
 
         async function openComments(workoutId) {
@@ -5177,8 +5763,425 @@
             const feedLink = document.querySelector('.nav-link[data-page="feed"]');
             if (feedLink) feedLink.classList.add('active');
         }
-    </script>
+    
+        // ── WORKOUT DETAIL + COMMENTS (Instagram style) ──────────────────────
+        let wdChartInstance = null;
+        window._wdWorkoutId = null;
 
+        function openWorkoutDetail(workoutId, commentBtn) {
+            // find workout data from the card
+            const card = document.querySelector(`[data-workout-id="${workoutId}"]`);
+            const viewBtn = card ? card.querySelector('[data-workout]') : null;
+            if (viewBtn) {
+                openWorkoutModal(viewBtn, workoutId, commentBtn);
+            }
+        }
+
+        function openWorkoutModal(btn, overrideId, commentBtn) {
+            const w = JSON.parse(btn.getAttribute('data-workout').replace(/&quot;/g,'"').replace(/&#39;/g,"'"));
+            const workoutId = overrideId || w.id;
+            window._wdWorkoutId = workoutId;
+            const exercises = w.exercises || [];
+
+            // Populate header
+            document.getElementById('wdTitle').textContent = w.name.toUpperCase();
+            const dateStr = new Date(w.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+            document.getElementById('wdMeta').textContent = dateStr + (w.duration ? ' · ' + w.duration + ' min' : '');
+
+            // Like button state — read from the card
+            const card = document.querySelector(`[data-workout-id="${workoutId}"]`);
+            const cardLikeBtn = card ? card.querySelector('.like-btn') : null;
+            const wdLikeBtn = document.getElementById('wdLikeBtn');
+            if (cardLikeBtn && wdLikeBtn) {
+                const liked = cardLikeBtn.dataset.liked === 'true';
+                wdLikeBtn.dataset.liked = String(liked);
+                wdLikeBtn.dataset.wid = workoutId;
+                updateLikeBtn(wdLikeBtn, liked,
+                    parseInt(cardLikeBtn.querySelector('.like-label')?.textContent) || 0);
+            }
+
+            // Exercise rows
+            const total_vol = exercises.reduce((s,ex) => s+(parseFloat(ex.weight)||0)*(parseInt(ex.sets)||1)*(parseInt(ex.reps)||1), 0);
+            document.getElementById('wdExercises').innerHTML = exercises.length ? exercises.map((ex, i) => {
+                const vol = (parseFloat(ex.weight)||0)*(parseInt(ex.sets)||1)*(parseInt(ex.reps)||1);
+                const isPR = (w.prExercises||[]).includes(ex.name);
+                return `<div style="display:flex;align-items:center;gap:12px;padding:13px 16px;${i>0?'border-top:1px solid #1e1e1e;':''}">
+                    <div style="width:30px;height:30px;border-radius:8px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);
+                        display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:13px;color:var(--primary);flex-shrink:0;">${i+1}</div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;">
+                            ${ex.name}${isPR?' <span style="background:var(--accent);color:#000;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;vertical-align:middle;">PR</span>':''}
+                        </div>
+                        <div style="font-family:'Roboto Mono',monospace;font-size:12px;color:#666;margin-top:2px;">
+                            ${ex.sets||'?'} sets × ${ex.reps||'?'} reps${ex.weight?' @ <span style="color:var(--primary);">'+ex.weight+' lb</span>':''}
+                        </div>
+                    </div>
+                    <div style="text-align:right;flex-shrink:0;">
+                        <div style="font-family:'Bebas Neue',cursive;font-size:15px;color:#fff;">${vol ? vol.toLocaleString() : '—'}</div>
+                        <div style="font-size:9px;color:#555;text-transform:uppercase;">vol lbs</div>
+                    </div>
+                </div>`;
+            }).join('') : '<div style="padding:16px;color:#555;text-align:center;font-family:Oswald,sans-serif;font-size:13px;">No exercises logged</div>';
+
+            // Stats
+            const maxWeight = exercises.length ? Math.max(...exercises.map(ex=>parseFloat(ex.weight)||0)) : 0;
+            document.getElementById('wdStats').innerHTML = [
+                { label:'Exercises', val: exercises.length },
+                { label:'Total Vol', val: total_vol ? Math.round(total_vol/100)/10+'k lbs' : '—' },
+                { label:'Top Weight', val: maxWeight ? maxWeight+' lbs' : '—' }
+            ].map(s => `<div style="background:var(--steel);border:1px solid #2a2a2a;border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-family:'Bebas Neue',cursive;font-size:20px;color:var(--primary);">${s.val}</div>
+                <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">${s.label}</div>
+            </div>`).join('');
+
+            // Show modal with slide-up animation
+            const modal = document.getElementById('workoutDetailModal');
+            const pane  = document.getElementById('wdPane');
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            // Reset scroll position
+            pane.scrollTop = 0;
+            // Clear comment input
+            document.getElementById('wdCommentInput').value = '';
+            // Animate in
+            requestAnimationFrame(() => {
+                modal.style.background = 'rgba(0,0,0,0.6)';
+                pane.style.transform = 'translateY(0)';
+            });
+
+            // Build bar chart
+            setTimeout(() => {
+                if (wdChartInstance) { wdChartInstance.destroy(); wdChartInstance = null; }
+                const canvas = document.getElementById('wdChart');
+                const wrap   = document.getElementById('wdChartWrap');
+                const w2 = wrap.clientWidth || (window.innerWidth - 64);
+                canvas.width  = w2;
+                canvas.height = 180;
+                const ctx = canvas.getContext('2d');
+                const labels = exercises.map(ex => ex.name.length > 10 ? ex.name.slice(0,10)+'…' : ex.name);
+                const data   = exercises.map(ex => parseFloat(ex.weight)||0);
+                const clrs   = exercises.map(ex => (w.prExercises||[]).includes(ex.name) ? '#ffb347' : '#ff6b35');
+                wdChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ data, backgroundColor: clrs.map(c=>c+'28'), borderColor: clrs, borderWidth: 2, borderRadius: 6, borderSkipped: false }] },
+                    options: { responsive:false, plugins: { legend:{display:false}, tooltip:{backgroundColor:'#1e1e1e',titleColor:'#ff6b35',bodyColor:'#fff',borderColor:'#ff6b35',borderWidth:1,callbacks:{label:c=>c.parsed.y+' lbs'}} },
+                        scales: { y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.04)'},border:{color:'#2a2a2a'},ticks:{color:'#555',font:{size:10},callback:v=>v+'lb'}}, x:{grid:{display:false},border:{color:'#2a2a2a'},ticks:{color:'#ccc',font:{size:11,family:'Oswald'}}} } }
+                });
+            }, 80);
+
+            // Load comments
+            loadWdComments(workoutId);
+        }
+
+        function closeWorkoutModal() {
+            const modal = document.getElementById('workoutDetailModal');
+            const pane  = document.getElementById('wdPane');
+            modal.style.background = 'rgba(0,0,0,0)';
+            pane.style.transform = 'translateY(100%)';
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }, 350);
+            if (wdChartInstance) { wdChartInstance.destroy(); wdChartInstance = null; }
+        }
+
+        async function loadWdComments(workoutId) {
+            const el = document.getElementById('wdComments');
+            el.innerHTML = '<div style="padding:20px;color:#555;font-family:Oswald,sans-serif;font-size:13px;text-align:center;">Loading...</div>';
+            try {
+                const comments = await sb(`workout_comments?workout_id=eq.${workoutId}&order=created_at.asc&select=*,profiles(full_name,username,initials,avatar_url)`);
+                if (!comments || comments.length === 0) {
+                    el.innerHTML = '<div style="padding:20px;color:#444;font-family:Oswald,sans-serif;font-size:13px;text-align:center;">No comments yet — be the first!</div>';
+                    return;
+                }
+                el.innerHTML = comments.map(c => {
+                    const p = c.profiles;
+                    const avatar = p?.avatar_url
+                        ? `<img src="${p.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">`
+                        : (p?.initials || '?');
+                    const timeAgo = getTimeAgo(new Date(c.created_at));
+                    const canDel = c.user_id === window._sbUserId;
+                    return `<div style="display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #1a1a1a;align-items:flex-start;">
+                        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));
+                            display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:13px;flex-shrink:0;overflow:hidden;">${avatar}</div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+                                <span style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;color:#fff;">${p?.full_name||'Unknown'}</span>
+                                <span style="font-size:11px;color:#444;">${timeAgo}</span>
+                                ${canDel?`<button onclick="deleteWdComment('${c.id}')" style="margin-left:auto;background:none;border:none;color:#333;cursor:pointer;font-size:11px;font-family:'Oswald',sans-serif;">Delete</button>`:''}
+                            </div>
+                            <div style="color:#ccc;font-size:14px;line-height:1.5;margin-top:3px;">${c.comment_text}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch(e) {
+                el.innerHTML = '<div style="padding:16px;color:#444;font-size:13px;text-align:center;">Comments unavailable</div>';
+            }
+        }
+
+        async function postWorkoutComment() {
+            const input = document.getElementById('wdCommentInput');
+            const text = input.value.trim();
+            if (!text || !window._wdWorkoutId || !window._sbUserId) return;
+            input.value = '';
+            input.style.height = 'auto';
+            try {
+                await sb('workout_comments', { method:'POST', body:{ workout_id: window._wdWorkoutId, user_id: window._sbUserId, comment_text: text }});
+                loadWdComments(window._wdWorkoutId);
+                // Sync comment count on cards
+                const countRes = await sb(`workout_comments?workout_id=eq.${window._wdWorkoutId}&select=id`);
+                const count = countRes?.length || 0;
+                document.querySelectorAll(`.comment-label-${window._wdWorkoutId}`).forEach(el => {
+                    el.textContent = count + (count===1?' Comment':' Comments');
+                });
+            } catch(e) { console.warn('Comment error:', e.message); }
+        }
+
+        async function deleteWdComment(commentId) {
+            if (!confirm('Delete comment?')) return;
+            try {
+                await sb(`workout_comments?id=eq.${commentId}`, { method:'DELETE' });
+                loadWdComments(window._wdWorkoutId);
+            } catch(e) {}
+        }
+
+        </script>
+
+
+
+    <!-- ── LOG PICKER SHEET ──────────────────────────────────────────────── -->
+    <div id="logPickerSheet" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+        background:rgba(0,0,0,0);z-index:3500;align-items:flex-end;justify-content:center;transition:background 0.28s;">
+        <!-- Backdrop tap to close -->
+        <div onclick="closeLogPicker()" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+        <div id="logPickerInner" style="position:relative;width:100%;max-width:600px;background:var(--iron);
+            border-radius:20px 20px 0 0;border-top:3px solid var(--primary);padding:0 0 40px;
+            transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.32,0.72,0,1);max-height:88vh;overflow-y:auto;">
+
+            <!-- Handle + close -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;">
+                <div style="width:36px;height:4px;background:#333;border-radius:2px;margin:0 auto;"></div>
+                <button onclick="closeLogPicker()" style="position:absolute;right:16px;top:12px;
+                    background:rgba(255,255,255,0.06);border:none;color:#fff;width:30px;height:30px;
+                    border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+            </div>
+
+            <div style="padding:4px 20px 0;">
+                <div style="font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;color:#fff;margin-bottom:4px;">What are you logging?</div>
+                <div style="font-family:'Oswald',sans-serif;font-size:13px;color:#555;margin-bottom:20px;">Choose where this workout gets posted</div>
+
+                <!-- ── Personal workout ── -->
+                <button onclick="startPersonalLog()"
+                    style="display:flex;align-items:center;gap:16px;width:100%;padding:16px;
+                    background:rgba(255,107,53,0.06);border:1.5px solid rgba(255,107,53,0.3);border-radius:14px;
+                    color:#fff;cursor:pointer;text-align:left;margin-bottom:12px;transition:all 0.2s;"
+                    onmouseover="this.style.borderColor='var(--primary)';this.style.background='rgba(255,107,53,0.12)'"
+                    onmouseout="this.style.borderColor='rgba(255,107,53,0.3)';this.style.background='rgba(255,107,53,0.06)'">
+                    <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));
+                        display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">&#x1F4AA;</div>
+                    <div style="flex:1;">
+                        <div style="font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:1px;margin-bottom:2px;">Personal Workout</div>
+                        <div style="font-family:'Oswald',sans-serif;font-size:12px;color:#888;">Log to your profile &amp; the public feed</div>
+                    </div>
+                    <div style="color:var(--primary);font-size:22px;flex-shrink:0;">›</div>
+                </button>
+
+                <!-- ── Group post ── -->
+                <div style="font-family:'Oswald',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:1px;
+                    color:#555;margin-bottom:10px;padding-left:2px;">Post to a Group</div>
+                <div id="pickerGroupList"></div>
+
+                <!-- No groups placeholder — shown by JS when list is empty -->
+                <div style="padding:4px 0 4px;">
+                    <button onclick="handleNav('groups',document.querySelector('[data-page=groups]'));closeLogPicker()"
+                        style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;
+                        background:rgba(255,255,255,0.03);border:1.5px dashed #2a2a2a;border-radius:12px;
+                        color:#555;cursor:pointer;text-align:left;transition:all 0.2s;"
+                        onmouseover="this.style.borderColor='#444';this.style.color='#888'"
+                        onmouseout="this.style.borderColor='#2a2a2a';this.style.color='#555'">
+                        <div style="width:38px;height:38px;border-radius:8px;background:rgba(255,255,255,0.04);
+                            display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">＋</div>
+                        <span style="font-family:'Oswald',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:1px;">Create or join a group</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── EDIT WORKOUT MODAL ─────────────────────────────────────────────── -->
+    <div id="editWorkoutModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+        background:rgba(0,0,0,0.85);z-index:4000;align-items:flex-end;justify-content:center;">
+        <div style="width:100%;max-width:600px;background:var(--iron);border-radius:20px 20px 0 0;
+            border-top:3px solid var(--primary);max-height:92vh;overflow-y:auto;position:relative;">
+
+            <!-- Header -->
+            <div style="position:sticky;top:0;background:var(--iron);z-index:10;
+                display:flex;align-items:center;justify-content:space-between;padding:18px 20px;
+                border-bottom:1px solid #2a2a2a;">
+                <h2 style="font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;color:var(--primary);margin:0;">Edit Workout</h2>
+                <button onclick="closeEditModal()" style="background:rgba(255,255,255,0.08);border:none;color:#fff;
+                    width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;
+                    display:flex;align-items:center;justify-content:center;">✕</button>
+            </div>
+
+            <div style="padding:16px 20px 40px;display:flex;flex-direction:column;gap:16px;">
+
+                <!-- Name -->
+                <div>
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;
+                        letter-spacing:1px;color:#666;margin-bottom:7px;">Workout Name</label>
+                    <input id="editWorkoutName" type="text" placeholder="e.g., Push Day · Chest & Triceps"
+                        style="width:100%;padding:13px 15px;background:#1e1e1e;border:1.5px solid #2a2a2a;
+                        border-radius:10px;color:#fff;font-family:'Oswald',sans-serif;font-size:15px;
+                        outline:none;box-sizing:border-box;transition:border-color 0.2s;"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#2a2a2a'">
+                </div>
+
+                <!-- Duration -->
+                <div>
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;
+                        letter-spacing:1px;color:#666;margin-bottom:7px;">Duration (minutes)</label>
+                    <input id="editWorkoutDuration" type="number" placeholder="60"
+                        style="width:100%;padding:13px 15px;background:#1e1e1e;border:1.5px solid #2a2a2a;
+                        border-radius:10px;color:#fff;font-family:'Oswald',sans-serif;font-size:15px;
+                        outline:none;box-sizing:border-box;transition:border-color 0.2s;"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#2a2a2a'">
+                </div>
+
+                <!-- Caption -->
+                <div>
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;
+                        letter-spacing:1px;color:#666;margin-bottom:7px;">Caption (Optional)</label>
+                    <textarea id="editWorkoutCaption" rows="2" placeholder="How did the session feel?"
+                        style="width:100%;padding:13px 15px;background:#1e1e1e;border:1.5px solid #2a2a2a;
+                        border-radius:10px;color:#fff;font-family:'Oswald',sans-serif;font-size:15px;
+                        outline:none;resize:none;box-sizing:border-box;transition:border-color 0.2s;"
+                        onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#2a2a2a'"></textarea>
+                </div>
+
+                <!-- Photo -->
+                <div>
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;
+                        letter-spacing:1px;color:#666;margin-bottom:7px;">Photo</label>
+                    <div id="editPhotoZone" onclick="document.getElementById('editPhotoInput').click()"
+                        style="border:1.5px dashed rgba(255,107,53,0.3);border-radius:12px;padding:24px;
+                        text-align:center;background:rgba(255,107,53,0.03);cursor:pointer;
+                        position:relative;transition:border-color 0.2s;"
+                        onmouseover="this.style.borderColor='var(--primary)'"
+                        onmouseout="this.style.borderColor='rgba(255,107,53,0.3)'">
+                        <div id="editPhotoZoneInner">
+                            <div style="font-size:28px;margin-bottom:6px;">📸</div>
+                            <div style="font-family:'Oswald',sans-serif;font-size:11px;color:#555;
+                                text-transform:uppercase;letter-spacing:1px;">Tap to change photo</div>
+                        </div>
+                        <img id="editPreviewImage" style="display:none;width:100%;border-radius:10px;
+                            max-height:260px;object-fit:cover;" alt="">
+                        <button type="button" id="editRemovePhoto"
+                            onclick="event.stopPropagation();removeEditPhoto()"
+                            style="display:none;position:absolute;top:10px;right:10px;
+                            background:rgba(0,0,0,0.75);border:none;color:#fff;width:28px;height:28px;
+                            border-radius:50%;font-size:15px;cursor:pointer;align-items:center;justify-content:center;">✕</button>
+                    </div>
+                    <input type="file" id="editPhotoInput" accept="image/*" style="display:none;"
+                        onchange="handleEditPhotoSelect(this)">
+                </div>
+
+                <!-- Exercises -->
+                <div>
+                    <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;
+                        letter-spacing:1px;color:#666;margin-bottom:10px;">Exercises</label>
+                    <div id="editExerciseContainer"></div>
+                    <button type="button" onclick="addEditExercise()"
+                        style="width:100%;margin-top:8px;padding:11px;background:transparent;
+                        border:1.5px dashed #333;border-radius:10px;color:#555;
+                        font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;
+                        text-transform:uppercase;letter-spacing:1px;cursor:pointer;transition:all 0.2s;"
+                        onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'"
+                        onmouseout="this.style.borderColor='#333';this.style.color='#555'">
+                        + Add Exercise
+                    </button>
+                </div>
+
+                <!-- Save / Cancel -->
+                <div style="display:flex;gap:10px;padding-top:4px;">
+                    <button onclick="closeEditModal()"
+                        style="flex:1;padding:14px;background:rgba(255,255,255,0.05);border:1px solid #333;
+                        border-radius:12px;color:#888;font-family:'Oswald',sans-serif;font-size:15px;
+                        font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">
+                        Cancel
+                    </button>
+                    <button id="editSaveBtn" onclick="saveEditWorkout()"
+                        style="flex:2;padding:14px;background:var(--primary);border:none;border-radius:12px;
+                        color:#fff;font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;
+                        cursor:pointer;text-transform:uppercase;letter-spacing:2px;transition:all 0.2s;">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workout Detail + Comments Modal -->
+    <div id="workoutDetailModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+        z-index:3000;background:rgba(0,0,0,0);transition:background 0.3s;">
+        <div id="wdPane" style="position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;
+            background:var(--black);transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);">
+            <div style="max-width:600px;margin:0 auto;">
+                <!-- Sticky header -->
+                <div style="position:sticky;top:0;z-index:10;background:var(--black);display:flex;align-items:center;
+                    gap:10px;padding:14px 16px 12px;border-bottom:1px solid #1e1e1e;">
+                    <button onclick="closeWorkoutModal()"
+                        style="background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;
+                        border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
+                    <div style="flex:1;min-width:0;">
+                        <div id="wdTitle" style="font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:1px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;"></div>
+                        <div id="wdMeta" style="font-size:11px;color:#555;margin-top:1px;"></div>
+                    </div>
+                    <button class="like-btn" id="wdLikeBtn" onclick="toggleLike(window._wdWorkoutId,this)"
+                        data-liked="false" data-wid=""
+                        style="flex-shrink:0;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;color:#777;padding:6px;">
+                        <span class="like-icon" style="font-size:20px;">&#x1F90D;</span>
+                        <span class="like-label" style="font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;">0</span>
+                    </button>
+                </div>
+                <!-- Chart -->
+                <div style="padding:14px 16px 6px;">
+                    <div style="background:var(--steel);border-radius:12px;padding:14px;border:1px solid #2a2a2a;">
+                        <div style="font-family:'Oswald',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:10px;">Weight per Exercise (lbs)</div>
+                        <div id="wdChartWrap" style="position:relative;height:180px;">
+                            <canvas id="wdChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Stats -->
+                <div id="wdStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:6px 16px;"></div>
+                <!-- Exercises -->
+                <div style="margin:6px 16px 0;background:var(--steel);border-radius:12px;overflow:hidden;border:1px solid #2a2a2a;">
+                    <div style="padding:10px 16px;border-bottom:1px solid #1e1e1e;font-family:'Oswald',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#555;">Exercise Breakdown</div>
+                    <div id="wdExercises"></div>
+                </div>
+                <!-- Comments -->
+                <div style="padding:16px 16px 0;">
+                    <div style="font-family:'Oswald',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:10px;">Comments</div>
+                    <div id="wdComments"></div>
+                </div>
+                <!-- Comment input -->
+                <div style="padding:12px 16px 100px;">
+                    <div style="display:flex;align-items:flex-end;background:#1a1a1a;border-radius:12px;border:1px solid #2a2a2a;overflow:hidden;">
+                        <textarea id="wdCommentInput" rows="1" placeholder="Add a comment..."
+                            style="flex:1;padding:12px 14px;background:transparent;border:none;color:#fff;
+                            font-family:'Oswald',sans-serif;font-size:14px;resize:none;outline:none;max-height:100px;overflow-y:auto;"
+                            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"
+                            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();postWorkoutComment();}"></textarea>
+                        <button onclick="postWorkoutComment()"
+                            style="background:var(--primary);border:none;color:#fff;padding:12px 18px;
+                            font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;
+                            letter-spacing:1px;cursor:pointer;align-self:stretch;flex-shrink:0;">Post</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
