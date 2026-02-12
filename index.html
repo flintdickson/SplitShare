@@ -135,7 +135,7 @@
             box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
         }
 
-        nav a {
+        nav a, nav button.nav-link {
             color: #999;
             text-decoration: none;
             font-size: 11px;
@@ -152,9 +152,10 @@
             max-width: 100px;
         }
 
-        nav a:hover { color: var(--primary); }
-        nav a.active { color: var(--primary); }
-        nav a::after { display: none; }
+        nav a:hover, nav button.nav-link:hover { color: var(--primary); }
+        nav a.active, nav button.nav-link.active { color: var(--primary); }
+        nav a::after, nav button.nav-link::after { display: none; }
+        nav a span, nav button.nav-link span { pointer-events: none; }
 
         .nav-icon {
             width: 24px;
@@ -162,6 +163,12 @@
             stroke: currentColor;
             transition: all 0.3s ease;
             flex-shrink: 0;
+            pointer-events: none;
+        }
+
+        /* Ensure all child elements of nav links don't block clicks */
+        nav a * {
+            pointer-events: none;
         }
 
         nav a.active .nav-icon,
@@ -173,6 +180,15 @@
         .log-btn svg {
             stroke: white;
             pointer-events: none;
+        }
+
+        /* Nav buttons reset */
+        nav button.nav-link {
+            background: none;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* Center Log Button */
@@ -2350,31 +2366,28 @@
 
     <!-- Bottom Navigation -->
     <nav>
-        <a href="#" class="nav-link active" data-page="feed">
+        <button type="button" class="nav-link active" data-page="feed" onclick="handleNav('feed',this)">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <!-- Feed / flame bolt = activity -->
                 <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
             <span>Feed</span>
-        </a>
-        <a href="#" class="nav-link" data-page="progress">
+        </button>
+        <button type="button" class="nav-link" data-page="progress" onclick="handleNav('progress',this)">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <!-- Progress / upward trend line -->
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
             </svg>
             <span>Progress</span>
-        </a>
+        </button>
         <div class="log-btn-container">
             <button class="log-btn" onclick="openModal()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:22px;height:22px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" style="width:22px;height:22px;pointer-events:none;">
                     <line x1="12" y1="5" x2="12" y2="19"/>
                     <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
             </button>
         </div>
-        <a href="#" class="nav-link" data-page="groups">
+        <button type="button" class="nav-link" data-page="groups" onclick="handleNav('groups',this)">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <!-- Groups / dumbbell -->
                 <rect x="2" y="10" width="4" height="4" rx="1"/>
                 <rect x="18" y="10" width="4" height="4" rx="1"/>
                 <rect x="7" y="8" width="2" height="8" rx="1"/>
@@ -2382,15 +2395,14 @@
                 <line x1="9" y1="12" x2="15" y2="12" stroke-width="2.5"/>
             </svg>
             <span>Groups</span>
-        </a>
-        <a href="#" class="nav-link" data-page="profile">
+        </button>
+        <button type="button" class="nav-link" data-page="profile" onclick="handleNav('profile',this)">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <!-- Profile / person -->
                 <circle cx="12" cy="8" r="4"/>
                 <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
             </svg>
             <span>Profile</span>
-        </a>
+        </button>
     </nav>
 
     <!-- Log Workout Modal -->
@@ -3883,6 +3895,11 @@
                 await loadFeedFromSupabase();
             } catch(e) {
                 console.warn('Could not load public feed:', e.message);
+                // Show helpful message in feed
+                const emptyMsg = document.getElementById('feedEmptyMsg');
+                const emptyState = document.getElementById('feedEmptyState');
+                if (emptyState) emptyState.style.display = 'block';
+                if (emptyMsg) emptyMsg.innerHTML = 'No workouts yet — be the first to log one! Hit the <strong style="color:var(--primary)">+</strong> button below.';
             }
         })();
 
@@ -4796,6 +4813,33 @@
         }
 
         // ── NAVIGATE ─────────────────────────────────────────────────────────
+        function handleNav(page, btn) {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            btn.classList.add('active');
+            ['feed-page','progress-page','groups-page','profile-page'].forEach(cls => {
+                const el = document.querySelector('.' + cls);
+                if (el) el.classList.remove('active');
+            });
+            if (page === 'feed') {
+                const fp = document.querySelector('.feed-page');
+                if (fp) fp.classList.add('active');
+                loadFeedFromSupabase();
+            } else if (page === 'progress') {
+                const pp = document.querySelector('.progress-page');
+                if (pp) pp.classList.add('active');
+                setTimeout(() => loadProgressPage(), 100);
+            } else if (page === 'groups') {
+                const gp = document.querySelector('.groups-page');
+                if (gp) gp.classList.add('active');
+                if (typeof closeGroupDetail === 'function') closeGroupDetail();
+                if (typeof loadGroupsPage === 'function') loadGroupsPage();
+            } else if (page === 'profile') {
+                const prp = document.querySelector('.profile-page');
+                if (prp) prp.classList.add('active');
+                if (typeof refreshFollowCounts === 'function') refreshFollowCounts();
+            }
+        }
+
         function navigateToFeed() {
             const sp = document.getElementById('signupPage');
             const lp = document.getElementById('loginPage');
