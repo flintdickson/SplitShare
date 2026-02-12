@@ -152,22 +152,27 @@
             max-width: 100px;
         }
 
-        nav a::before {
-            content: attr(data-icon);
-            font-size: 24px;
+        nav a:hover { color: var(--primary); }
+        nav a.active { color: var(--primary); }
+        nav a::after { display: none; }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
             transition: all 0.3s ease;
+            flex-shrink: 0;
         }
 
-        nav a:hover {
-            color: var(--primary);
+        nav a.active .nav-icon,
+        nav a:hover .nav-icon {
+            stroke: var(--primary);
+            filter: drop-shadow(0 0 6px rgba(255,107,53,0.5));
         }
 
-        nav a.active {
-            color: var(--primary);
-        }
-
-        nav a::after {
-            display: none;
+        .log-btn svg {
+            stroke: white;
+            pointer-events: none;
         }
 
         /* Center Log Button */
@@ -871,7 +876,7 @@
 
             /* Nav */
             nav a         { font-size: 9px; padding: 4px 4px; max-width: 64px; gap: 2px; }
-            nav a::before { font-size: 18px; }
+            .nav-icon { width: 20px; height: 20px; }
             .log-btn      { width: 46px; height: 46px; font-size: 20px; margin-top: -23px; }
 
             /* Cards */
@@ -1933,7 +1938,7 @@
 
             <!-- User Search Bar -->
             <div style="position:relative; margin:25px 0 20px 0;">
-                <input id="userSearchInput" type="text" placeholder="🔍  Search users by name or @username..."
+                <input id="userSearchInput" type="text" placeholder="<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>  Search users by name or @username..."
                     style="width:100%;padding:16px 20px;background:var(--steel);border:2px solid #333;color:var(--white);font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:0.5px;transition:border-color 0.3s;"
                     oninput="handleUserSearch(this.value)"
                     onfocus="this.style.borderColor='var(--primary)'"
@@ -1952,7 +1957,7 @@
 
             <div class="activity-feed" id="mainFeed">
                 <div class="feed-empty-state" id="feedEmptyState" style="display:none; text-align:center; padding:80px 20px; color:#999;">
-                    <div style="font-size:64px; margin-bottom:20px;">🏋️</div>
+                    <div style="font-size:64px; margin-bottom:20px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/><rect x="7" y="8" width="2" height="8" rx="1"/><rect x="15" y="8" width="2" height="8" rx="1"/><line x1="9" y1="12" x2="15" y2="12" stroke-width="2.5"/></svg></div>
                     <h3 style="font-family:'Bebas Neue',cursive; font-size:32px; color:var(--primary); margin-bottom:10px; letter-spacing:2px;">NO WORKOUTS YET</h3>
                     <p style="font-size:16px; line-height:1.6;" id="feedEmptyMsg">Be the first to log a workout!<br>Hit the <strong style="color:var(--primary)">+</strong> button below to get started.</p>
                 </div>
@@ -1973,17 +1978,23 @@
                 <div id="exerciseSelector" class="exercise-selector"></div>
             </div>
 
-            <!-- Empty state -->
-            <div id="progressEmptyState" style="display:none; text-align:center; padding:80px 20px; color:#999;">
-                <div style="font-size:64px; margin-bottom:20px;">📊</div>
-                <h3 style="font-family:'Bebas Neue',cursive; font-size:32px; color:var(--primary); margin-bottom:10px; letter-spacing:2px;">NO DATA YET</h3>
-                <p style="font-size:16px; line-height:1.8;">Log workouts with exercises and weights<br>to see your progress charts here.</p>
+            <!-- Empty state with demo chart -->
+            <div id="progressEmptyState" style="display:none;">
+                <div class="chart-container">
+                    <h2 class="chart-title">Your Progress Will Appear Here</h2>
+                    <div style="position:relative; height:320px; width:100%;">
+                        <canvas id="demoChart"></canvas>
+                    </div>
+                    <div style="text-align:center; padding:20px 0 0; color:#666; font-size:13px; letter-spacing:1px; text-transform:uppercase;">
+                        Log workouts with weights to track your real gains
+                    </div>
+                </div>
             </div>
 
             <div id="progressChartContainer" class="chart-container" style="display:none;">
                 <h2 class="chart-title" id="chartTitle">Progress</h2>
-                <div class="chart-wrapper">
-                    <canvas id="progressChart" class="chart-canvas"></canvas>
+                <div class="chart-wrapper" style="position:relative; height:320px; width:100%;">
+                    <canvas id="progressChart"></canvas>
                 </div>
                 <div class="stats-grid">
                     <div class="stat-box">
@@ -2031,7 +2042,7 @@
                         <p class="progress-subtitle">Train together, achieve together</p>
                     </div>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        <button class="create-group-btn" style="background:transparent;border:2px solid var(--primary);color:var(--primary);" onclick="showJoinGroupPanel()">🔍 Find Group</button>
+                        <button class="create-group-btn" style="background:transparent;border:2px solid var(--primary);color:var(--primary);" onclick="showJoinGroupPanel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Find Group</button>
                         <button class="create-group-btn" onclick="showCreateGroupPanel()">+ Create Group</button>
                     </div>
                 </div>
@@ -2089,7 +2100,7 @@
                     <!-- Populated by JS -->
                 </div>
                 <div id="myGroupsEmpty" style="display:none;text-align:center;padding:80px 20px;color:#999;">
-                    <div style="font-size:64px;margin-bottom:20px;">👥</div>
+                    <div style="font-size:64px;margin-bottom:20px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
                     <h3 style="font-family:'Bebas Neue',cursive;font-size:32px;color:var(--primary);margin-bottom:10px;letter-spacing:2px;">NO GROUPS YET</h3>
                     <p style="font-size:16px;line-height:1.8;">Create a group or find one by its Group ID.</p>
                 </div>
@@ -2109,7 +2120,7 @@
                     <h3 style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--primary);letter-spacing:2px;margin-bottom:20px;">POST WORKOUT CHALLENGE</h3>
                     <div class="form-group">
                         <label>Challenge Title</label>
-                        <input id="challengeTitle" type="text" placeholder="Monday Push Day 💪">
+                        <input id="challengeTitle" type="text" placeholder="Monday Push Day <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1l-1 4H9l-1-4H7a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3h1V6a4 4 0 0 1 4-4z" stroke="var(--primary)" fill="rgba(255,107,53,0.2)" stroke-width="1.5"/></svg>">
                     </div>
                     <div class="form-group">
                         <label>Description</label>
@@ -2149,7 +2160,7 @@
                     <div class="profile-info">
                         <h1 class="profile-name" id="profileName">Marcus King</h1>
                         <div class="profile-username" id="profileUsername">@marcusking</div>
-                        <p class="profile-bio" id="profileBio">Powerlifter | 5 AM Grind | Chasing 500lb deadlift 💪</p>
+                        <p class="profile-bio" id="profileBio">Powerlifter | 5 AM Grind | Chasing 500lb deadlift <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1l-1 4H9l-1-4H7a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3h1V6a4 4 0 0 1 4-4z" stroke="var(--primary)" fill="rgba(255,107,53,0.2)" stroke-width="1.5"/></svg></p>
                         <div class="profile-stats-row">
                             <div class="profile-stat-item">
                                 <div class="profile-stat-number" id="profileWorkoutCount">0</div>
@@ -2328,21 +2339,45 @@
 
     <!-- Bottom Navigation -->
     <nav>
-        <a href="#" class="nav-link active" data-page="feed" data-icon="🏠">
+        <a href="#" class="nav-link active" data-page="feed">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Feed / flame bolt = activity -->
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
             <span>Feed</span>
         </a>
-        <a href="#" class="nav-link" data-page="progress" data-icon="📊">
+        <a href="#" class="nav-link" data-page="progress">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Progress / upward trend line -->
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
             <span>Progress</span>
         </a>
         <div class="log-btn-container">
             <button class="log-btn" onclick="openModal()">
-                <span>+</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:22px;height:22px;">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
             </button>
         </div>
-        <a href="#" class="nav-link" data-page="groups" data-icon="👥">
+        <a href="#" class="nav-link" data-page="groups">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Groups / dumbbell -->
+                <rect x="2" y="10" width="4" height="4" rx="1"/>
+                <rect x="18" y="10" width="4" height="4" rx="1"/>
+                <rect x="7" y="8" width="2" height="8" rx="1"/>
+                <rect x="15" y="8" width="2" height="8" rx="1"/>
+                <line x1="9" y1="12" x2="15" y2="12" stroke-width="2.5"/>
+            </svg>
             <span>Groups</span>
         </a>
-        <a href="#" class="nav-link" data-page="profile" data-icon="👤">
+        <a href="#" class="nav-link" data-page="profile">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Profile / person -->
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
             <span>Profile</span>
         </a>
     </nav>
@@ -2374,7 +2409,7 @@
                 <div class="form-group">
                     <label>Add Photo (Optional)</label>
                     <div class="photo-upload-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
-                        <div class="upload-icon">📸</div>
+                        <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
                         <div class="upload-text">Click to upload workout photo</div>
                         <img id="previewImage" class="preview-image" alt="Workout preview">
                         <button type="button" class="remove-photo" id="removePhoto">×</button>
@@ -2384,7 +2419,7 @@
 
                 <div class="form-group">
                     <label>Caption (Optional)</label>
-                    <textarea id="captionInput" rows="2" placeholder="Feeling strong today! 💪"></textarea>
+                    <textarea id="captionInput" rows="2" placeholder="Feeling strong today! <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1l-1 4H9l-1-4H7a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3h1V6a4 4 0 0 1 4-4z" stroke="var(--primary)" fill="rgba(255,107,53,0.2)" stroke-width="1.5"/></svg>"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -2572,7 +2607,7 @@
                     return `<div class="group-card" onclick="openGroupDetail('${g.id}')">
                         <div class="group-header-banner">
                             <h3 class="group-name">${g.name}</h3>
-                            <div class="group-members-count">${g.privacy === 'private' ? '🔒 Private' : '🌐 Public'} · ID: ${g.group_id}</div>
+                            <div class="group-members-count">${g.privacy === 'private' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Private' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Public'} · ID: ${g.group_id}</div>
                         </div>
                         <div class="group-body">
                             <p class="group-description">${g.description || 'No description.'}</p>
@@ -2646,10 +2681,10 @@
                 result.innerHTML = `
                     <div style="background:var(--iron);border-left:4px solid var(--primary);padding:20px;margin-top:10px;">
                         <div style="font-family:'Bebas Neue',cursive;font-size:24px;color:var(--white);margin-bottom:5px;">${g.name}</div>
-                        <div style="font-size:13px;color:#999;margin-bottom:10px;">${g.privacy === 'private' ? '🔒 Private Group' : '🌐 Public Group'} · ID: ${g.group_id}</div>
+                        <div style="font-size:13px;color:#999;margin-bottom:10px;">${g.privacy === 'private' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Private Group' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Public Group'} · ID: ${g.group_id}</div>
                         <p style="color:#ccc;font-size:14px;margin-bottom:15px;">${g.description || ''}</p>
                         ${isMember
-                            ? '<span style="color:#4ade80;font-size:14px;font-weight:600;">✅ You are already a member</span>'
+                            ? '<span style="color:#4ade80;font-size:14px;font-weight:600;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:#4ade80;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> You are already a member</span>'
                             : g.privacy === 'private'
                                 ? `<div style="display:flex;gap:10px;align-items:center;margin-top:10px;">
                                     <input id="joinCodeInput" type="text" placeholder="Enter join code" style="padding:12px;background:var(--steel);border:2px solid #333;color:#fff;font-family:'Oswald',sans-serif;font-size:14px;flex:1;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
@@ -2693,15 +2728,15 @@
 
                 document.getElementById('groupDetailTitle').textContent = g.name;
                 document.getElementById('groupDetailInfo').innerHTML = `
-                    <span>👥 ${memberCount} member${memberCount !== 1 ? 's' : ''}</span>
-                    <span>${g.privacy === 'private' ? '🔒 Private' : '🌐 Public'}</span>
-                    <span>🆔 ${g.group_id}</span>
-                    ${isCreator && g.privacy === 'private' ? `<span>🔑 Join Code: <strong style="color:var(--primary)">${g.join_code}</strong></span>` : ''}`;
+                    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> ${memberCount} member${memberCount !== 1 ? 's' : ''}</span>
+                    <span>${g.privacy === 'private' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Private' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Public'}</span>
+                    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h4m-4 4h4m6-4h2m-2 4h2"/><circle cx="16" cy="11" r="2"/></svg> ${g.group_id}</span>
+                    ${isCreator && g.privacy === 'private' ? `<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg> Join Code: <strong style="color:var(--primary)">${g.join_code}</strong></span>` : ''}`;
 
                 const actions = document.getElementById('groupDetailActions');
                 actions.innerHTML = isCreator
-                    ? `<button class="post-workout-btn" onclick="document.getElementById('postChallengePanel').style.display='block'">📝 Post Workout Challenge</button>
-                       <button style="background:transparent;border:2px solid #666;color:#999;padding:12px 25px;font-family:'Oswald',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;" onclick="handleDeleteGroup('${g.id}')">🗑 Delete Group</button>`
+                    ? `<button class="post-workout-btn" onclick="document.getElementById('postChallengePanel').style.display='block'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Post Workout Challenge</button>
+                       <button style="background:transparent;border:2px solid #666;color:#999;padding:12px 25px;font-family:'Oswald',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;" onclick="handleDeleteGroup('${g.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg> Delete Group</button>`
                     : `<button style="background:transparent;border:2px solid #666;color:#999;padding:12px 25px;font-family:'Oswald',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;" onclick="handleLeaveGroup('${g.id}')">Leave Group</button>`;
 
                 await loadGroupChallenges(groupUUID, members, isCreator);
@@ -2714,7 +2749,7 @@
                 const challenges = await sb(`group_challenges?group_id=eq.${groupUUID}&order=created_at.desc&select=*`);
                 if (!challenges || challenges.length === 0) {
                     feed.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#999;">
-                        <div style="font-size:48px;margin-bottom:15px;">🏋️</div>
+                        <div style="font-size:48px;margin-bottom:15px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/><rect x="7" y="8" width="2" height="8" rx="1"/><rect x="15" y="8" width="2" height="8" rx="1"/><line x1="9" y1="12" x2="15" y2="12" stroke-width="2.5"/></svg></div>
                         <h3 style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">NO CHALLENGES YET</h3>
                         <p>${isCreator ? 'Post the first workout challenge above!' : 'Waiting for the group creator to post a challenge.'}</p>
                     </div>`; return;
@@ -2740,7 +2775,7 @@
                                 <div class="completion-name">${c.profiles?.full_name || 'Unknown'}</div>
                                 <div class="completion-time">${new Date(c.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
                             </div>
-                            <span class="completion-status">✅</span>
+                            <span class="completion-status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:#4ade80;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
                         </div>`).join('');
 
                     const dateStr = new Date(ch.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
@@ -2756,12 +2791,12 @@
                                 <div class="completions-title">Completions (${chCompletions.length})</div>
                                 ${!myCompletion
                                     ? `<button class="complete-workout-btn" onclick="handleMarkComplete('${ch.id}', this)">✓ Mark Complete</button>`
-                                    : `<button class="complete-workout-btn completed" disabled>✅ Completed!</button>`
+                                    : `<button class="complete-workout-btn completed" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:#4ade80;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Completed!</button>`
                                 }
                             </div>
                             <div class="completions-grid">${completionItems || '<p style="color:#666;font-size:13px;padding:10px;">No completions yet. Be the first!</p>'}</div>
                         </div>
-                        ${isCreator ? `<div style="padding:10px 30px;border-top:1px solid #333;"><button onclick="handleDeleteChallenge('${ch.id}')" style="background:transparent;border:none;color:#555;font-family:'Oswald',sans-serif;font-size:13px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">🗑 Delete Challenge</button></div>` : ''}
+                        ${isCreator ? `<div style="padding:10px 30px;border-top:1px solid #333;"><button onclick="handleDeleteChallenge('${ch.id}')" style="background:transparent;border:none;color:#555;font-family:'Oswald',sans-serif;font-size:13px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4h6v2"/></svg> Delete Challenge</button></div>` : ''}
                     </div>`;
                 }).join('');
             } catch(e) { feed.innerHTML = `<p style="color:#ff6b35;padding:20px;">Error loading challenges: ${e.message}</p>`; }
@@ -2801,7 +2836,7 @@
         async function handleMarkComplete(challengeId, btn) {
             try {
                 await sb('group_completions', { method: 'POST', body: { challenge_id: challengeId, user_id: window._sbUserId, group_id: currentGroupData.id } });
-                btn.textContent = '✅ Completed!';
+                btn.textContent = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:#4ade80;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Completed!';
                 btn.classList.add('completed');
                 btn.disabled = true;
                 // Reload to show new completion
@@ -2892,6 +2927,46 @@
                 if (emptyState) emptyState.style.display = 'block';
                 if (chartContainer) chartContainer.style.display = 'none';
                 if (historyContainer) historyContainer.style.display = 'none';
+                // Render a demo/placeholder chart
+                setTimeout(() => {
+                    const demoCanvas = document.getElementById('demoChart');
+                    if (!demoCanvas || window.demoChart) return;
+                    const demoCtx = demoCanvas.getContext('2d');
+                    const grad = demoCtx.createLinearGradient(0, 0, 0, 320);
+                    grad.addColorStop(0, 'rgba(255,107,53,0.25)');
+                    grad.addColorStop(1, 'rgba(255,107,53,0)');
+                    window.demoChart = new Chart(demoCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Week 1','Week 2','Week 3','Week 4','Week 5','Week 6','Week 7','Week 8'],
+                            datasets: [{
+                                data: [135, 140, 140, 145, 150, 155, 155, 160],
+                                borderColor: 'rgba(255,107,53,0.4)',
+                                backgroundColor: grad,
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 5,
+                                pointBackgroundColor: 'rgba(255,107,53,0.5)',
+                                pointBorderColor: '#333',
+                                pointBorderWidth: 2,
+                                borderDash: [6,4]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { enabled: false }
+                            },
+                            scales: {
+                                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#444', callback: v => v+' lbs', font: {size:11} }, border: { color: '#2a2a2a' } },
+                                x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#444', font: {size:11} }, border: { color: '#2a2a2a' } }
+                            }
+                        }
+                    });
+                }, 150);
                 return;
             }
 
@@ -2934,47 +3009,87 @@
             // Draw chart
             const canvas = document.getElementById('progressChart');
             if (!canvas) return;
+
+            // Force destroy any existing chart
+            if (window.progressChart) {
+                window.progressChart.destroy();
+                window.progressChart = null;
+            }
+
+            // Reset canvas dimensions
+            const wrapper = canvas.parentElement;
+            canvas.width = wrapper.offsetWidth || 400;
+            canvas.height = wrapper.offsetHeight || 320;
+
             const ctx = canvas.getContext('2d');
 
-            if (window.progressChart) { window.progressChart.destroy(); window.progressChart = null; }
+            // Build gradient fill
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, 'rgba(255,107,53,0.35)');
+            gradient.addColorStop(0.6, 'rgba(255,107,53,0.08)');
+            gradient.addColorStop(1, 'rgba(255,107,53,0)');
+
+            // If only 1 session, duplicate point so line is visible
+            const chartLabels = entries.length === 1
+                ? [entries[0].dateLabel, entries[0].dateLabel]
+                : entries.map(e => e.dateLabel);
+            const chartData = entries.length === 1
+                ? [entries[0].weight, entries[0].weight]
+                : entries.map(e => e.weight);
+            const chartPoints = entries.length === 1
+                ? ['#ffb347', '#ffb347']
+                : entries.map(e => e.weight === pr ? '#ffb347' : '#ff6b35');
 
             window.progressChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: entries.map(e => e.dateLabel),
+                    labels: chartLabels,
                     datasets: [{
                         label: 'Weight (lbs)',
-                        data: entries.map(e => e.weight),
+                        data: chartData,
                         borderColor: '#ff6b35',
-                        backgroundColor: 'rgba(255,107,53,0.15)',
-                        borderWidth: 4,
+                        backgroundColor: gradient,
+                        borderWidth: 3,
                         fill: true,
-                        tension: 0.4,
-                        pointRadius: 7,
-                        pointBackgroundColor: entries.map(e => e.weight === pr ? '#ffb347' : '#ff6b35'),
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 3,
-                        pointHoverRadius: 10
+                        tension: 0.35,
+                        pointRadius: entries.map(e => e.weight === pr ? 9 : 6),
+                        pointBackgroundColor: chartPoints,
+                        pointBorderColor: '#1a1a1a',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 11,
+                        pointHoverBackgroundColor: '#ffb347',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: { duration: 600, easing: 'easeInOutQuart' },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#2a2a2a',
+                            backgroundColor: '#1a1a1a',
                             titleColor: '#ff6b35',
-                            bodyColor: '#fff',
+                            bodyColor: '#eee',
                             borderColor: '#ff6b35',
-                            borderWidth: 2,
-                            padding: 15,
+                            borderWidth: 1,
+                            padding: 14,
+                            cornerRadius: 8,
                             displayColors: false,
+                            titleFont: { family: 'Oswald', size: 14, weight: '600' },
+                            bodyFont: { family: 'Roboto Mono', size: 13 },
                             callbacks: {
-                                label: c => c.parsed.y + ' lbs',
+                                title: items => chartLabels[items[0].dataIndex],
+                                label: c => `  ${c.parsed.y} lbs`,
                                 afterLabel: c => {
-                                    const e = entries[c.dataIndex];
-                                    return `${e.sets} sets × ${e.reps} reps`;
+                                    const e = entries[Math.min(c.dataIndex, entries.length-1)];
+                                    const vol = e.weight * (parseInt(e.sets)||1) * (parseInt(e.reps)||1);
+                                    return [
+                                        `  ${e.sets} sets × ${e.reps} reps`,
+                                        `  Volume: ${vol.toLocaleString()} lbs`,
+                                        e.weight === pr ? '  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-4-2-7-2-10-2 2-4 3-4 6 0-5 4-8 4-14-2 2-4 5-4 4z" fill="var(--primary)" stroke="var(--primary-dark)" stroke-width="1"/></svg> Personal Record!' : ''
+                                    ].filter(Boolean);
                                 }
                             }
                         }
@@ -2982,14 +3097,24 @@
                     scales: {
                         y: {
                             beginAtZero: false,
-                            grid: { color: 'rgba(255,255,255,0.08)' },
-                            border: { color: '#333' },
-                            ticks: { color: '#999', font: { family: 'Roboto Mono', size: 13 }, callback: v => v + ' lbs' }
+                            grid: { color: 'rgba(255,255,255,0.06)', lineWidth: 1 },
+                            border: { color: 'rgba(255,255,255,0.1)', dash: [4,4] },
+                            ticks: {
+                                color: '#777',
+                                font: { family: 'Roboto Mono', size: 11 },
+                                padding: 8,
+                                callback: v => v + ' lbs'
+                            }
                         },
                         x: {
-                            grid: { color: 'rgba(255,255,255,0.08)' },
-                            border: { color: '#333' },
-                            ticks: { color: '#999', font: { family: 'Roboto Mono', size: 13 } }
+                            grid: { color: 'rgba(255,255,255,0.04)' },
+                            border: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: {
+                                color: '#777',
+                                font: { family: 'Roboto Mono', size: 11 },
+                                padding: 8,
+                                maxRotation: 45
+                            }
                         }
                     },
                     interaction: { intersect: false, mode: 'index' }
@@ -3233,7 +3358,7 @@
                 const text = this.textContent;
                 if (text.includes('Respect')) {
                     const count = parseInt(text.match(/\d+/)[0]) + 1;
-                    this.innerHTML = `<span class="action-icon">👊</span><span>${count} Respect</span>`;
+                    this.innerHTML = `<span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M14 2c0-1.1.9-2 2-2h.5A2.5 2.5 0 0 1 19 2.5V3c1.1 0 2 .9 2 2v1c1.1 0 2 .9 2 2v5a7 7 0 0 1-7 7H8A6 6 0 0 1 2 14V9c0-1.1.9-2 2-2h1V5c0-1.1.9-2 2-2h1V2c0-1.1.9-2 2-2h4z"/></svg></span><span>${count} Respect</span>`;
                 }
             });
         });
@@ -3273,7 +3398,7 @@
                 const banner = document.createElement('div');
                 banner.style.cssText = `position:fixed;top:0;left:0;right:0;z-index:9999;background:#1a0a00;border-bottom:3px solid #ff6b35;padding:20px 25px;font-family:'Oswald',sans-serif;color:#fff;`;
                 banner.innerHTML = `
-                    <div style="font-size:18px;color:#ff6b35;font-weight:bold;margin-bottom:8px;">⚠️ CANNOT CONNECT TO SERVER</div>
+                    <div style="font-size:18px;color:#ff6b35;font-weight:bold;margin-bottom:8px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> CANNOT CONNECT TO SERVER</div>
                     <div style="font-size:14px;color:#ccc;line-height:1.6;">
                         Opening this file directly won't work because browsers block network requests from local files.<br>
                         <strong style="color:#ff6b35;">Fix:</strong> Host this file on any web server, or use VS Code's Live Server extension.
@@ -3568,7 +3693,7 @@
                 const feed = document.getElementById('viewUserWorkoutFeed');
                 if (!workouts || workouts.length === 0) {
                     feed.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#999;">
-                        <div style="font-size:48px;margin-bottom:15px;">🏋️</div>
+                        <div style="font-size:48px;margin-bottom:15px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/><rect x="7" y="8" width="2" height="8" rx="1"/><rect x="15" y="8" width="2" height="8" rx="1"/><line x1="9" y1="12" x2="15" y2="12" stroke-width="2.5"/></svg></div>
                         <h3 style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">No workouts yet</h3>
                         <p>This user hasn't logged any workouts.</p>
                     </div>`;
@@ -3658,7 +3783,7 @@
                 
                 if (!users || users.length === 0) {
                     content.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#999;">
-                        <div style="font-size:48px;margin-bottom:15px;">👥</div>
+                        <div style="font-size:48px;margin-bottom:15px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
                         <h3 style="font-family:'Bebas Neue',cursive;font-size:24px;color:var(--primary);margin-bottom:10px;">No ${type} yet</h3>
                     </div>`;
                     return;
@@ -3779,7 +3904,7 @@
                 
                 if (!memberships || memberships.length === 0) {
                     grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#999;">
-                        <div style="font-size:48px;margin-bottom:15px;">👥</div>
+                        <div style="font-size:48px;margin-bottom:15px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
                         <h3 style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">No Groups Yet</h3>
                         <p>Join or create a group to train with others!</p>
                         <button onclick="document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));document.querySelector('.nav-link[data-page=\\'groups\\']').classList.add('active');document.querySelectorAll('.feed-page,.progress-page,.groups-page,.profile-page').forEach(p=>p.classList.remove('active'));document.querySelector('.groups-page').classList.add('active');" 
@@ -3807,7 +3932,7 @@
                     <div class="group-card" onclick="navigateToGroup('${g.id}')" style="cursor:pointer;">
                         <div class="group-header-banner">
                             <h3 class="group-name">${g.name}</h3>
-                            <div class="group-members-count">👥 ${g.memberCount} members</div>
+                            <div class="group-members-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> ${g.memberCount} members</div>
                         </div>
                         <div class="group-body">
                             <p class="group-description">${g.description || 'No description'}</p>
@@ -3818,7 +3943,7 @@
                                     <div class="group-stat-label">Challenges</div>
                                 </div>
                                 <div class="group-stat">
-                                    <div class="group-stat-value">${g.privacy === 'public' ? '🌐 Public' : '🔒 Private'}</div>
+                                    <div class="group-stat-value">${g.privacy === 'public' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Public' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Private'}</div>
                                     <div class="group-stat-label">Privacy</div>
                                 </div>
                             </div>
@@ -3850,7 +3975,7 @@
             const workouts = user.workouts || [];
             if (workouts.length === 0) {
                 feed.innerHTML = `<div style="text-align:center; padding:60px 20px; color:#999;">
-                    <div style="font-size:48px; margin-bottom:15px;">🏋️</div>
+                    <div style="font-size:48px; margin-bottom:15px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/><rect x="7" y="8" width="2" height="8" rx="1"/><rect x="15" y="8" width="2" height="8" rx="1"/><line x1="9" y1="12" x2="15" y2="12" stroke-width="2.5"/></svg></div>
                     <h3 style="font-family:'Bebas Neue',cursive; font-size:28px; color:var(--primary); margin-bottom:10px;">No Workouts Yet</h3>
                     <p>Hit the + button to log your first workout!</p>
                 </div>`;
@@ -3896,10 +4021,10 @@
                     </div>
                     <div class="activity-actions">
                         <button class="action-btn" onclick="handleRespect(this)">
-                            <span class="action-icon">👊</span><span>0 Respect</span>
+                            <span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M14 2c0-1.1.9-2 2-2h.5A2.5 2.5 0 0 1 19 2.5V3c1.1 0 2 .9 2 2v1c1.1 0 2 .9 2 2v5a7 7 0 0 1-7 7H8A6 6 0 0 1 2 14V9c0-1.1.9-2 2-2h1V5c0-1.1.9-2 2-2h1V2c0-1.1.9-2 2-2h4z"/></svg></span><span>0 Respect</span>
                         </button>
-                        <button class="action-btn"><span class="action-icon">💬</span><span>0 Comments</span></button>
-                        <button class="action-btn"><span class="action-icon">🔥</span><span>PR!</span></button>
+                        <button class="action-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span>0 Comments</span></button>
+                        <button class="action-btn"><span class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-4-2-7-2-10-2 2-4 3-4 6 0-5 4-8 4-14-2 2-4 5-4 4z" fill="var(--primary)" stroke="var(--primary-dark)" stroke-width="1"/></svg></span><span>PR!</span></button>
                     </div>
                 </div>`;
             }).join('');
@@ -3914,16 +4039,16 @@
 
             // Define all achievements with earned condition
             const all = [
-                { icon:'🥇', title:'First Rep',         desc:'Log your first workout',          earned: count >= 1 },
-                { icon:'🔟', title:'10 Workout Club',   desc:'Log 10 workouts',                 earned: count >= 10 },
-                { icon:'🏆', title:'25 Workout Club',   desc:'Log 25 workouts',                 earned: count >= 25 },
-                { icon:'💯', title:'100 Workout Club',  desc:'Log 100 workouts',                earned: count >= 100 },
-                { icon:'⏱️', title:'Hour Grinder',      desc:'Log 60+ minutes in a workout',    earned: workouts.some(w => w.duration >= 60) },
-                { icon:'🕐', title:'Time Warrior',      desc:'Log 1,000 total minutes',         earned: totalMinutes >= 1000 },
-                { icon:'💪', title:'Variety Pack',      desc:'Log 5 different exercise names',  earned: new Set(workouts.flatMap(w => (w.exercises||[]).map(e => e.name.toLowerCase()))).size >= 5 },
-                { icon:'🔥', title:'On Fire',           desc:'Log 3 workouts in one week',      earned: hasWorkoutsInWeek(workouts, 3) },
-                { icon:'⚡', title:'Consistent',        desc:'Log workouts 2 weeks in a row',   earned: hasWeeklyStreak(workouts, 2) },
-                { icon:'🦾', title:'Iron Habit',        desc:'Log workouts 4 weeks in a row',   earned: hasWeeklyStreak(workouts, 4) },
+                { icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--accent);"><circle cx="12" cy="8" r="6" stroke="var(--accent)" fill="rgba(255,179,71,0.2)"/><path d="M8.56 2.9L7 7h10l-1.56-4.1M7 7l-4 13h18L17 7" stroke="var(--accent)" fill="none"/><text x="12" y="10" text-anchor="middle" font-size="6" fill="var(--accent)" stroke="none" font-family="sans-serif" font-weight="bold">1</text></svg>', title:'First Rep',         desc:'Log your first workout',          earned: count >= 1 },
+                { icon:'<span style="font-family:'Bebas Neue',cursive;font-size:1em;color:var(--primary);">10</span>', title:'10 Workout Club',   desc:'Log 10 workouts',                 earned: count >= 10 },
+                { icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>', title:'25 Workout Club',   desc:'Log 25 workouts',                 earned: count >= 25 },
+                { icon:'<span style="font-family:'Bebas Neue',cursive;font-size:1em;color:var(--primary);">100</span>', title:'100 Workout Club',  desc:'Log 100 workouts',                earned: count >= 100 },
+                { icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 3h6"/><path d="M12 3v2"/></svg>', title:'Hour Grinder',      desc:'Log 60+ minutes in a workout',    earned: workouts.some(w => w.duration >= 60) },
+                { icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>', title:'Time Warrior',      desc:'Log 1,000 total minutes',         earned: totalMinutes >= 1000 },
+                { icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1l-1 4H9l-1-4H7a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3h1V6a4 4 0 0 1 4-4z" stroke="var(--primary)" fill="rgba(255,107,53,0.2)" stroke-width="1.5"/></svg>', title:'Variety Pack',      desc:'Log 5 different exercise names',  earned: new Set(workouts.flatMap(w => (w.exercises||[]).map(e => e.name.toLowerCase()))).size >= 5 },
+                { icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-4-2-7-2-10-2 2-4 3-4 6 0-5 4-8 4-14-2 2-4 5-4 4z" fill="var(--primary)" stroke="var(--primary-dark)" stroke-width="1"/></svg>', title:'On Fire',           desc:'Log 3 workouts in one week',      earned: hasWorkoutsInWeek(workouts, 3) },
+                { icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--accent);"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="var(--accent)" stroke="var(--accent)" stroke-width="1"/></svg>', title:'Consistent',        desc:'Log workouts 2 weeks in a row',   earned: hasWeeklyStreak(workouts, 2) },
+                { icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M12 2v6m0 0c-3.3 0-6 2.7-6 6v8h12v-8c0-3.3-2.7-6-6-6zm-3 6h6m-6 4h6"/></svg>', title:'Iron Habit',        desc:'Log workouts 4 weeks in a row',   earned: hasWeeklyStreak(workouts, 4) },
             ];
 
             const earned = all.filter(a => a.earned);
@@ -3931,7 +4056,7 @@
 
             if (earned.length === 0 && locked.length > 0) {
                 grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px 20px; color:#999;">
-                    <div style="font-size:48px; margin-bottom:15px;">🎯</div>
+                    <div style="font-size:48px; margin-bottom:15px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
                     <h3 style="font-family:'Bebas Neue',cursive; font-size:28px; color:var(--primary); margin-bottom:10px;">No Achievements Yet</h3>
                     <p>Log workouts to start earning achievements!</p>
                 </div>` + locked.map(a => lockedCard(a)).join('');
@@ -3943,9 +4068,28 @@
                 (locked.length > 0 ? `<div style="grid-column:1/-1; font-family:'Bebas Neue',cursive; font-size:18px; letter-spacing:2px; color:#555; padding:20px 0 5px;">LOCKED (${locked.length})</div>` + locked.map(a => lockedCard(a)).join('') : '');
         }
 
+        const achSVG = {
+            medal:    `<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" width="44" height="44"><circle cx="12" cy="8" r="5" fill="rgba(255,179,71,0.15)"/><path d="M8.5 3.5L7 7h10l-1.5-3.5" stroke-linecap="round"/><line x1="12" y1="5" x2="12" y2="11"/><text x="12" y="10" text-anchor="middle" font-size="5" font-weight="bold" fill="var(--accent)" stroke="none" font-family="sans-serif">1</text></svg>`,
+            ten:      `<svg viewBox="0 0 44 44" width="44" height="44"><text x="22" y="30" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="28" fill="var(--primary)">×10</text></svg>`,
+            trophy:   `<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" width="44" height="44"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z" fill="rgba(255,179,71,0.1)"/></svg>`,
+            hundred:  `<svg viewBox="0 0 44 44" width="44" height="44"><text x="22" y="30" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="20" fill="var(--primary)">×100</text></svg>`,
+            timer:    `<svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" width="44" height="44"><circle cx="12" cy="13" r="8" fill="rgba(255,107,53,0.1)"/><polyline points="12 9 12 13 15 15"/><path d="M9 3h6M12 3v2"/></svg>`,
+            clock:    `<svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" width="44" height="44"><circle cx="12" cy="12" r="10" fill="rgba(255,107,53,0.1)"/><polyline points="12 6 12 12 16 14"/></svg>`,
+            dumbbell: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" width="44" height="44"><rect x="2" y="10" width="4" height="4" rx="1" fill="rgba(255,107,53,0.2)"/><rect x="18" y="10" width="4" height="4" rx="1" fill="rgba(255,107,53,0.2)"/><rect x="7" y="8" width="2" height="8" rx="1" fill="rgba(255,107,53,0.2)"/><rect x="15" y="8" width="2" height="8" rx="1" fill="rgba(255,107,53,0.2)"/><line x1="9" y1="12" x2="15" y2="12" stroke-width="2.5"/></svg>`,
+            fire:     `<svg viewBox="0 0 24 24" fill="var(--primary)" stroke="var(--primary-dark)" stroke-width="0.5" width="44" height="44"><path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-4-2-7-2-10-2 2-4 3-4 6 0-5 4-8 4-14-2 2-4 5-4 4z"/></svg>`,
+            bolt:     `<svg viewBox="0 0 24 24" fill="var(--accent)" stroke="none" width="44" height="44"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>`,
+            arm:      `<svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" width="44" height="44"><path d="M6 15l3-5 4-1 5-4" stroke-linecap="round"/><path d="M18 5l1 3-2 2-5 4-4 1-3 5" stroke-linecap="round"/><rect x="3" y="19" width="5" height="2" rx="1" fill="rgba(255,107,53,0.3)"/><rect x="16" y="3" width="5" height="2" rx="1" fill="rgba(255,107,53,0.3)"/></svg>`,
+        };
+        const achSVGMap = {
+            'First Rep': achSVG.medal, '10 Workout Club': achSVG.ten, '25 Workout Club': achSVG.trophy,
+            '100 Workout Club': achSVG.hundred, 'Hour Grinder': achSVG.timer, 'Time Warrior': achSVG.clock,
+            'Variety Pack': achSVG.dumbbell, 'On Fire': achSVG.fire, 'Consistent': achSVG.bolt, 'Iron Habit': achSVG.arm,
+        };
+
         function earnedCard(a) {
-            return `<div class="achievement-card" style="border-color:var(--primary);">
-                <div class="achievement-icon">${a.icon}</div>
+            const svg = achSVGMap[a.title] || achSVG.trophy;
+            return `<div class="achievement-card" style="border-color:var(--primary);text-align:center;">
+                <div style="display:flex;align-items:center;justify-content:center;height:56px;margin-bottom:10px;">${svg}</div>
                 <div class="achievement-title">${a.title}</div>
                 <div class="achievement-description">${a.desc}</div>
             </div>`;
@@ -3953,7 +4097,7 @@
 
         function lockedCard(a) {
             return `<div class="achievement-card" style="opacity:0.35; filter:grayscale(1);">
-                <div class="achievement-icon">🔒</div>
+                <div class="achievement-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
                 <div class="achievement-title" style="color:#666;">${a.title}</div>
                 <div class="achievement-description">${a.desc}</div>
             </div>`;
@@ -4369,7 +4513,7 @@
                         padding:9px 12px;background:rgba(0,0,0,0.25);border-radius:8px;
                         border-left:3px solid ${isPR ? 'var(--accent)' : 'var(--sweat)'};">
                         <span style="font-family:'Roboto Mono',monospace;font-size:12px;color:#eee;">
-                            ${ex.name}${isPR ? ' <span style="color:var(--accent);font-size:10px;">🔥PR</span>' : ''}
+                            ${ex.name}${isPR ? ' <span style="color:var(--accent);font-size:10px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-4-2-7-2-10-2 2-4 3-4 6 0-5 4-8 4-14-2 2-4 5-4 4z" fill="var(--primary)" stroke="var(--primary-dark)" stroke-width="1"/></svg>PR</span>' : ''}
                         </span>
                         <span style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--sweat);white-space:nowrap;margin-left:8px;">
                             ${ex.sets||'?'}×${ex.reps||'?'}${ex.weight?' @ '+ex.weight+'lb':''}
@@ -4390,7 +4534,7 @@
                         <div style="font-size:9px;color:#999;text-transform:uppercase;letter-spacing:1px;">Minutes</div>
                     </div>` : ''}
                     ${hasPR ? `<div style="background:rgba(255,179,71,0.15);border:1px solid rgba(255,179,71,0.4);border-radius:8px;padding:6px 12px;text-align:center;flex:1;">
-                        <div style="font-size:18px;">🔥</div>
+                        <div style="font-size:18px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;color:var(--primary);"><path d="M12 2c0 6-6 8-6 14a6 6 0 0 0 12 0c0-4-2-7-2-10-2 2-4 3-4 6 0-5 4-8 4-14-2 2-4 5-4 4z" fill="var(--primary)" stroke="var(--primary-dark)" stroke-width="1"/></svg></div>
                         <div style="font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;font-weight:700;">PR!</div>
                     </div>` : ''}
                 </div>`;
@@ -4453,7 +4597,7 @@
                     </button>
                     <button class="action-btn" onclick="openComments('${w.id}')"
                         style="flex:1;justify-content:center;color:#777;border-radius:0 0 10px 0;">
-                        <span style="font-size:16px;">💬</span>
+                        <span style="font-size:16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1em;height:1em;display:inline-block;vertical-align:-0.1em;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
                         <span>${commentCount} ${commentCount===1?'Comment':'Comments'}</span>
                     </button>
                 </div>`;
