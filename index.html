@@ -756,8 +756,9 @@
         /* Workout Photo in Activity Cards */
         .workout-photo {
             width: 100%;
-            height: 450px;
+            aspect-ratio: 3 / 4;
             object-fit: cover;
+            display: block;
             margin: 0;
             border: none;
         }
@@ -974,6 +975,92 @@
         }
         .detail-ex-table tr:last-child td { border-bottom: none; }
         .detail-ex-table td:first-child { color: #fff; font-weight: 500; font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 0.5px; }
+
+        /* ── FEED SEARCH BAR ──────────────────────────────────────── */
+        .feed-search-wrap {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .feed-search-input {
+            width: 100%;
+            padding: 13px 18px 13px 44px;
+            background: var(--steel);
+            border: 1.5px solid #2a2a2a;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Oswald', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        .feed-search-input::placeholder { color: #444; }
+        .feed-search-input:focus { border-color: var(--primary); }
+        .feed-search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #444;
+            pointer-events: none;
+            font-size: 18px;
+        }
+        .search-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0; right: 0;
+            background: #161616;
+            border: 1.5px solid #2a2a2a;
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 500;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+            display: none;
+        }
+        .search-dropdown.open { display: block; }
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            border-bottom: 1px solid #1e1e1e;
+            text-decoration: none;
+        }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover { background: rgba(255,107,53,0.08); }
+        .search-result-avatar {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 16px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .search-result-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .search-result-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+        .search-result-username {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 11px;
+            color: #555;
+            margin-top: 1px;
+        }
+        .search-no-results {
+            padding: 16px;
+            text-align: center;
+            color: #444;
+            font-family: 'Oswald', sans-serif;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
 
         /* Responsive */
         @media (max-width: 1024px) {
@@ -1987,8 +2074,23 @@
         <div class="feed-page active">
             <!-- Feed Section -->
         <section class="feed-section">
-            <div class="section-header">
-                <h2 class="section-title">Activity Feed</h2>
+
+            <!-- Search bar -->
+            <div class="feed-search-wrap" id="feedSearchWrap">
+                <span class="feed-search-icon">🔍</span>
+                <input
+                    class="feed-search-input"
+                    id="feedSearchInput"
+                    type="text"
+                    placeholder="Search people…"
+                    autocomplete="off"
+                    oninput="onFeedSearch(this.value)"
+                    onfocus="if(this.value.trim()) openSearchDropdown()"
+                >
+                <div class="search-dropdown" id="searchDropdown"></div>
+            </div>
+
+            <div class="section-header" style="margin-top:0;margin-bottom:14px;">
                 <div class="filter-tabs">
                     <button class="filter-tab active">Following</button>
                     <button class="filter-tab">Everyone</button>
@@ -3472,6 +3574,151 @@
             container.appendChild(makeExerciseRow());
         }
 
+        // ── FEED SEARCH ──────────────────────────────────────────────────────
+        let _searchTimer = null;
+
+        function onFeedSearch(val) {
+            clearTimeout(_searchTimer);
+            const q = val.trim();
+            if (!q) { closeSearchDropdown(); return; }
+            _searchTimer = setTimeout(() => runSearch(q), 220);
+        }
+
+        async function runSearch(q) {
+            const dropdown = document.getElementById('searchDropdown');
+            if (!dropdown) return;
+            dropdown.innerHTML = `<div class="search-no-results">Searching…</div>`;
+            openSearchDropdown();
+            try {
+                // Search by full_name or username (case-insensitive via ilike)
+                const results = await sb(
+                    `profiles?or=(full_name.ilike.*${encodeURIComponent(q)}*,username.ilike.*${encodeURIComponent(q)}*)&select=id,full_name,username,initials,avatar_url&limit=8`
+                );
+                renderSearchResults(results || []);
+            } catch(e) {
+                dropdown.innerHTML = `<div class="search-no-results">Search unavailable</div>`;
+            }
+        }
+
+        function renderSearchResults(results) {
+            const dropdown = document.getElementById('searchDropdown');
+            if (!dropdown) return;
+            if (results.length === 0) {
+                dropdown.innerHTML = `<div class="search-no-results">No users found</div>`;
+                return;
+            }
+            dropdown.innerHTML = results.map(p => {
+                const name     = p.full_name || p.username || 'Unknown';
+                const initials = p.initials || name.slice(0,2).toUpperCase();
+                const avHtml   = p.avatar_url
+                    ? `<img src="${p.avatar_url}" alt="">`
+                    : initials;
+                return `<div class="search-result-item" onclick="openUserProfile('${p.id}','${name.replace(/'/g,"\\'")}','${(p.username||'').replace(/'/g,"\\'")}','${initials}','${p.avatar_url||''}')">
+                    <div class="search-result-avatar">${avHtml}</div>
+                    <div>
+                        <div class="search-result-name">${name}</div>
+                        <div class="search-result-username">@${p.username||''}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function openSearchDropdown() {
+            document.getElementById('searchDropdown')?.classList.add('open');
+        }
+
+        function closeSearchDropdown() {
+            document.getElementById('searchDropdown')?.classList.remove('open');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', e => {
+            const wrap = document.getElementById('feedSearchWrap');
+            if (wrap && !wrap.contains(e.target)) closeSearchDropdown();
+        });
+
+        // Navigate to a user's profile overlay
+        async function openUserProfile(userId, name, username, initials, avatarUrl) {
+            closeSearchDropdown();
+            document.getElementById('feedSearchInput').value = '';
+
+            // Build a lightweight profile overlay
+            let overlay = document.getElementById('userProfileOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'userProfileOverlay';
+                overlay.style.cssText = `
+                    position:fixed;top:0;left:0;right:0;bottom:0;
+                    z-index:1997;background:#0a0a0a;
+                    overflow-y:auto;padding-bottom:90px;
+                    transform:translateX(100%);
+                    transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);
+                    -webkit-overflow-scrolling:touch;
+                `;
+                document.body.appendChild(overlay);
+            }
+
+            const avHtml = avatarUrl
+                ? `<img src="${avatarUrl}" style="width:76px;height:76px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);">`
+                : `<div style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:30px;">${initials}</div>`;
+
+            overlay.innerHTML = `
+                <!-- sticky back bar -->
+                <div style="position:sticky;top:0;z-index:10;background:rgba(10,10,10,0.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #1a1a1a;padding:14px 18px;display:flex;align-items:center;gap:14px;">
+                    <button onclick="closeUserProfile()" style="background:transparent;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;color:#888;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;padding:0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        Back
+                    </button>
+                </div>
+                <!-- profile header -->
+                <div style="padding:24px 18px 20px;border-bottom:1px solid #161616;">
+                    <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+                        ${avHtml}
+                        <div>
+                            <div style="font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:2px;color:#fff;line-height:1.1;">${name}</div>
+                            <div style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--primary);margin-top:2px;">@${username}</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- workouts feed -->
+                <div style="padding:14px 0 0;" id="userProfileWorkouts">
+                    <div style="text-align:center;padding:50px 20px;color:#333;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;">Loading…</div>
+                </div>`;
+
+            overlay.style.display = 'block';
+            // Trigger slide-in
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => { overlay.style.transform = 'translateX(0)'; });
+            });
+
+            // Load their workouts
+            try {
+                const workouts = await sb(`workouts?user_id=eq.${userId}&order=created_at.desc&limit=20&select=*`);
+                const feed = document.getElementById('userProfileWorkouts');
+                if (!feed) return;
+                if (!workouts || workouts.length === 0) {
+                    feed.innerHTML = `<div style="text-align:center;padding:50px 20px;color:#333;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;">No workouts yet</div>`;
+                    return;
+                }
+                feed.innerHTML = '';
+                workouts.forEach(w => {
+                    const dateStr = w.created_at ? new Date(w.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+                    const card = buildSimpleCard({ name:w.name, duration:w.duration, exercises:w.exercises||[], photoSrc:w.photo_url||null, caption:w.caption||null, dateStr, avatarUrl, initials, userName:name });
+                    feed.appendChild(card);
+                });
+            } catch(e) {
+                const feed = document.getElementById('userProfileWorkouts');
+                if (feed) feed.innerHTML = `<div style="text-align:center;padding:40px;color:#333;">Could not load workouts</div>`;
+            }
+        }
+
+        function closeUserProfile() {
+            const overlay = document.getElementById('userProfileOverlay');
+            if (!overlay) return;
+            overlay.style.transform = 'translateX(100%)';
+            setTimeout(() => { overlay.style.display = 'none'; }, 320);
+        }
+
         // ── STEP NAVIGATION ──────────────────────────────────────────────────
         function goToStep1() {
             document.getElementById('logStep1').style.display = 'block';
@@ -3518,7 +3765,7 @@
             // opts: { name, duration, exercises, photoSrc, caption, dateStr, avatarUrl, initials, userName }
             const { name, duration, exercises=[], photoSrc, caption, dateStr, avatarUrl, initials, userName } = opts;
 
-            const photoHTML   = photoSrc ? `<img src="${photoSrc}" class="workout-photo" alt="" style="width:100%;max-height:360px;object-fit:cover;display:block;">` : '';
+            const photoHTML   = photoSrc ? `<img src="${photoSrc}" class="workout-photo" alt="">` : '';
             const captionHTML = caption  ? `<p style="padding:12px 18px 0;font-size:14px;color:#ccc;line-height:1.5;">"${caption}"</p>` : '';
 
             const pills = exercises.slice(0, 6).map(ex =>
