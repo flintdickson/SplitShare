@@ -1939,272 +1939,24 @@
                 <button class="create-group-btn" onclick="openCreateGroupModal()">+ Create Group</button>
             </div>
 
-            <div class="groups-grid">
-                <!-- Group Card 1 -->
-                <div class="group-card" onclick="openGroup('morning-grind')">
-                    <div class="group-header-banner">
-                        <h3 class="group-name">Morning Grind Crew</h3>
-                        <div class="group-members-count">👥 12 members</div>
-                    </div>
-                    <div class="group-body">
-                        <p class="group-description">Early morning lifters crushing it before work. 5 AM squad! 💪</p>
-                        <div class="group-stats">
-                            <div class="group-stat">
-                                <div class="group-stat-value">24</div>
-                                <div class="group-stat-label">Workouts</div>
-                            </div>
-                            <div class="group-stat">
-                                <div class="group-stat-value">89%</div>
-                                <div class="group-stat-label">Completion</div>
-                            </div>
-                        </div>
-                        <button class="view-group-btn">View Group</button>
-                    </div>
-                </div>
-
-                <!-- Group Card 2 -->
-                <div class="group-card" onclick="openGroup('powerlifting')">
-                    <div class="group-header-banner">
-                        <h3 class="group-name">Powerlifting Gang</h3>
-                        <div class="group-members-count">👥 8 members</div>
-                    </div>
-                    <div class="group-body">
-                        <p class="group-description">Focused on the big three: squat, bench, deadlift. Let's get strong! 🏋️</p>
-                        <div class="group-stats">
-                            <div class="group-stat">
-                                <div class="group-stat-value">18</div>
-                                <div class="group-stat-label">Workouts</div>
-                            </div>
-                            <div class="group-stat">
-                                <div class="group-stat-value">92%</div>
-                                <div class="group-stat-label">Completion</div>
-                            </div>
-                        </div>
-                        <button class="view-group-btn">View Group</button>
-                    </div>
-                </div>
-
-                <!-- Group Card 3 -->
-                <div class="group-card" onclick="openGroup('summer-shred')">
-                    <div class="group-header-banner">
-                        <h3 class="group-name">Summer Shred</h3>
-                        <div class="group-members-count">👥 25 members</div>
-                    </div>
-                    <div class="group-body">
-                        <p class="group-description">12-week program to get beach ready. High intensity, high accountability! 🔥</p>
-                        <div class="group-stats">
-                            <div class="group-stat">
-                                <div class="group-stat-value">36</div>
-                                <div class="group-stat-label">Workouts</div>
-                            </div>
-                            <div class="group-stat">
-                                <div class="group-stat-value">76%</div>
-                                <div class="group-stat-label">Completion</div>
-                            </div>
-                        </div>
-                        <button class="view-group-btn">View Group</button>
-                    </div>
+            <!-- Dynamic groups grid — rendered by JS -->
+            <div class="groups-grid" id="groupsGrid">
+                <div id="groupsEmptyState" style="grid-column:1/-1;text-align:center;padding:80px 20px;color:#999;">
+                    <div style="font-size:56px;margin-bottom:16px;">👥</div>
+                    <h3 style="font-family:'Bebas Neue',cursive;font-size:32px;color:var(--primary);margin-bottom:10px;">No Groups Yet</h3>
+                    <p style="font-size:15px;margin-bottom:24px;">Create a group or ask a friend to invite you</p>
+                    <button onclick="openCreateGroupModal()" style="background:var(--primary);color:#fff;border:none;padding:14px 36px;font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">+ Create Group</button>
                 </div>
             </div>
 
-            <!-- Group Detail View -->
+            <!-- Group Detail View — rendered by JS -->
             <div class="group-detail" id="groupDetail">
-                <div class="group-detail-header">
+                <div class="group-detail-header" id="groupDetailHeader">
                     <button class="back-to-groups" onclick="closeGroup()">← Back to Groups</button>
-                    <h2 class="group-detail-title" id="groupDetailTitle">Morning Grind Crew</h2>
-                    <div class="group-detail-info">
-                        <span>👥 12 members</span>
-                        <span>📅 Created Jan 2026</span>
-                        <span>👤 Leader: Marcus King</span>
-                    </div>
-
+                    <h2 class="group-detail-title" id="groupDetailTitle">Group</h2>
+                    <div class="group-detail-info" id="groupDetailInfo"></div>
                 </div>
-
-                <div class="group-workout-feed">
-                    <!-- Workout Challenge 1 -->
-                    <div class="group-workout-card">
-                        <div class="workout-posted-by">
-                            <div class="posted-by-label">Posted by Group Leader</div>
-                            <div class="posted-by-name">Marcus King</div>
-                        </div>
-                        <h3 class="workout-challenge-title">Monday Push Day Challenge</h3>
-                        <p class="workout-challenge-description">Let's crush this push day together! Focus on progressive overload - add 5 lbs from last week if you can. Post your completion photo or just check in when done! 💪</p>
-                        <div class="workout-challenge-exercises">
-                            <div class="exercise-list">
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Barbell Bench Press</span>
-                                    <span class="exercise-details">4 × 8</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Incline Dumbbell Press</span>
-                                    <span class="exercise-details">3 × 10</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Cable Flyes</span>
-                                    <span class="exercise-details">3 × 12</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Overhead Press</span>
-                                    <span class="exercise-details">3 × 8</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Tricep Pushdowns</span>
-                                    <span class="exercise-details">3 × 15</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="completions-section">
-                            <div class="completions-header">
-                                <div class="completions-title">Completions (8/12)</div>
-                                <button class="complete-workout-btn" onclick="completeWorkout(this)">✓ Mark Complete</button>
-                            </div>
-                            <div class="completions-grid">
-                                <div class="completion-item">
-                                    <div class="completion-avatar">JR</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Jessica Rodriguez</div>
-                                        <div class="completion-time">2 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">TC</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Tyler Chen</div>
-                                        <div class="completion-time">3 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">✅</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">SD</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Sarah Davis</div>
-                                        <div class="completion-time">4 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">MJ</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Mike Johnson</div>
-                                        <div class="completion-time">5 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">✅</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">AL</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Alex Lee</div>
-                                        <div class="completion-time">6 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">KB</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Kim Brown</div>
-                                        <div class="completion-time">7 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">✅</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">RP</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Ryan Park</div>
-                                        <div class="completion-time">8 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">✅</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">EN</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Emma Nelson</div>
-                                        <div class="completion-time">9 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1550345332-09e3ac987658?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Workout Challenge 2 -->
-                    <div class="group-workout-card">
-                        <div class="workout-posted-by">
-                            <div class="posted-by-label">Posted by Group Leader</div>
-                            <div class="posted-by-name">Marcus King</div>
-                        </div>
-                        <h3 class="workout-challenge-title">Friday Leg Day 🦵</h3>
-                        <p class="workout-challenge-description">End the week strong with a brutal leg session. Remember: legs don't grow from comfort!</p>
-                        <div class="workout-challenge-exercises">
-                            <div class="exercise-list">
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Back Squat</span>
-                                    <span class="exercise-details">5 × 5</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Romanian Deadlift</span>
-                                    <span class="exercise-details">4 × 8</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Leg Press</span>
-                                    <span class="exercise-details">3 × 12</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Walking Lunges</span>
-                                    <span class="exercise-details">3 × 20</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="completions-section">
-                            <div class="completions-header">
-                                <div class="completions-title">Completions (5/12)</div>
-                                <button class="complete-workout-btn" onclick="completeWorkout(this)">✓ Mark Complete</button>
-                            </div>
-                            <div class="completions-grid">
-                                <div class="completion-item">
-                                    <div class="completion-avatar">TC</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Tyler Chen</div>
-                                        <div class="completion-time">1 hour ago</div>
-                                    </div>
-                                    <span class="completion-status">✅</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">SD</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Sarah Davis</div>
-                                        <div class="completion-time">2 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">✅</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">AL</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Alex Lee</div>
-                                        <div class="completion-time">3 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">MJ</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Mike Johnson</div>
-                                        <div class="completion-time">4 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">✅</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">JR</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Jessica Rodriguez</div>
-                                        <div class="completion-time">5 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div class="group-workout-feed" id="groupWorkoutFeed"></div>
             </div>
         </div>
         <!-- End My Groups Page -->
@@ -2213,7 +1965,11 @@
         <div class="profile-page">
             <div class="profile-header">
                 <div class="profile-top">
-                    <div class="profile-avatar-large" id="profileInitials">MK</div>
+                    <div class="profile-avatar-large" id="profileAvatarWrap" style="position:relative;overflow:hidden;cursor:pointer;" onclick="openEditProfileModal()">
+                        <img id="profileAvatarImg" src="" alt="" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                        <span id="profileInitials">MK</span>
+                        <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.55);text-align:center;padding:5px 0;font-size:10px;letter-spacing:1px;color:#fff;font-family:'Oswald',sans-serif;">EDIT</div>
+                    </div>
                     <div class="profile-info">
                         <h1 class="profile-name" id="profileName">Marcus King</h1>
                         <div class="profile-username" id="profileUsername">@marcusking</div>
@@ -2401,12 +2157,71 @@
         </div>
     </div>
 
+    <!-- Create Group Modal -->
+    <div class="modal" id="createGroupModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCreateGroupModal()">×</button>
+            <h2>Create Group</h2>
+            <form id="createGroupForm">
+                <div class="form-group">
+                    <label>Group Name</label>
+                    <input id="cgName" type="text" placeholder="e.g., Morning Grind Crew">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="cgDesc" rows="3" placeholder="What's this group about? 💪"></textarea>
+                </div>
+                <button type="button" class="submit-btn" onclick="handleCreateGroup()">Create Group</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Completion Sheet (bottom sheet) -->
+    <div id="completionSheet" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1999;background:rgba(0,0,0,0.75);" onclick="if(event.target===this)closeCompletionSheet()">
+        <div style="position:absolute;bottom:0;left:0;right:0;background:var(--iron);border-top:2px solid var(--primary);padding:28px 24px calc(28px + env(safe-area-inset-bottom));animation:slideUp 0.3s ease-out;max-height:90vh;overflow-y:auto;">
+            <div style="font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:2px;color:var(--primary);margin-bottom:6px;">Workout Complete! 💪</div>
+            <div style="color:#999;font-size:13px;letter-spacing:1px;margin-bottom:22px;">Optionally share a photo and comment with the group</div>
+
+            <!-- Photo upload -->
+            <div id="csPhotoZone" onclick="document.getElementById('csPhotoInput').click()" style="border:2px dashed rgba(255,107,53,0.35);padding:24px;text-align:center;background:rgba(255,107,53,0.04);cursor:pointer;border-radius:4px;margin-bottom:16px;position:relative;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='rgba(255,107,53,0.35)'">
+                <div id="csUploadPlaceholder">
+                    <div style="font-size:36px;margin-bottom:6px;">📸</div>
+                    <div style="color:#999;font-size:13px;text-transform:uppercase;letter-spacing:1px;">Tap to add a photo</div>
+                </div>
+                <img id="csPhotoPreview" src="" alt="" style="display:none;width:100%;max-height:280px;object-fit:cover;border-radius:4px;">
+                <button type="button" id="csRemovePhoto" onclick="event.stopPropagation();clearCompletionPhoto()" style="display:none;position:absolute;top:8px;right:8px;background:var(--primary);color:#fff;border:none;width:30px;height:30px;border-radius:50%;font-size:16px;cursor:pointer;line-height:30px;text-align:center;">×</button>
+            </div>
+            <input type="file" id="csPhotoInput" accept="image/*" style="display:none;">
+
+            <!-- Comment -->
+            <textarea id="csComment" rows="3" placeholder="Leave a comment for the group... (optional)" style="width:100%;padding:14px;background:var(--steel);border:2px solid #333;color:var(--white);font-family:'Oswald',sans-serif;font-size:15px;resize:none;margin-bottom:16px;border-radius:0;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#333'"></textarea>
+
+            <div style="display:flex;gap:12px;">
+                <button onclick="submitCompletion()" style="flex:1;background:var(--primary);color:#fff;border:none;padding:16px;font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Post Completion</button>
+                <button onclick="closeCompletionSheet()" style="background:transparent;border:2px solid #444;color:#999;padding:16px 20px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Skip</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Edit Profile Modal -->
     <div class="modal" id="editProfileModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeEditProfileModal()">×</button>
             <h2>Edit Profile</h2>
             <form id="editProfileForm">
+
+                <!-- Avatar Upload -->
+                <div class="form-group" style="text-align:center;">
+                    <label>Profile Photo</label>
+                    <div id="epAvatarWrap" onclick="document.getElementById('epAvatarInput').click()" style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;margin:0 auto 12px;cursor:pointer;position:relative;overflow:hidden;border:3px solid var(--primary);">
+                        <img id="epAvatarPreview" src="" alt="" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                        <span id="epAvatarInitials" style="font-family:'Bebas Neue',cursive;font-size:36px;">??</span>
+                        <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);text-align:center;padding:5px 0;font-size:10px;letter-spacing:1px;color:#fff;font-family:'Oswald',sans-serif;">CHANGE</div>
+                    </div>
+                    <input type="file" id="epAvatarInput" accept="image/*" style="display:none;">
+                    <p style="font-size:12px;color:#666;letter-spacing:1px;">Click photo to change</p>
+                </div>
+
                 <div class="form-group">
                     <label>Full Name</label>
                     <input id="epName" type="text" placeholder="Your full name">
@@ -2439,9 +2254,6 @@
                     <label>Post To Group</label>
                     <select id="gwGroupSelect" required style="width:100%;padding:15px;background:var(--iron);border:2px solid #333;color:var(--white);font-family:'Oswald',sans-serif;font-size:16px;">
                         <option value="">— Select a group —</option>
-                        <option value="morning-grind">Morning Grind Crew</option>
-                        <option value="powerlifting">Powerlifting Gang</option>
-                        <option value="summer-shred">Summer Shred</option>
                     </select>
                 </div>
 
@@ -2579,8 +2391,8 @@
                     setTimeout(() => { loadProgressPage(); }, 100);
                 } else if (page === 'groups' && groupsPage) {
                     groupsPage.classList.add('active');
-                    // Close group detail if open
                     closeGroup();
+                    loadUserGroups();
                 } else if (page === 'profile' && profilePage) {
                     profilePage.classList.add('active');
                 }
@@ -2588,43 +2400,351 @@
         });
 
         // Groups functionality
-        function openGroup(groupId) {
-            const groupsGrid = document.querySelector('.groups-grid');
-            const groupsHeader = document.querySelector('.groups-header');
-            const groupDetail = document.getElementById('groupDetail');
-            
-            if (groupsGrid) groupsGrid.style.display = 'none';
-            if (groupsHeader) groupsHeader.style.display = 'none';
-            if (groupDetail) groupDetail.classList.add('active');
-        }
+        // ── GROUPS ───────────────────────────────────────────────────────────
+        window._userGroups   = [];   // [{id, name, description, created_at, member_count, workout_count}]
+        window._currentGroup = null; // currently open group object
+        window._completionTargetBtn = null; // the Mark Complete button being acted on
 
-        function closeGroup() {
-            const groupsGrid = document.querySelector('.groups-grid');
-            const groupsHeader = document.querySelector('.groups-header');
-            const groupDetail = document.getElementById('groupDetail');
-            
-            if (groupsGrid) groupsGrid.style.display = 'grid';
-            if (groupsHeader) groupsHeader.style.display = 'flex';
-            if (groupDetail) groupDetail.classList.remove('active');
-        }
-
-        function completeWorkout(button) {
-            if (button.classList.contains('completed')) {
-                button.classList.remove('completed');
-                button.textContent = '✓ Mark Complete';
-            } else {
-                button.classList.add('completed');
-                button.textContent = '✅ Completed!';
-                // In a real app, this would add the user to the completions list
-                setTimeout(() => {
-                    alert('Great work! Your completion has been posted to the group! 💪');
-                }, 300);
+        async function loadUserGroups() {
+            const grid = document.getElementById('groupsGrid');
+            const empty = document.getElementById('groupsEmptyState');
+            if (!grid) return;
+            try {
+                const groups = await sb(`groups?order=created_at.desc&select=*`);
+                window._userGroups = groups || [];
+                renderGroupsGrid();
+            } catch(e) {
+                console.warn('Failed to load groups:', e.message);
+                renderGroupsGrid();
             }
         }
 
-        function openCreateGroupModal() {
-            alert('Create Group modal would open here! In the full version, you would enter group name, description, and invite members.');
+        function renderGroupsGrid() {
+            const grid  = document.getElementById('groupsGrid');
+            const empty = document.getElementById('groupsEmptyState');
+            if (!grid) return;
+            // Remove old cards (keep empty state node)
+            Array.from(grid.children).forEach(c => { if (c.id !== 'groupsEmptyState') c.remove(); });
+            const groups = window._userGroups;
+            if (!groups || groups.length === 0) {
+                if (empty) empty.style.display = 'block';
+                return;
+            }
+            if (empty) empty.style.display = 'none';
+            groups.forEach(g => {
+                const card = document.createElement('div');
+                card.className = 'group-card';
+                card.onclick = () => openGroup(g.id);
+                card.innerHTML = `
+                    <div class="group-header-banner">
+                        <h3 class="group-name">${g.name}</h3>
+                        <div class="group-members-count">👥 ${g.member_count || 1} member${(g.member_count||1)===1?'':'s'}</div>
+                    </div>
+                    <div class="group-body">
+                        <p class="group-description">${g.description || ''}</p>
+                        <div class="group-stats">
+                            <div class="group-stat"><div class="group-stat-value">${g.workout_count || 0}</div><div class="group-stat-label">Workouts</div></div>
+                            <div class="group-stat"><div class="group-stat-value">${g.member_count || 1}</div><div class="group-stat-label">Members</div></div>
+                        </div>
+                        <button class="view-group-btn">View Group</button>
+                    </div>`;
+                grid.appendChild(card);
+            });
         }
+
+        async function openGroup(groupId) {
+            const groupsGrid   = document.getElementById('groupsGrid');
+            const groupsHeader = document.querySelector('.groups-header');
+            const groupDetail  = document.getElementById('groupDetail');
+            if (groupsGrid)   groupsGrid.style.display   = 'none';
+            if (groupsHeader) groupsHeader.style.display = 'none';
+            if (groupDetail)  groupDetail.classList.add('active');
+
+            const g = window._userGroups.find(x => x.id === groupId) || { id: groupId, name: 'Group' };
+            window._currentGroup = g;
+
+            const titleEl = document.getElementById('groupDetailTitle');
+            const infoEl  = document.getElementById('groupDetailInfo');
+            if (titleEl) titleEl.textContent = g.name;
+            if (infoEl)  infoEl.innerHTML = `
+                <span>👥 ${g.member_count || 1} member${(g.member_count||1)===1?'':'s'}</span>
+                <span>📅 Created ${g.created_at ? new Date(g.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : 'Recently'}</span>`;
+
+            await loadGroupWorkouts(groupId);
+        }
+
+        function closeGroup() {
+            const groupsGrid   = document.getElementById('groupsGrid');
+            const groupsHeader = document.querySelector('.groups-header');
+            const groupDetail  = document.getElementById('groupDetail');
+            if (groupsGrid)   groupsGrid.style.display   = 'grid';
+            if (groupsHeader) groupsHeader.style.display = 'flex';
+            if (groupDetail)  groupDetail.classList.remove('active');
+            window._currentGroup = null;
+        }
+
+        async function loadGroupWorkouts(groupId) {
+            const feed = document.getElementById('groupWorkoutFeed');
+            if (!feed) return;
+            feed.innerHTML = `<div style="text-align:center;padding:40px;color:#666;font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:1px;">Loading workouts...</div>`;
+            try {
+                const workouts = await sb(`group_workouts?group_id=eq.${groupId}&order=created_at.desc&select=*,profiles(full_name,initials)`);
+                renderGroupWorkouts(feed, workouts || [], groupId);
+            } catch(e) {
+                renderGroupWorkouts(feed, [], groupId);
+            }
+        }
+
+        function renderGroupWorkouts(feed, workouts, groupId) {
+            if (!feed) return;
+            if (workouts.length === 0) {
+                feed.innerHTML = `
+                    <div style="text-align:center;padding:80px 20px;color:#999;">
+                        <div style="font-size:48px;margin-bottom:16px;">🏋️</div>
+                        <h3 style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">No Workouts Yet</h3>
+                        <p>Hit the + button and post a Group Workout to get started!</p>
+                    </div>`;
+                return;
+            }
+            feed.innerHTML = '';
+            workouts.forEach(w => {
+                const poster = w.profiles?.full_name || 'Someone';
+                const initials = w.profiles?.initials || poster.slice(0,2).toUpperCase();
+                const exHTML = (w.exercises||[]).map(ex =>
+                    `<div class="exercise-item"><span class="exercise-name">${ex.name}</span><span class="exercise-details">${ex.sets||'?'} × ${ex.reps||'?'}${ex.weight?' @ '+ex.weight+' lbs':''}</span></div>`
+                ).join('') || '';
+                const photoHTML = w.photo_url ? `<div style="width:100%;padding-bottom:56%;position:relative;overflow:hidden;"><img src="${w.photo_url}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"></div>` : '';
+                const descHTML = w.description ? `<p class="workout-challenge-description">${w.description}</p>` : '';
+
+                const card = document.createElement('div');
+                card.className = 'group-workout-card';
+                card.dataset.workoutId = w.id;
+                card.innerHTML = `
+                    <div class="workout-posted-by">
+                        <div class="posted-by-label">Posted by</div>
+                        <div class="posted-by-name">${poster}</div>
+                    </div>
+                    ${photoHTML}
+                    <h3 class="workout-challenge-title">${w.name.toUpperCase()}</h3>
+                    ${descHTML}
+                    ${exHTML ? `<div class="workout-challenge-exercises"><div class="exercise-list">${exHTML}</div></div>` : ''}
+                    <div class="completions-section">
+                        <div class="completions-header">
+                            <div class="completions-title" id="compTitle-${w.id}">Completions (0)</div>
+                            <button class="complete-workout-btn" onclick="promptCompletion(this,'${w.id}')">✓ Mark Complete</button>
+                        </div>
+                        <div class="completions-list" id="compList-${w.id}" style="display:flex;flex-direction:column;gap:0;"></div>
+                    </div>`;
+                feed.appendChild(card);
+                loadCompletions(w.id);
+            });
+        }
+
+        async function loadCompletions(workoutId) {
+            try {
+                const completions = await sb(`group_completions?workout_id=eq.${workoutId}&order=created_at.asc&select=*,profiles(full_name,initials,avatar_url)`);
+                renderCompletions(workoutId, completions || []);
+            } catch(e) { console.warn('Completions load error:', e.message); }
+        }
+
+        function renderCompletions(workoutId, completions) {
+            const list  = document.getElementById(`compList-${workoutId}`);
+            const title = document.getElementById(`compTitle-${workoutId}`);
+            if (!list) return;
+            if (title) title.textContent = `Completions (${completions.length})`;
+            list.innerHTML = '';
+            completions.forEach(c => {
+                const name = c.profiles?.full_name || 'Someone';
+                const initials = c.profiles?.initials || name.slice(0,2).toUpperCase();
+                const avatarUrl = c.profiles?.avatar_url || '';
+                const timeStr = c.created_at ? timeAgo(new Date(c.created_at)) : 'Just now';
+                const avatarHTML = avatarUrl
+                    ? `<img src="${avatarUrl}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);flex-shrink:0;">`
+                    : `<div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:18px;flex-shrink:0;">${initials}</div>`;
+
+                const item = document.createElement('div');
+                item.style.cssText = 'border-top:1px solid #333;padding:16px 20px;';
+                item.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:${c.comment||c.photo_url?'12':'0'}px;">
+                        ${avatarHTML}
+                        <div style="flex:1;">
+                            <div style="font-size:15px;font-weight:600;letter-spacing:0.5px;">${name}</div>
+                            <div style="font-size:12px;color:#666;font-family:'Roboto Mono',monospace;">${timeStr}</div>
+                        </div>
+                        <span style="color:#4ade80;font-size:18px;">✅</span>
+                    </div>
+                    ${c.photo_url ? `<img src="${c.photo_url}" style="width:100%;max-height:300px;object-fit:cover;border-radius:4px;margin-bottom:${c.comment?'10':'0'}px;">` : ''}
+                    ${c.comment ? `<div style="background:var(--iron);padding:10px 14px;font-size:14px;color:#ddd;border-left:3px solid var(--primary);font-weight:400;">"${c.comment}"</div>` : ''}`;
+                list.appendChild(item);
+            });
+        }
+
+        // ── COMPLETION SHEET ─────────────────────────────────────────────────
+        function promptCompletion(btn, workoutId) {
+            if (btn.classList.contains('completed')) return; // already done
+            window._completionTargetBtn = btn;
+            window._completionWorkoutId = workoutId;
+            // Clear previous state
+            document.getElementById('csComment').value = '';
+            clearCompletionPhoto();
+            document.getElementById('completionSheet').style.display = 'block';
+        }
+
+        function closeCompletionSheet() {
+            document.getElementById('completionSheet').style.display = 'none';
+            window._completionTargetBtn = null;
+            window._completionWorkoutId = null;
+        }
+
+        function clearCompletionPhoto() {
+            const input   = document.getElementById('csPhotoInput');
+            const preview = document.getElementById('csPhotoPreview');
+            const remove  = document.getElementById('csRemovePhoto');
+            const placeholder = document.getElementById('csUploadPlaceholder');
+            if (input)   input.value = '';
+            if (preview) { preview.src = ''; preview.style.display = 'none'; }
+            if (remove)  remove.style.display = 'none';
+            if (placeholder) placeholder.style.display = 'block';
+        }
+
+        // Wire up completion photo input
+        (function() {
+            const input   = document.getElementById('csPhotoInput');
+            const preview = document.getElementById('csPhotoPreview');
+            const remove  = document.getElementById('csRemovePhoto');
+            const placeholder = document.getElementById('csUploadPlaceholder');
+            if (!input) return;
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    if (preview)     { preview.src = ev.target.result; preview.style.display = 'block'; }
+                    if (remove)      remove.style.display = 'block';
+                    if (placeholder) placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            });
+        })();
+
+        async function submitCompletion() {
+            const btn       = window._completionTargetBtn;
+            const workoutId = window._completionWorkoutId;
+            const comment   = document.getElementById('csComment')?.value.trim() || null;
+            const preview   = document.getElementById('csPhotoPreview');
+            const photoSrc  = (preview?.style.display !== 'none' && preview?.src && preview.src.startsWith('data:')) ? preview.src : null;
+            const user      = getCurrentUser();
+
+            if (!workoutId) { closeCompletionSheet(); return; }
+
+            // Mark button as completed
+            if (btn) { btn.classList.add('completed'); btn.textContent = '✅ Completed!'; btn.disabled = true; }
+
+            closeCompletionSheet();
+
+            // Save to Supabase
+            if (user && window._sbUserId) {
+                try {
+                    await sb('group_completions', {
+                        method: 'POST',
+                        body: {
+                            workout_id: workoutId,
+                            user_id:    window._sbUserId,
+                            comment:    comment || null,
+                            photo_url:  photoSrc || null
+                        }
+                    });
+                } catch(e) { console.warn('Completion save failed:', e.message); }
+            }
+
+            // Optimistically add completion to UI
+            const name     = user ? (user.full_name || user.fullName || user.username) : 'You';
+            const initials = user ? (user.initials || name.slice(0,2).toUpperCase()) : 'ME';
+            const avatarUrl = user?.avatar_url || '';
+            const list  = document.getElementById(`compList-${workoutId}`);
+            const title = document.getElementById(`compTitle-${workoutId}`);
+            if (list) {
+                const avatarHTML = avatarUrl
+                    ? `<img src="${avatarUrl}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);flex-shrink:0;">`
+                    : `<div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:18px;flex-shrink:0;">${initials}</div>`;
+                const item = document.createElement('div');
+                item.style.cssText = 'border-top:1px solid #333;padding:16px 20px;animation:fadeInUp 0.4s ease-out;';
+                item.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:${comment||photoSrc?'12':'0'}px;">
+                        ${avatarHTML}
+                        <div style="flex:1;">
+                            <div style="font-size:15px;font-weight:600;letter-spacing:0.5px;">${name}</div>
+                            <div style="font-size:12px;color:#666;font-family:'Roboto Mono',monospace;">Just now</div>
+                        </div>
+                        <span style="color:#4ade80;font-size:18px;">✅</span>
+                    </div>
+                    ${photoSrc ? `<img src="${photoSrc}" style="width:100%;max-height:300px;object-fit:cover;border-radius:4px;margin-bottom:${comment?'10':'0'}px;">` : ''}
+                    ${comment ? `<div style="background:var(--iron);padding:10px 14px;font-size:14px;color:#ddd;border-left:3px solid var(--primary);">"${comment}"</div>` : ''}`;
+                list.appendChild(item);
+                // Update count
+                const existing = list.children.length;
+                if (title) title.textContent = `Completions (${existing})`;
+            }
+        }
+
+        // ── CREATE GROUP ─────────────────────────────────────────────────────
+        function openCreateGroupModal() {
+            document.getElementById('cgName')?.focus && (document.getElementById('cgName').value = '');
+            document.getElementById('cgDesc')?.focus && (document.getElementById('cgDesc').value = '');
+            const modal = document.getElementById('createGroupModal');
+            if (modal) modal.classList.add('active');
+        }
+
+        function closeCreateGroupModal() {
+            const modal = document.getElementById('createGroupModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        async function handleCreateGroup() {
+            const name = document.getElementById('cgName')?.value.trim();
+            const desc = document.getElementById('cgDesc')?.value.trim();
+            if (!name) { alert('Please enter a group name.'); return; }
+            const btn = document.querySelector('#createGroupForm .submit-btn');
+            if (btn) { btn.textContent = 'Creating...'; btn.disabled = true; }
+            try {
+                const user = getCurrentUser();
+                const created = await sb('groups', {
+                    method: 'POST',
+                    body: {
+                        name,
+                        description: desc || null,
+                        created_by:  window._sbUserId || null,
+                        member_count: 1,
+                        workout_count: 0
+                    }
+                });
+                const newGroup = created?.[0] || { id: Date.now().toString(), name, description: desc, member_count: 1, workout_count: 0, created_at: new Date().toISOString() };
+                window._userGroups.unshift(newGroup);
+                renderGroupsGrid();
+                // Update group dropdowns in workout modals
+                populateGroupDropdowns();
+                closeCreateGroupModal();
+                document.getElementById('cgName').value = '';
+                document.getElementById('cgDesc').value = '';
+            } catch(e) {
+                alert('Failed to create group: ' + e.message);
+            } finally {
+                if (btn) { btn.textContent = 'Create Group'; btn.disabled = false; }
+            }
+        }
+
+        function populateGroupDropdowns() {
+            const sel = document.getElementById('gwGroupSelect');
+            if (!sel) return;
+            const groups = window._userGroups;
+            sel.innerHTML = '<option value="">— Select a group —</option>' +
+                groups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+        }
+
+        // Close create group modal on outside click
+        document.getElementById('createGroupModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeCreateGroupModal();
+        });
 
         // Exercise Data
         // ── PROGRESS PAGE ─────────────────────────────────────────────────────
@@ -2808,16 +2928,7 @@
         }
 
         function openGroupWorkoutModal() {
-            // Populate group dropdown from user's groups
-            const user = getCurrentUser();
-            const sel = document.getElementById('gwGroupSelect');
-            if (sel && user) {
-                // Keep static options as fallback — in a full build this would fetch from Supabase groups
-                sel.innerHTML = '<option value="">— Select a group —</option>' +
-                    '<option value="morning-grind">Morning Grind Crew</option>' +
-                    '<option value="powerlifting">Powerlifting Gang</option>' +
-                    '<option value="summer-shred">Summer Shred</option>';
-            }
+            populateGroupDropdowns();
             const modal = document.getElementById('groupWorkoutModal');
             if (modal) modal.classList.add('active');
         }
@@ -2837,6 +2948,39 @@
             if (nameEl) nameEl.value = user.full_name || user.fullName || '';
             if (userEl) userEl.value = user.username || '';
             if (bioEl)  bioEl.value  = user.bio || '';
+
+            // Pre-fill avatar preview
+            const preview  = document.getElementById('epAvatarPreview');
+            const initials = document.getElementById('epAvatarInitials');
+            const avatarUrl = user.avatar_url || '';
+            if (preview && initials) {
+                if (avatarUrl) {
+                    preview.src = avatarUrl;
+                    preview.style.display = 'block';
+                    initials.style.display = 'none';
+                } else {
+                    preview.style.display = 'none';
+                    initials.style.display = '';
+                    initials.textContent = user.initials || (user.full_name||user.username||'?').slice(0,2).toUpperCase();
+                }
+            }
+
+            // Wire up avatar file input (attach once)
+            const avatarInput = document.getElementById('epAvatarInput');
+            if (avatarInput && !avatarInput._wired) {
+                avatarInput._wired = true;
+                avatarInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        if (preview)  { preview.src = ev.target.result; preview.style.display = 'block'; }
+                        if (initials) initials.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
             const modal = document.getElementById('editProfileModal');
             if (modal) modal.classList.add('active');
         }
@@ -2850,6 +2994,9 @@
             const newName     = document.getElementById('epName')?.value.trim();
             const newUsername = document.getElementById('epUsername')?.value.trim().toLowerCase();
             const newBio      = document.getElementById('epBio')?.value.trim();
+            const preview     = document.getElementById('epAvatarPreview');
+            const newAvatar   = (preview?.style.display !== 'none' && preview?.src && !preview.src.startsWith('http://localhost') && preview.src !== window.location.href)
+                                ? preview.src : null;
 
             if (!newName || !newUsername) { alert('Name and username are required.'); return; }
 
@@ -2858,20 +3005,30 @@
 
             try {
                 const newInitials = newName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                const patchBody = {
+                    full_name: newName,
+                    username:  newUsername,
+                    bio:       newBio || '',
+                    initials:  newInitials
+                };
+                // Only update avatar_url if a new photo was picked
+                if (newAvatar) patchBody.avatar_url = newAvatar;
+
                 await sb(`profiles?id=eq.${window._sbUserId}`, {
                     method: 'PATCH',
                     prefer: 'return=representation',
-                    body: { full_name: newName, username: newUsername, bio: newBio || '', initials: newInitials }
+                    body: patchBody
                 });
 
-                // Update local user
+                // Update local user object
                 const user = getCurrentUser();
                 if (user) {
-                    user.full_name = newName;
-                    user.fullName  = newName;
-                    user.username  = newUsername;
-                    user.bio       = newBio || '';
-                    user.initials  = newInitials;
+                    user.full_name  = newName;
+                    user.fullName   = newName;
+                    user.username   = newUsername;
+                    user.bio        = newBio || '';
+                    user.initials   = newInitials;
+                    if (newAvatar) user.avatar_url = newAvatar;
                     setCurrentUser(user);
                     loadProfileForUser(user);
                 }
@@ -2907,7 +3064,6 @@
             if (!name)    { alert('Please enter a workout name.'); return; }
             if (!groupId) { alert('Please select a group to post to.'); return; }
 
-            // Gather exercises
             const exercises = [];
             document.querySelectorAll('#gwExerciseContainer .exercise-inputs').forEach(row => {
                 const inputs = row.querySelectorAll('input');
@@ -2915,58 +3071,35 @@
                 if (n) exercises.push({ name: n, sets: inputs[1]?.value||'', reps: inputs[2]?.value||'', weight: inputs[3]?.value||'' });
             });
 
-            const user      = getCurrentUser();
-            const userName  = user ? (user.full_name || user.fullName || user.username) : 'Anonymous';
-            const initials  = user ? (user.initials || userName.slice(0,2).toUpperCase()) : '??';
+            const btn = document.querySelector('#groupWorkoutForm .submit-btn');
+            if (btn) { btn.textContent = 'Posting...'; btn.disabled = true; }
 
-            // Map groupId to display name
-            const groupNames = {
-                'morning-grind': 'Morning Grind Crew',
-                'powerlifting':  'Powerlifting Gang',
-                'summer-shred':  'Summer Shred'
-            };
-            const groupDisplayName = groupNames[groupId] || groupId;
-
-            // Build exercise list HTML
-            const exHTML = exercises.length
-                ? exercises.map(ex => `<div class="exercise-item"><span class="exercise-name">${ex.name}</span><span class="exercise-details">${ex.sets||'?'} × ${ex.reps||'?'}${ex.weight ? ' @ '+ex.weight+' lbs' : ''}</span></div>`).join('')
-                : '<div class="exercise-item"><span class="exercise-name">No exercises listed</span></div>';
-
-            const photoHTML = photoSrc
-                ? `<div style="position:relative;width:100%;padding-bottom:125%;overflow:hidden;background:#111;"><img src="${photoSrc}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"></div>` : '';
-            const descHTML  = desc  ? `<p class="workout-challenge-description">${desc}</p>` : '';
-            const notesHTML = notes ? `<p style="padding:0 30px 20px;color:#888;font-size:13px;font-style:italic;">${notes}</p>` : '';
-
-            // Inject into the group workout feed (the group detail section)
-            const feed = document.querySelector('.group-workout-feed');
-            if (feed) {
-                const card = document.createElement('div');
-                card.className = 'group-workout-card';
-                card.style.animation = 'fadeInUp 0.5s ease-out';
-                card.innerHTML = `
-                    <div class="workout-posted-by">
-                        <div class="posted-by-label">Posted to ${groupDisplayName}</div>
-                        <div class="posted-by-name">${userName}</div>
-                    </div>
-                    ${photoHTML}
-                    <h3 class="workout-challenge-title">${name.toUpperCase()}</h3>
-                    ${descHTML}
-                    <div class="workout-challenge-exercises"><div class="exercise-list">${exHTML}</div></div>
-                    ${notesHTML}
-                    <div class="completions-section">
-                        <div class="completions-header">
-                            <div class="completions-title">Completions (0)</div>
-                            <button class="complete-workout-btn" onclick="completeWorkout(this)">✓ Mark Complete</button>
-                        </div>
-                        <div class="completions-grid"></div>
-                    </div>`;
-                feed.insertBefore(card, feed.firstChild);
+            try {
+                await sb('group_workouts', {
+                    method: 'POST',
+                    body: {
+                        group_id:    groupId,
+                        user_id:     window._sbUserId || null,
+                        name,
+                        description: desc || null,
+                        notes:       notes || null,
+                        exercises,
+                        photo_url:   photoSrc || null
+                    }
+                });
+                // Increment workout count on group
+                const g = window._userGroups.find(x => x.id === groupId);
+                if (g) { g.workout_count = (g.workout_count || 0) + 1; }
+            } catch(e) {
+                console.warn('Post group workout failed:', e.message);
+            } finally {
+                if (btn) { btn.textContent = 'Post to Group'; btn.disabled = false; }
             }
 
             // Reset form
             document.getElementById('groupWorkoutForm')?.reset();
-            const pImg  = document.getElementById('gwPreviewImage');
-            const pZone = document.getElementById('gwPhotoZone');
+            const pImg   = document.getElementById('gwPreviewImage');
+            const pZone  = document.getElementById('gwPhotoZone');
             const rPhoto = document.getElementById('gwRemovePhoto');
             if (pImg)   pImg.classList.remove('active');
             if (pZone)  pZone.classList.remove('has-image');
@@ -2985,12 +3118,12 @@
 
             closeGroupWorkoutModal();
 
-            // Navigate to the matching group detail
-            openGroup(groupId);
+            // Navigate to the group detail
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.querySelector('.nav-link[data-page="groups"]')?.classList.add('active');
             document.querySelectorAll('.feed-page,.progress-page,.groups-page,.profile-page').forEach(p => p.classList.remove('active'));
             document.querySelector('.groups-page')?.classList.add('active');
+            await openGroup(groupId);
         }
 
         function toggleDetails(button) {
@@ -3284,9 +3417,25 @@
             if (el('profileName'))     el('profileName').textContent    = user.full_name || user.fullName || '';
             if (el('profileUsername')) el('profileUsername').textContent = '@' + user.username;
             if (el('profileBio'))      el('profileBio').textContent      = user.bio || 'No bio yet.';
-            if (el('profileInitials')) el('profileInitials').textContent = user.initials || '';
             if (el('profileFollowers')) el('profileFollowers').textContent = user.followers || 0;
             if (el('profileFollowing')) el('profileFollowing').textContent = user.following || 0;
+
+            // Avatar: show photo if available, otherwise show initials
+            const avatarImg      = el('profileAvatarImg');
+            const initialsSpan   = el('profileInitials');
+            const avatarUrl      = user.avatar_url || '';
+            if (avatarImg && initialsSpan) {
+                if (avatarUrl) {
+                    avatarImg.src = avatarUrl;
+                    avatarImg.style.display = 'block';
+                    initialsSpan.style.display = 'none';
+                } else {
+                    avatarImg.style.display = 'none';
+                    initialsSpan.style.display = '';
+                    initialsSpan.textContent = user.initials || (user.full_name||user.username||'?').slice(0,2).toUpperCase();
+                }
+            }
+
             refreshProfileStats(user);
             refreshProfileWorkouts(user);
             refreshAchievements(user);
@@ -3310,6 +3459,7 @@
                             setCurrentUser(profiles[0]);
                             loadProfileForUser(profiles[0]);
                             await loadFeedFromSupabase();
+                            loadUserGroups();
                             navigateToFeed();
                             return;
                         }
@@ -3519,6 +3669,7 @@
                 setCurrentUser(profile);
                 loadProfileForUser(profile);
                 await loadFeedFromSupabase();
+                loadUserGroups();
                 navigateToFeed();
             } catch(err) {
                 showAuthError('signup', err.message);
@@ -3577,6 +3728,7 @@
                 setCurrentUser(profile);
                 loadProfileForUser(profile);
                 await loadFeedFromSupabase();
+                loadUserGroups();
                 navigateToFeed();
             } catch(err) {
                 showAuthError('login', err.message.includes('Invalid') ? 'Incorrect email or password.' : err.message);
@@ -3694,6 +3846,15 @@
         document.getElementById('editProfileModal')?.addEventListener('click', function(e) {
             if (e.target === this) closeEditProfileModal();
         });
+
+        // ── HELPERS ───────────────────────────────────────────────────────────
+        function timeAgo(date) {
+            const secs = Math.floor((Date.now() - date.getTime()) / 1000);
+            if (secs < 60)   return 'Just now';
+            if (secs < 3600) return Math.floor(secs/60) + 'm ago';
+            if (secs < 86400) return Math.floor(secs/3600) + 'h ago';
+            return Math.floor(secs/86400) + 'd ago';
+        }
 
         // ── NAVIGATE ─────────────────────────────────────────────────────────
         function navigateToFeed() {
