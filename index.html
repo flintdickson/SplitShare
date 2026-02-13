@@ -817,6 +817,29 @@
             max-height: 1000px;
         }
 
+        /* Exercise row dropdown styles */
+        .ex-name-select, .ex-name-custom {
+            transition: border-color 0.2s ease;
+        }
+        .ex-name-select:focus, .ex-name-custom:focus {
+            outline: none;
+            border-color: var(--primary) !important;
+        }
+        .ex-name-select option { background: var(--iron); }
+
+        @media (max-width: 600px) {
+            .exercise-inputs {
+                grid-template-columns: 1fr 1fr 1fr auto !important;
+                grid-template-rows: auto auto;
+            }
+            .exercise-inputs > div:first-child {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* Step indicator text */
+        #stepLabel { transition: all 0.3s ease; }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .hero-stats {
@@ -2093,16 +2116,27 @@
     <div class="modal" id="workoutModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal()">×</button>
-            <h2>Log New Workout</h2>
-            <form id="workoutForm">
+
+            <!-- Step indicator -->
+            <div style="display:flex;align-items:center;gap:0;margin-bottom:28px;">
+                <div id="stepDot1" style="width:32px;height:32px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:16px;flex-shrink:0;">1</div>
+                <div id="stepLine" style="flex:1;height:3px;background:var(--primary);opacity:0.25;margin:0 8px;transition:opacity 0.3s;"></div>
+                <div id="stepDot2" style="width:32px;height:32px;border-radius:50%;background:#333;border:2px solid #444;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:16px;color:#666;flex-shrink:0;transition:all 0.3s;">2</div>
+                <div style="margin-left:14px;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;color:var(--primary);" id="stepLabel">EXERCISES</div>
+            </div>
+
+            <!-- ── STEP 1: Name, Type, Exercises ── -->
+            <div id="logStep1">
+                <h2 style="margin-bottom:24px;">Log Workout</h2>
+
                 <div class="form-group">
                     <label>Workout Name</label>
-                    <input id="workoutName" type="text" placeholder="e.g., PUSH DAY - CHEST & TRICEPS" required>
+                    <input id="workoutName" type="text" placeholder="e.g., PUSH DAY — CHEST & TRIS">
                 </div>
-                
+
                 <div class="form-group">
                     <label>Workout Type</label>
-                    <select id="workoutType" required>
+                    <select id="workoutType">
                         <option value="">Select type</option>
                         <option value="push">Push (Chest, Shoulders, Triceps)</option>
                         <option value="pull">Pull (Back, Biceps)</option>
@@ -2110,14 +2144,36 @@
                         <option value="upper">Upper Body</option>
                         <option value="lower">Lower Body</option>
                         <option value="full">Full Body</option>
+                        <option value="cardio">Cardio</option>
+                        <option value="other">Other</option>
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label>Duration (minutes)</label>
+                    <input id="workoutDuration" type="number" placeholder="60" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label>Exercises</label>
+                    <div id="exerciseContainer"></div>
+                    <button type="button" class="add-exercise-btn" onclick="addExercise()" style="width:100%;margin-top:8px;">+ Add Exercise</button>
+                </div>
+
+                <button type="button" class="submit-btn" onclick="goToStep2()" style="margin-top:8px;">
+                    Continue →
+                </button>
+            </div>
+
+            <!-- ── STEP 2: Photo, Caption, Post to Group ── -->
+            <div id="logStep2" style="display:none;">
+                <h2 style="margin-bottom:24px;">Share It</h2>
 
                 <div class="form-group">
                     <label>Add Photo (Optional)</label>
                     <div class="photo-upload-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
                         <div class="upload-icon">📸</div>
-                        <div class="upload-text">Click to upload workout photo</div>
+                        <div class="upload-text">Tap to add a workout photo</div>
                         <img id="previewImage" class="preview-image" alt="Workout preview">
                         <button type="button" class="remove-photo" id="removePhoto">×</button>
                     </div>
@@ -2130,30 +2186,17 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Duration (minutes)</label>
-                    <input id="workoutDuration" type="number" placeholder="60" required>
+                    <label>Also Post to a Group? (Optional)</label>
+                    <select id="postToGroupSelect" style="width:100%;padding:15px;background:var(--iron);border:2px solid #333;color:var(--white);font-family:'Oswald',sans-serif;font-size:16px;">
+                        <option value="">— No, just my feed —</option>
+                    </select>
                 </div>
 
-                <div class="form-group">
-                    <label>Exercises</label>
-                    <div id="exerciseContainer">
-                        <div class="exercise-inputs">
-                            <input type="text" placeholder="Exercise name" required>
-                            <input type="number" placeholder="Sets" required>
-                            <input type="number" placeholder="Reps" required>
-                            <input type="number" placeholder="Weight (lbs)" required>
-                        </div>
-                    </div>
-                    <button type="button" class="add-exercise-btn" onclick="addExercise()">+ Add Exercise</button>
+                <div style="display:flex;gap:12px;margin-top:8px;">
+                    <button type="button" onclick="goToStep1()" style="background:transparent;border:2px solid #444;color:#999;padding:16px 20px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;flex-shrink:0;">← Back</button>
+                    <button type="button" class="submit-btn" onclick="handleLogWorkout()" style="margin-top:0;flex:1;">Post Workout 🔥</button>
                 </div>
-
-                <div class="form-group">
-                    <label>Notes (optional)</label>
-                    <textarea rows="3" placeholder="How did you feel? Any PRs?"></textarea>
-                </div>
-
-                <button type="button" class="submit-btn" onclick="handleLogWorkout()">Log Workout</button>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -2920,6 +2963,12 @@
         function openModal() {
             const modal = document.getElementById('workoutModal');
             if (modal) modal.classList.add('active');
+            goToStep1();
+            resetExerciseContainer();
+            // Reset fields
+            const fields = ['workoutName','workoutDuration','captionInput'];
+            fields.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            const wt = document.getElementById('workoutType'); if (wt) wt.value = '';
         }
 
         function closeModal() {
@@ -3126,23 +3175,99 @@
             await openGroup(groupId);
         }
 
-        function toggleDetails(button) {
-            button.classList.toggle('active');
-            const content = button.nextElementSibling;
-            if (content) content.classList.toggle('active');
+        const EXERCISE_OPTIONS = [
+            'Barbell Bench Press','Incline Dumbbell Press','Decline Bench Press','Cable Flyes','Chest Dips',
+            'Overhead Press','Arnold Press','Lateral Raises','Front Raises','Face Pulls',
+            'Deadlift','Romanian Deadlift','Sumo Deadlift','Pull-Ups','Chin-Ups',
+            'Barbell Rows','Dumbbell Rows','Lat Pulldown','Seated Cable Row','T-Bar Row',
+            'Back Squat','Front Squat','Hack Squat','Leg Press','Walking Lunges',
+            'Bulgarian Split Squat','Leg Extension','Leg Curl','Calf Raises','Hip Thrust',
+            'Barbell Curl','Hammer Curl','Preacher Curl','Tricep Pushdown','Skull Crushers',
+            'Tricep Dips','Close-Grip Bench','Plank','Crunches','Hanging Leg Raises',
+            'Russian Twists','Cable Crunch','Running','Cycling','Jump Rope','Custom...'
+        ];
+
+        function makeExerciseRow() {
+            const row = document.createElement('div');
+            row.className = 'exercise-inputs';
+            row.style.cssText = 'display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;margin-bottom:10px;align-items:center;';
+            row.innerHTML = `
+                <div style="position:relative;">
+                    <select class="ex-name-select" onchange="handleExerciseSelect(this)" style="width:100%;padding:12px;background:var(--iron);border:2px solid #333;color:var(--white);font-family:'Oswald',sans-serif;font-size:14px;">
+                        <option value="">— Exercise —</option>
+                        ${EXERCISE_OPTIONS.map(e => `<option value="${e}">${e}</option>`).join('')}
+                    </select>
+                    <input class="ex-name-custom" type="text" placeholder="Type exercise name" style="display:none;width:100%;padding:12px;background:var(--iron);border:2px solid var(--primary);color:var(--white);font-family:'Oswald',sans-serif;font-size:14px;">
+                </div>
+                <input type="number" placeholder="Sets" min="1" style="padding:12px;background:var(--iron);border:2px solid #333;color:var(--white);font-family:'Oswald',sans-serif;font-size:14px;width:100%;">
+                <input type="number" placeholder="Reps" min="1" style="padding:12px;background:var(--iron);border:2px solid #333;color:var(--white);font-family:'Oswald',sans-serif;font-size:14px;width:100%;">
+                <input type="number" placeholder="lbs" min="0" style="padding:12px;background:var(--iron);border:2px solid #333;color:var(--white);font-family:'Oswald',sans-serif;font-size:14px;width:100%;">
+                <button type="button" onclick="this.closest('.exercise-inputs').remove()" style="background:transparent;border:none;color:#555;font-size:20px;cursor:pointer;padding:8px;line-height:1;flex-shrink:0;" title="Remove">×</button>`;
+            return row;
+        }
+
+        function handleExerciseSelect(sel) {
+            const custom = sel.nextElementSibling;
+            if (sel.value === 'Custom...') {
+                sel.style.display = 'none';
+                custom.style.display = 'block';
+                custom.focus();
+                // Allow going back to dropdown
+                custom.onblur = () => { if (!custom.value) { sel.style.display = 'block'; custom.style.display = 'none'; sel.value = ''; } };
+            }
         }
 
         function addExercise() {
             const container = document.getElementById('exerciseContainer');
+            if (container) container.appendChild(makeExerciseRow());
+        }
+
+        function resetExerciseContainer() {
+            const container = document.getElementById('exerciseContainer');
             if (!container) return;
-            const newRow = document.createElement('div');
-            newRow.className = 'exercise-inputs';
-            newRow.innerHTML = `
-                <input type="text" placeholder="Exercise name">
-                <input type="number" placeholder="Sets">
-                <input type="number" placeholder="Reps">
-                <input type="number" placeholder="Weight (lbs)">`;
-            container.appendChild(newRow);
+            container.innerHTML = '';
+            container.appendChild(makeExerciseRow());
+        }
+
+        // ── STEP NAVIGATION ──────────────────────────────────────────────────
+        function goToStep1() {
+            document.getElementById('logStep1').style.display = 'block';
+            document.getElementById('logStep2').style.display = 'none';
+            document.getElementById('stepDot1').style.background = 'var(--primary)';
+            document.getElementById('stepDot1').style.color = '#fff';
+            document.getElementById('stepDot2').style.background = '#333';
+            document.getElementById('stepDot2').style.color = '#666';
+            document.getElementById('stepLine').style.opacity = '0.25';
+            document.getElementById('stepLabel').textContent = 'EXERCISES';
+        }
+
+        function goToStep2() {
+            const name = document.getElementById('workoutName')?.value.trim();
+            if (!name) {
+                document.getElementById('workoutName').focus();
+                document.getElementById('workoutName').style.borderColor = 'var(--primary)';
+                return;
+            }
+            // Populate the "post to group" dropdown with real groups
+            const sel = document.getElementById('postToGroupSelect');
+            if (sel) {
+                sel.innerHTML = '<option value="">— No, just my feed —</option>' +
+                    (window._userGroups||[]).map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+            }
+            document.getElementById('logStep1').style.display = 'none';
+            document.getElementById('logStep2').style.display = 'block';
+            document.getElementById('stepDot1').style.background = '#4ade80';
+            document.getElementById('stepDot1').innerHTML = '✓';
+            document.getElementById('stepDot2').style.background = 'var(--primary)';
+            document.getElementById('stepDot2').style.color = '#fff';
+            document.getElementById('stepLine').style.opacity = '1';
+            document.getElementById('stepLabel').textContent = 'SHARE';
+        }
+
+        function toggleDetails(button) {
+            button.classList.toggle('active');
+            const content = button.nextElementSibling;
+            if (content) content.classList.toggle('active');
         }
 
         function handleRespect(btn) {
@@ -3152,33 +3277,54 @@
             btn.style.color = 'var(--primary)';
         }
 
+        // ── AVATAR HELPER — returns either <img> or initials div ─────────────
+        function avatarHTML(avatarUrl, initials, size) {
+            size = size || 50;
+            const fontSize = Math.round(size * 0.44);
+            if (avatarUrl) {
+                return `<img src="${avatarUrl}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);flex-shrink:0;" alt="">`;
+            }
+            return `<div class="user-avatar" style="width:${size}px;height:${size}px;font-size:${fontSize}px;">${initials}</div>`;
+        }
+
         async function handleLogWorkout() {
             const workoutName = document.getElementById('workoutName')?.value.trim();
             const duration    = parseInt(document.getElementById('workoutDuration')?.value) || 0;
             const caption     = document.getElementById('captionInput')?.value.trim();
             const previewImg  = document.getElementById('previewImage');
             const photoSrc    = previewImg?.classList.contains('active') ? previewImg.src : null;
+            const postGroupId = document.getElementById('postToGroupSelect')?.value || '';
 
-            if (!workoutName) { alert('Please enter a workout name.'); return; }
+            if (!workoutName) { goToStep1(); document.getElementById('workoutName').focus(); return; }
 
-            // Gather exercises
+            // Read exercises from new dropdown rows
             const exercises = [];
             document.querySelectorAll('#exerciseContainer .exercise-inputs').forEach(row => {
-                const inputs = row.querySelectorAll('input');
-                const name   = inputs[0]?.value.trim();
-                if (name) exercises.push({
-                    name,
-                    sets:   inputs[1]?.value || '',
-                    reps:   inputs[2]?.value || '',
-                    weight: inputs[3]?.value || ''
-                });
+                const sel    = row.querySelector('.ex-name-select');
+                const custom = row.querySelector('.ex-name-custom');
+                // Name: prefer custom input if visible, else dropdown value
+                let exName = '';
+                if (custom && custom.style.display !== 'none') {
+                    exName = custom.value.trim();
+                } else if (sel) {
+                    exName = sel.value === 'Custom...' ? '' : sel.value;
+                }
+                const numInputs = row.querySelectorAll('input[type="number"]');
+                const sets   = numInputs[0]?.value || '';
+                const reps   = numInputs[1]?.value || '';
+                const weight = numInputs[2]?.value || '';
+                if (exName) exercises.push({ name: exName, sets, reps, weight });
             });
+
+            const postBtn = document.querySelector('#logStep2 .submit-btn');
+            if (postBtn) { postBtn.textContent = 'Posting...'; postBtn.disabled = true; }
 
             const user      = getCurrentUser();
             const userName  = user ? (user.full_name || user.fullName || user.username) : 'Anonymous';
             const initials  = user ? (user.initials || userName.slice(0,2).toUpperCase()) : '??';
+            const userAvUrl = user?.avatar_url || '';
 
-            // Save to Supabase
+            // Save personal workout to Supabase
             if (user && window._sbUserId) {
                 try {
                     await sb('workouts', { method: 'POST', body: {
@@ -3189,20 +3335,27 @@
                         exercises,
                         photo_url: photoSrc || null
                     }});
-                    // Refresh user workout stats
                     const fresh = await sb(`workouts?user_id=eq.${window._sbUserId}&order=created_at.desc&select=*`);
-                    if (user && fresh) {
-                        user.workouts = fresh;
-                        setCurrentUser(user);
-                        refreshProfileStats(user);
-                        refreshProfileWorkouts(user);
-                        refreshAchievements(user);
-                    }
+                    if (fresh) { user.workouts = fresh; setCurrentUser(user); refreshProfileStats(user); refreshProfileWorkouts(user); refreshAchievements(user); }
                 } catch(e) { console.warn('Save workout failed:', e.message); }
+
+                // Also post to group if selected
+                if (postGroupId) {
+                    try {
+                        await sb('group_workouts', { method: 'POST', body: {
+                            group_id:    postGroupId,
+                            user_id:     window._sbUserId,
+                            name:        workoutName,
+                            description: caption || null,
+                            exercises,
+                            photo_url:   photoSrc || null
+                        }});
+                    } catch(e) { console.warn('Group post failed:', e.message); }
+                }
             }
 
-            // Build and prepend card to feed
-            const photoHTML   = photoSrc ? `<div style="position:relative;width:100%;padding-bottom:125%;overflow:hidden;background:#111;"><img src="${photoSrc}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"></div>` : '';
+            // Build feed card
+            const photoHTML   = photoSrc ? `<img src="${photoSrc}" class="workout-photo" alt="">` : '';
             const captionHTML = caption  ? `<p class="workout-caption">"${caption}"</p>` : '';
             const exHTML = exercises.length
                 ? exercises.map(ex => `<div class="exercise-item"><span class="exercise-name">${ex.name}</span><span class="exercise-details">${ex.sets||'?'} × ${ex.reps||'?'}${ex.weight ? ' @ '+ex.weight+' lbs' : ''}</span></div>`).join('')
@@ -3213,7 +3366,7 @@
             card.style.animation = 'fadeInUp 0.5s ease-out';
             card.innerHTML = `
                 <div class="activity-header">
-                    <div class="user-avatar">${initials}</div>
+                    ${avatarHTML(userAvUrl, initials, 50)}
                     <div class="activity-user-info">
                         <h3>${userName}</h3>
                         <span class="activity-time">Just now</span>
@@ -3239,36 +3392,26 @@
                     <button class="action-btn"><span class="action-icon">🔥</span><span>PR!</span></button>
                 </div>`;
 
-            const feed = document.getElementById('mainFeed');
-            if (feed) {
-                const empty = document.getElementById('feedEmptyState');
-                if (empty) empty.style.display = 'none';
-                feed.insertBefore(card, feed.firstChild);
-            }
+            const feed = document.querySelector('.activity-feed');
+            if (feed) feed.insertBefore(card, feed.firstChild);
 
-            // Reset form
-            document.getElementById('workoutForm')?.reset();
+            // Reset photo
             const pImg  = document.getElementById('previewImage');
             const pZone = document.getElementById('photoZone');
             const rPhoto = document.getElementById('removePhoto');
-            if (pImg)   pImg.classList.remove('active');
+            if (pImg)   { pImg.src = ''; pImg.classList.remove('active'); }
             if (pZone)  pZone.classList.remove('has-image');
             if (rPhoto) rPhoto.classList.remove('active');
             const uIcon = pZone?.querySelector('.upload-icon');
             const uText = pZone?.querySelector('.upload-text');
-            if (uIcon) uIcon.style.display = 'block';
-            if (uText) uText.style.display = 'block';
+            if (uIcon) uIcon.style.display = '';
+            if (uText) uText.style.display = '';
+            document.getElementById('photoInput').value = '';
 
-            const container = document.getElementById('exerciseContainer');
-            if (container) container.innerHTML = `<div class="exercise-inputs">
-                <input type="text" placeholder="Exercise name">
-                <input type="number" placeholder="Sets">
-                <input type="number" placeholder="Reps">
-                <input type="number" placeholder="Weight (lbs)">
-            </div>`;
-
+            if (postBtn) { postBtn.textContent = 'Post Workout 🔥'; postBtn.disabled = false; }
             closeModal();
-            // Switch to feed
+
+            // Navigate to feed
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             document.querySelector('.nav-link[data-page="feed"]')?.classList.add('active');
             document.querySelectorAll('.feed-page,.progress-page,.groups-page,.profile-page').forEach(p => p.classList.remove('active'));
@@ -3509,7 +3652,7 @@
                 const displayName = user.full_name || user.fullName || user.username || 'You';
                 return `<div class="activity-card">
                     <div class="activity-header">
-                        <div class="user-avatar">${user.initials || displayName.slice(0,2).toUpperCase()}</div>
+                        ${avatarHTML(user.avatar_url||'', user.initials || displayName.slice(0,2).toUpperCase(), 50)}
                         <div class="activity-user-info">
                             <h3>${displayName}</h3>
                             <span class="activity-time">${dateStr}</span>
@@ -3763,6 +3906,7 @@
         function buildWorkoutCard(w, profile) {
             const name     = profile?.full_name || profile?.username || 'Unknown';
             const initials = profile?.initials  || (name !== 'Unknown' ? name.slice(0,2).toUpperCase() : '??');
+            const avUrl    = profile?.avatar_url || '';
             const exercises = w.exercises || [];
             const photoHTML   = w.photo_url ? `<img src="${w.photo_url}" class="workout-photo" alt="">` : '';
             const captionHTML = w.caption   ? `<p class="workout-caption">"${w.caption}"</p>` : '';
@@ -3774,7 +3918,7 @@
             card.className = 'activity-card';
             card.innerHTML = `
                 <div class="activity-header">
-                    <div class="user-avatar">${initials}</div>
+                    ${avatarHTML(avUrl, initials, 50)}
                     <div class="activity-user-info"><h3>${name}</h3><span class="activity-time">${dateStr}</span></div>
                 </div>
                 <h2 class="workout-title">${w.name.toUpperCase()}</h2>
