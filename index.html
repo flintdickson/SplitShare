@@ -232,7 +232,7 @@
 
         /* Add bottom padding to main content to account for fixed nav */
         main {
-            padding-bottom: 100px;
+            padding-bottom: 140px;
         }
 
         /* Hero Stats */
@@ -307,7 +307,7 @@
 
         /* Feed Section */
         .feed-section {
-            margin: 60px 0;
+            margin: 20px 0;
         }
 
         .section-header {
@@ -2232,10 +2232,10 @@
                         <div id="sessionsLogged" style="font-family:'Bebas Neue',cursive;font-size:26px;color:var(--primary);line-height:1;">—</div>
                     </div>
                 </div>
-                <div style="background:var(--steel);border-radius:12px;overflow:hidden;border:1px solid #2a2a2a;margin-bottom:80px;">
+                <div style="background:var(--steel);border-radius:12px;overflow:hidden;border:1px solid #2a2a2a;margin-bottom:160px;">
                     <div style="padding:12px 16px;border-bottom:1px solid #2a2a2a;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1.5px;color:#fff;">Exercise History</div>
-                    <div style="overflow-y:auto;max-height:420px;-webkit-overflow-scrolling:touch;">
-                        <table class="history-table" style="min-width:320px;width:100%;">
+                    <div style="-webkit-overflow-scrolling:touch;">
+                        <table class="history-table" style="width:100%;">
                             <thead style="position:sticky;top:0;z-index:1;background:var(--steel);"><tr><th>Date</th><th>Weight</th><th>Sets × Reps</th><th>Volume</th><th>Trend</th></tr></thead>
                             <tbody id="historyTableBody"></tbody>
                         </table>
@@ -3208,7 +3208,7 @@
             }
             if (prev && exercises.includes(prev)) {
                 if(liftDetail) liftDetail.style.display='block';
-                renderProgressChart(prev);
+                requestAnimationFrame(() => requestAnimationFrame(() => renderProgressChart(prev)));
             }
         }
 
@@ -3216,7 +3216,8 @@
             const liftDetail = document.getElementById('liftDetailSection');
             if (!val) { if(liftDetail) liftDetail.style.display='none'; return; }
             if(liftDetail) liftDetail.style.display='block';
-            renderProgressChart(val);
+            // Double rAF: first lets browser paint display:block, second lets Chart.js measure
+            requestAnimationFrame(() => requestAnimationFrame(() => renderProgressChart(val)));
         }
 
         function renderProgressChart(exerciseName) {
@@ -3226,14 +3227,24 @@
             const diff = pr - entries[0].weight;
 
             const g = id => document.getElementById(id);
-            if (g('chartTitle'))    g('chartTitle').textContent    = exerciseName;
-            if (g('chartPrBadge')) g('chartPrBadge').textContent   = `PR: ${pr} lbs`;
-            if (g('currentPR'))    g('currentPR').textContent      = pr + ' lbs';
-            if (g('totalIncrease')) g('totalIncrease').textContent = (diff >= 0 ? '+' : '') + diff + ' lbs';
+            if (g('chartTitle'))     g('chartTitle').textContent     = exerciseName;
+            if (g('chartPrBadge'))   g('chartPrBadge').textContent   = `PR: ${pr} lbs`;
+            if (g('currentPR'))      g('currentPR').textContent      = pr + ' lbs';
+            if (g('totalIncrease'))  g('totalIncrease').textContent  = (diff >= 0 ? '+' : '') + diff + ' lbs';
             if (g('sessionsLogged')) g('sessionsLogged').textContent = entries.length;
 
             // Destroy old chart
             if (window.progressChart) { window.progressChart.destroy(); window.progressChart = null; }
+
+            const canvas = g('progressChart');
+            if (!canvas) return;
+
+            // Force canvas to fill parent div before Chart.js measures it
+            const parent = canvas.parentElement;
+            const pxW = parent ? parent.offsetWidth  : 300;
+            const pxH = parent ? parent.offsetHeight : 220;
+            canvas.width  = pxW;
+            canvas.height = pxH;
 
             // Duplicate single point so line draws
             const labels = entries.length === 1
@@ -3245,87 +3256,82 @@
             const pts   = (entries.length === 1 ? [entries[0], entries[0]] : entries).map(e => e.weight === pr ? '#ffb347' : '#ff6b35');
             const radii = (entries.length === 1 ? [entries[0], entries[0]] : entries).map(e => e.weight === pr ? 8 : 5);
 
-            // Use requestAnimationFrame so container is fully painted before Chart.js measures it
-            requestAnimationFrame(() => {
-                const canvas = document.getElementById('progressChart');
-                if (!canvas) return;
-                const ctx = canvas.getContext('2d');
-                const grad = ctx.createLinearGradient(0, 0, 0, 220);
-                grad.addColorStop(0, 'rgba(255,107,53,0.35)');
-                grad.addColorStop(1, 'rgba(255,107,53,0.0)');
+            const ctx  = canvas.getContext('2d');
+            const grad = ctx.createLinearGradient(0, 0, 0, pxH);
+            grad.addColorStop(0, 'rgba(255,107,53,0.35)');
+            grad.addColorStop(1, 'rgba(255,107,53,0.0)');
 
-                window.progressChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels,
-                        datasets: [{
-                            data,
-                            borderColor: '#ff6b35',
-                            backgroundColor: grad,
-                            borderWidth: 2.5,
-                            fill: true,
-                            tension: 0.35,
-                            pointRadius: radii,
-                            pointBackgroundColor: pts,
-                            pointBorderColor: '#1a1a1a',
-                            pointBorderWidth: 2,
-                            pointHoverRadius: 10,
-                            pointHoverBackgroundColor: '#ffb347',
-                            pointHoverBorderColor: '#fff',
-                            pointHoverBorderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 600 },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: '#1a1a1a',
-                                titleColor: '#ff6b35',
-                                bodyColor: '#eee',
-                                borderColor: '#333',
-                                borderWidth: 1,
-                                padding: 12,
-                                cornerRadius: 8,
-                                displayColors: false,
-                                titleFont: { family: 'Oswald', size: 13, weight: '600' },
-                                bodyFont:  { family: 'Roboto Mono', size: 12 },
-                                callbacks: {
-                                    title: items => labels[items[0].dataIndex],
-                                    label: c => `  ${c.parsed.y} lbs`,
-                                    afterLabel: c => {
-                                        const idx = Math.min(c.dataIndex, entries.length - 1);
-                                        const e = entries[idx];
-                                        const vol = e.weight * (parseInt(e.sets) || 1) * (parseInt(e.reps) || 1);
-                                        const lines = [`  ${e.sets} sets × ${e.reps} reps`, `  Vol: ${vol.toLocaleString()} lbs`];
-                                        if (e.weight === pr) lines.push('  🏆 PR!');
-                                        return lines;
-                                    }
+            window.progressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        borderColor: '#ff6b35',
+                        backgroundColor: grad,
+                        borderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: radii,
+                        pointBackgroundColor: pts,
+                        pointBorderColor: '#1a1a1a',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 10,
+                        pointHoverBackgroundColor: '#ffb347',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: { duration: 600 },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1a1a1a',
+                            titleColor: '#ff6b35',
+                            bodyColor: '#eee',
+                            borderColor: '#333',
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false,
+                            titleFont: { family: 'Oswald', size: 13, weight: '600' },
+                            bodyFont:  { family: 'Roboto Mono', size: 12 },
+                            callbacks: {
+                                title: items => labels[items[0].dataIndex],
+                                label: c => `  ${c.parsed.y} lbs`,
+                                afterLabel: c => {
+                                    const idx = Math.min(c.dataIndex, entries.length - 1);
+                                    const e = entries[idx];
+                                    const vol = e.weight * (parseInt(e.sets)||1) * (parseInt(e.reps)||1);
+                                    const lines = [`  ${e.sets} sets × ${e.reps} reps`, `  Vol: ${vol.toLocaleString()} lbs`];
+                                    if (e.weight === pr) lines.push('  🏆 PR!');
+                                    return lines;
                                 }
                             }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            border: { color: 'rgba(255,255,255,0.08)', dash: [4,4] },
+                            ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, padding: 6, callback: v => v + ' lbs' }
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: false,
-                                grid: { color: 'rgba(255,255,255,0.06)' },
-                                border: { color: 'rgba(255,255,255,0.08)', dash: [4, 4] },
-                                ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, padding: 6, callback: v => v + ' lbs' }
-                            },
-                            x: {
-                                grid: { color: 'rgba(255,255,255,0.03)' },
-                                border: { color: 'rgba(255,255,255,0.08)' },
-                                ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, padding: 6, maxRotation: 40 }
-                            }
-                        },
-                        interaction: { intersect: false, mode: 'index' }
-                    }
-                });
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.03)' },
+                            border: { color: 'rgba(255,255,255,0.08)' },
+                            ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, padding: 6, maxRotation: 40 }
+                        }
+                    },
+                    interaction: { intersect: false, mode: 'index' }
+                }
             });
 
             // History table — newest first
-            const tbody = document.getElementById('historyTableBody');
+            const tbody = g('historyTableBody');
             if (tbody) {
                 const rows = [...entries].reverse();
                 tbody.innerHTML = rows.map((e, i) => {
@@ -3336,7 +3342,7 @@
                         if (d > 0) trend = `<span style="color:#4ade80;">↑ +${d}</span>`;
                         else if (d < 0) trend = `<span style="color:#f87171;">↓ ${d}</span>`;
                     }
-                    const vol  = e.weight * (parseInt(e.sets) || 1) * (parseInt(e.reps) || 1);
+                    const vol  = e.weight * (parseInt(e.sets)||1) * (parseInt(e.reps)||1);
                     const isPR = e.weight === pr;
                     return `<tr style="${isPR ? 'background:rgba(255,179,71,0.08);' : ''}">
                         <td style="white-space:nowrap;">${e.dateLabel}${isPR ? ' <span style="background:var(--primary);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:4px;vertical-align:middle;">PR</span>' : ''}</td>
@@ -3905,7 +3911,9 @@
             const { workoutId, name, duration, exercises=[], photoSrc, caption, dateStr, avatarUrl, initials, userName } = opts;
 
             const photoHTML   = photoSrc ? `<img src="${photoSrc}" class="workout-photo" alt="">` : '';
-            const captionHTML = caption  ? `<p style="padding:12px 18px 0;font-size:14px;color:#ccc;line-height:1.5;">"${caption}"</p>` : '';
+            // Strip any HTML/SVG that may have leaked into caption from old data
+            const safeCaption = caption ? caption.replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, '').trim() : null;
+            const captionHTML = safeCaption ? `<p style="padding:12px 18px 0;font-size:14px;color:#ccc;line-height:1.5;">"${safeCaption}"</p>` : '';
 
             const pills = exercises.slice(0, 6).map(ex =>
                 `<span class="ex-pill">${ex.name}${ex.weight ? ' · ' + ex.weight + 'lb' : ''}</span>`
@@ -3934,8 +3942,8 @@
                     <button class="view-workout-btn" onclick="openWorkoutDetail(this.closest('.activity-card'))">View Full Workout</button>
                 </div>
                 <div class="activity-actions" style="padding:12px 18px;">
-                    <button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">👊</span><span>0 Respect</span></button>
-                    <button class="action-btn"><span class="action-icon">💬</span><span>0 Comments</span></button>
+                    <button class="action-btn" onclick="openWorkoutDetail(this.closest('.activity-card'))"><span class="action-icon">👊</span><span class="card-like-count">0 Respect</span></button>
+                    <button class="action-btn" onclick="openWorkoutDetail(this.closest('.activity-card'))"><span class="action-icon">💬</span><span class="card-comment-count">0 Comments</span></button>
                 </div>`;
             return card;
         }
@@ -3943,12 +3951,14 @@
         // ── WORKOUT DETAIL MODAL ─────────────────────────────────────────────
         let _detailBarChart = null;
         let _detailWorkoutId = null;
+        let _detailCardEl = null;
 
         async function openWorkoutDetail(cardEl) {
             const data = cardEl?._workoutData;
             if (!data) return;
             const { name, duration, exercises=[], dateStr, avatarUrl, initials, userName } = data;
             _detailWorkoutId = cardEl._workoutId || null;
+            _detailCardEl    = cardEl;
 
             document.getElementById('detailWorkoutName').textContent = name.toUpperCase();
             document.getElementById('detailWorkoutMeta').textContent =
@@ -4015,32 +4025,48 @@
         async function loadDetailLikes(workoutId) {
             const btn   = document.getElementById('detailLikeBtn');
             const count = document.getElementById('detailLikeCount');
-            const icon  = document.getElementById('detailLikeIcon');
             if (!btn || !count) return;
             try {
                 const likes = await sb(`workout_likes?workout_id=eq.${workoutId}&select=user_id`);
-                const me = getCurrentUser();
-                const myId = window._sbUserId;
-                const liked = myId && (likes||[]).some(l => l.user_id === myId);
-                count.textContent = `${(likes||[]).length} Respect`;
-                btn._liked = liked;
-                btn.style.color = liked ? 'var(--primary)' : '#666';
-                if (icon) icon.textContent = liked ? '👊' : '👊';
-                if (liked) btn.style.color = 'var(--primary)';
-            } catch(e) { /* table may not exist yet */ }
+                const myId  = window._sbUserId;
+                const liked = !!(myId && (likes||[]).some(l => l.user_id === myId));
+                const n     = (likes||[]).length;
+                count.textContent = `${n} Respect`;
+                btn._liked        = liked;
+                btn.style.color   = liked ? 'var(--primary)' : '#666';
+                // Sync count back to the card action bar
+                if (_detailCardEl) {
+                    const cardLike = _detailCardEl.querySelector('.card-like-count');
+                    if (cardLike) cardLike.textContent = `${n} Respect`;
+                }
+            } catch(e) { /* workout_likes table may not exist yet */ }
         }
 
         async function toggleDetailLike() {
             const workoutId = _detailWorkoutId;
-            if (!workoutId || !window._sbUserId) return;
+            if (!workoutId || !window._sbUserId) {
+                alert('Log in to like workouts!');
+                return;
+            }
             const btn   = document.getElementById('detailLikeBtn');
             const count = document.getElementById('detailLikeCount');
             const liked = btn?._liked;
             const cur   = parseInt(count?.textContent) || 0;
+            const newN  = liked ? Math.max(0, cur - 1) : cur + 1;
 
-            // Optimistic UI
-            if (btn) { btn._liked = !liked; btn.style.color = !liked ? 'var(--primary)' : '#666'; }
-            if (count) count.textContent = `${liked ? Math.max(0,cur-1) : cur+1} Respect`;
+            // Optimistic UI — update modal
+            if (btn)   { btn._liked = !liked; btn.style.color = !liked ? 'var(--primary)' : '#666'; }
+            if (count) { count.textContent = `${newN} Respect`; }
+
+            // Immediately sync count back to card too
+            if (_detailCardEl) {
+                const cardLike = _detailCardEl.querySelector('.card-like-count');
+                if (cardLike) cardLike.textContent = `${newN} Respect`;
+                if (!liked) { // pulse animation on like
+                    const cardBtn = _detailCardEl.querySelector('.action-btn');
+                    if (cardBtn) { cardBtn.style.color = 'var(--primary)'; }
+                }
+            }
 
             try {
                 if (liked) {
@@ -4050,8 +4076,12 @@
                 }
             } catch(e) {
                 // Revert on error
-                if (btn) { btn._liked = liked; btn.style.color = liked ? 'var(--primary)' : '#666'; }
-                if (count) count.textContent = `${cur} Respect`;
+                if (btn)   { btn._liked = liked; btn.style.color = liked ? 'var(--primary)' : '#666'; }
+                if (count) { count.textContent = `${cur} Respect`; }
+                if (_detailCardEl) {
+                    const cardLike = _detailCardEl.querySelector('.card-like-count');
+                    if (cardLike) cardLike.textContent = `${cur} Respect`;
+                }
             }
         }
 
@@ -4062,6 +4092,11 @@
             try {
                 const comments = await sb(`workout_comments?workout_id=eq.${workoutId}&order=created_at.asc&select=*,profiles(full_name,initials,avatar_url)`);
                 renderDetailComments(comments || []);
+                // Sync comment count back to card
+                if (_detailCardEl) {
+                    const countEl = _detailCardEl.querySelector('.card-comment-count');
+                    if (countEl) countEl.textContent = `${(comments||[]).length} Comments`;
+                }
             } catch(e) { list.innerHTML = ''; }
         }
 
@@ -4095,21 +4130,29 @@
             if (!body || !_detailWorkoutId || !window._sbUserId) return;
             input.value = '';
             const me = getCurrentUser();
-            // Optimistic insert
-            const tempComment = [{
-                body,
-                created_at: new Date().toISOString(),
-                profiles: { full_name: me?.full_name||me?.fullName||'You', initials: me?.initials||'?', avatar_url: me?.avatar_url||null }
-            }];
-            // Append to existing
+
+            // Append optimistically to comments list
             const list = document.getElementById('detailCommentsList');
             if (list) {
-                const existing = list.innerHTML === '<div style="padding:16px 20px;color:#333;font-family:\'Oswald\',sans-serif;font-size:12px;letter-spacing:1px;">Be the first to comment…</div>' ? '' : list.innerHTML;
-                const c = tempComment[0];
-                const avHtml = c.profiles?.avatar_url ? `<img src="${c.profiles.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : (c.profiles?.initials||'?');
-                list.innerHTML = existing + `<div class="detail-comment"><div class="detail-comment-avatar">${avHtml}</div><div style="flex:1;"><div class="detail-comment-name">${c.profiles.full_name} <span class="detail-comment-time">Just now</span></div><div class="detail-comment-text">${c.body}</div></div></div>`;
-                list.scrollTop = list.scrollHeight;
+                const isEmpty = list.children.length === 1 && list.firstChild?.style?.color === '#333';
+                if (isEmpty) list.innerHTML = '';
+                const avHtml = me?.avatar_url ? `<img src="${me.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : (me?.initials||'?');
+                const newRow = document.createElement('div');
+                newRow.className = 'detail-comment';
+                newRow.innerHTML = `<div class="detail-comment-avatar">${avHtml}</div><div style="flex:1;"><div class="detail-comment-name">${me?.full_name||me?.fullName||'You'} <span class="detail-comment-time">Just now</span></div><div class="detail-comment-text">${body}</div></div>`;
+                list.appendChild(newRow);
+                newRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
+
+            // Sync comment count back to card
+            if (_detailCardEl) {
+                const countEl = _detailCardEl.querySelector('.card-comment-count');
+                if (countEl) {
+                    const cur = parseInt(countEl.textContent) || 0;
+                    countEl.textContent = `${cur + 1} Comments`;
+                }
+            }
+
             try {
                 await sb('workout_comments', { method:'POST', body:{ workout_id:_detailWorkoutId, user_id:window._sbUserId, body } });
             } catch(e) { console.warn('Comment save failed:', e.message); }
