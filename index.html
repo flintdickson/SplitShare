@@ -840,6 +840,141 @@
         /* Step indicator text */
         #stepLabel { transition: all 0.3s ease; }
 
+        /* ── SIMPLIFIED FEED CARD ─────────────────────────────────── */
+        .card-exercises-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 0 18px 14px;
+        }
+        .ex-pill {
+            background: rgba(255,107,53,0.1);
+            border: 1px solid rgba(255,107,53,0.25);
+            color: #ccc;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+        .ex-pill.pr { background: rgba(255,179,71,0.15); border-color: rgba(255,179,71,0.4); color: #ffb347; }
+        .card-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px 16px;
+            gap: 12px;
+        }
+        .card-duration {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            color: #555;
+        }
+        .view-workout-btn {
+            background: transparent;
+            border: 1.5px solid rgba(255,107,53,0.4);
+            color: var(--primary);
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 7px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .view-workout-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        /* ── WORKOUT DETAIL MODAL ──────────────────────────────────── */
+        #workoutDetailModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1998;
+            background: rgba(0,0,0,0.88);
+            align-items: flex-end;
+            justify-content: center;
+        }
+        #workoutDetailModal.active { display: flex; }
+        .detail-sheet {
+            background: #111;
+            width: 100%;
+            max-width: 680px;
+            max-height: 88vh;
+            overflow-y: auto;
+            border-radius: 20px 20px 0 0;
+            border-top: 2px solid var(--primary);
+            padding: 0 0 calc(20px + env(safe-area-inset-bottom));
+            animation: slideUp 0.35s cubic-bezier(0.32,0.72,0,1);
+            -webkit-overflow-scrolling: touch;
+        }
+        .detail-drag-handle {
+            width: 36px; height: 4px;
+            background: #333; border-radius: 2px;
+            margin: 12px auto 0;
+        }
+        .detail-header {
+            padding: 18px 20px 0;
+        }
+        .detail-workout-name {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 26px;
+            letter-spacing: 2px;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .detail-meta {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 18px;
+        }
+        .detail-section-label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #444;
+            padding: 0 20px;
+            margin-bottom: 10px;
+        }
+        .detail-chart-wrap {
+            padding: 0 16px;
+            margin-bottom: 20px;
+        }
+        .detail-ex-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .detail-ex-table th {
+            font-family: 'Oswald', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            padding: 8px 20px;
+            text-align: left;
+            border-bottom: 1px solid #1e1e1e;
+        }
+        .detail-ex-table td {
+            padding: 11px 20px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            color: #ccc;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .detail-ex-table tr:last-child td { border-bottom: none; }
+        .detail-ex-table td:first-child { color: #fff; font-weight: 500; font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 0.5px; }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .hero-stats {
@@ -1913,8 +2048,8 @@
                 <div style="background:var(--steel);border-radius:12px;padding:16px 14px;margin-bottom:12px;border:1px solid #2a2a2a;">
                     <div id="chartTitle" style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:1.5px;color:#fff;margin-bottom:2px;"></div>
                     <div id="chartPrBadge" style="display:inline-block;background:var(--primary);color:#fff;font-family:'Oswald',sans-serif;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-bottom:12px;letter-spacing:1px;"></div>
-                    <div style="position:relative;height:220px;">
-                        <canvas id="progressChart"></canvas>
+                    <div style="position:relative;width:100%;height:220px;background:rgba(0,0,0,0.2);border-radius:8px;">
+                        <canvas id="progressChart" style="position:absolute;top:0;left:0;width:100%!important;height:100%!important;"></canvas>
                     </div>
                 </div>
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
@@ -1931,11 +2066,11 @@
                         <div id="sessionsLogged" style="font-family:'Bebas Neue',cursive;font-size:26px;color:var(--primary);line-height:1;">—</div>
                     </div>
                 </div>
-                <div style="background:var(--steel);border-radius:12px;overflow:hidden;border:1px solid #2a2a2a;margin-bottom:8px;">
+                <div style="background:var(--steel);border-radius:12px;overflow:hidden;border:1px solid #2a2a2a;margin-bottom:80px;">
                     <div style="padding:12px 16px;border-bottom:1px solid #2a2a2a;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1.5px;color:#fff;">Exercise History</div>
-                    <div style="overflow-x:auto;">
-                        <table class="history-table" style="min-width:320px;">
-                            <thead><tr><th>Date</th><th>Weight</th><th>Sets × Reps</th><th>Volume</th></tr></thead>
+                    <div style="overflow-y:auto;max-height:420px;-webkit-overflow-scrolling:touch;">
+                        <table class="history-table" style="min-width:320px;width:100%;">
+                            <thead style="position:sticky;top:0;z-index:1;background:var(--steel);"><tr><th>Date</th><th>Weight</th><th>Sets × Reps</th><th>Volume</th><th>Trend</th></tr></thead>
                             <tbody id="historyTableBody"></tbody>
                         </table>
                     </div>
@@ -2197,6 +2332,26 @@
                     <button type="button" class="submit-btn" onclick="handleLogWorkout()" style="margin-top:0;flex:1;">Post Workout 🔥</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Workout Detail Modal (bottom sheet) -->
+    <div id="workoutDetailModal" onclick="if(event.target===this)closeWorkoutDetail()">
+        <div class="detail-sheet">
+            <div class="detail-drag-handle"></div>
+            <div class="detail-header">
+                <div class="detail-workout-name" id="detailWorkoutName"></div>
+                <div class="detail-meta" id="detailWorkoutMeta"></div>
+            </div>
+            <div class="detail-section-label">Exercise Breakdown</div>
+            <div class="detail-chart-wrap">
+                <canvas id="detailBarChart" style="width:100%;max-height:200px;"></canvas>
+            </div>
+            <div class="detail-section-label">Sets & Reps</div>
+            <table class="detail-ex-table" id="detailExTable">
+                <thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Weight</th><th>Vol</th></tr></thead>
+                <tbody id="detailExBody"></tbody>
+            </table>
         </div>
     </div>
 
@@ -2879,42 +3034,130 @@
         function renderProgressChart(exerciseName) {
             const entries = progressExerciseData[exerciseName];
             if (!entries || entries.length === 0) return;
-            const pr = Math.max(...entries.map(e=>e.weight));
+            const pr   = Math.max(...entries.map(e => e.weight));
             const diff = pr - entries[0].weight;
 
-            const g=id=>document.getElementById(id);
-            if(g('chartTitle')) g('chartTitle').textContent = exerciseName;
-            if(g('chartPrBadge')) g('chartPrBadge').textContent = `PR: ${pr} lbs`;
-            if(g('currentPR')) g('currentPR').textContent = pr+' lbs';
-            if(g('totalIncrease')) g('totalIncrease').textContent = (diff>=0?'+':'')+diff+' lbs';
-            if(g('sessionsLogged')) g('sessionsLogged').textContent = entries.length;
+            const g = id => document.getElementById(id);
+            if (g('chartTitle'))    g('chartTitle').textContent    = exerciseName;
+            if (g('chartPrBadge')) g('chartPrBadge').textContent   = `PR: ${pr} lbs`;
+            if (g('currentPR'))    g('currentPR').textContent      = pr + ' lbs';
+            if (g('totalIncrease')) g('totalIncrease').textContent = (diff >= 0 ? '+' : '') + diff + ' lbs';
+            if (g('sessionsLogged')) g('sessionsLogged').textContent = entries.length;
 
-            const canvas = document.getElementById('progressChart');
-            if (!canvas) return;
+            // Destroy old chart
             if (window.progressChart) { window.progressChart.destroy(); window.progressChart = null; }
-            const wrapper = canvas.parentElement;
-            const w = wrapper.clientWidth || window.innerWidth-60 || 320;
-            canvas.width=w; canvas.height=220;
-            canvas.style.width='100%'; canvas.style.height='100%';
-            const ctx = canvas.getContext('2d');
-            const grad = ctx.createLinearGradient(0,0,0,220);
-            grad.addColorStop(0,'rgba(255,107,53,0.3)'); grad.addColorStop(1,'rgba(255,107,53,0)');
 
-            const labels = entries.length===1 ? [entries[0].dateLabel,entries[0].dateLabel] : entries.map(e=>e.dateLabel);
-            const data   = entries.length===1 ? [entries[0].weight,entries[0].weight] : entries.map(e=>e.weight);
-            const pts    = (entries.length===1?[entries[0]]:entries).map(e=>e.weight===pr?'#ffb347':'#ff6b35');
-            const radii  = (entries.length===1?[entries[0]]:entries).map(e=>e.weight===pr?8:5);
+            // Duplicate single point so line draws
+            const labels = entries.length === 1
+                ? [entries[0].dateLabel, entries[0].dateLabel]
+                : entries.map(e => e.dateLabel);
+            const data = entries.length === 1
+                ? [entries[0].weight, entries[0].weight]
+                : entries.map(e => e.weight);
+            const pts   = (entries.length === 1 ? [entries[0], entries[0]] : entries).map(e => e.weight === pr ? '#ffb347' : '#ff6b35');
+            const radii = (entries.length === 1 ? [entries[0], entries[0]] : entries).map(e => e.weight === pr ? 8 : 5);
 
-            window.progressChart = new Chart(ctx, {
-                type:'line', data:{ labels, datasets:[{ data, borderColor:'#ff6b35', backgroundColor:grad, borderWidth:2.5, fill:true, tension:0.35, pointRadius:radii, pointBackgroundColor:pts, pointBorderColor:'#1a1a1a', pointBorderWidth:2, pointHoverRadius:10, pointHoverBackgroundColor:'#ffb347', pointHoverBorderColor:'#fff', pointHoverBorderWidth:2 }] },
-                options:{ responsive:true, maintainAspectRatio:false, animation:{duration:500}, plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#1a1a1a', titleColor:'#ff6b35', bodyColor:'#eee', borderColor:'#333', borderWidth:1, padding:12, cornerRadius:8, displayColors:false, titleFont:{family:'Oswald',size:13,weight:'600'}, bodyFont:{family:'Roboto Mono',size:12}, callbacks:{ title:items=>labels[items[0].dataIndex], label:c=>`  ${c.parsed.y} lbs`, afterLabel:c=>{ const e=entries[Math.min(c.dataIndex,entries.length-1)]; const vol=e.weight*(parseInt(e.sets)||1)*(parseInt(e.reps)||1); const lines=[`  ${e.sets} sets × ${e.reps} reps`,`  Vol: ${vol.toLocaleString()} lbs`]; if(e.weight===pr) lines.push('  🏆 PR!'); return lines; } } } }, scales:{ y:{beginAtZero:false, grid:{color:'rgba(255,255,255,0.06)'}, border:{color:'rgba(255,255,255,0.08)',dash:[4,4]}, ticks:{color:'#666',font:{family:'Roboto Mono',size:10},padding:6,callback:v=>v+' lbs'}}, x:{grid:{color:'rgba(255,255,255,0.03)'}, border:{color:'rgba(255,255,255,0.08)'}, ticks:{color:'#666',font:{family:'Roboto Mono',size:10},padding:6,maxRotation:40}} }, interaction:{intersect:false,mode:'index'} }
+            // Use requestAnimationFrame so container is fully painted before Chart.js measures it
+            requestAnimationFrame(() => {
+                const canvas = document.getElementById('progressChart');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const grad = ctx.createLinearGradient(0, 0, 0, 220);
+                grad.addColorStop(0, 'rgba(255,107,53,0.35)');
+                grad.addColorStop(1, 'rgba(255,107,53,0.0)');
+
+                window.progressChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data,
+                            borderColor: '#ff6b35',
+                            backgroundColor: grad,
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: radii,
+                            pointBackgroundColor: pts,
+                            pointBorderColor: '#1a1a1a',
+                            pointBorderWidth: 2,
+                            pointHoverRadius: 10,
+                            pointHoverBackgroundColor: '#ffb347',
+                            pointHoverBorderColor: '#fff',
+                            pointHoverBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 600 },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1a1a1a',
+                                titleColor: '#ff6b35',
+                                bodyColor: '#eee',
+                                borderColor: '#333',
+                                borderWidth: 1,
+                                padding: 12,
+                                cornerRadius: 8,
+                                displayColors: false,
+                                titleFont: { family: 'Oswald', size: 13, weight: '600' },
+                                bodyFont:  { family: 'Roboto Mono', size: 12 },
+                                callbacks: {
+                                    title: items => labels[items[0].dataIndex],
+                                    label: c => `  ${c.parsed.y} lbs`,
+                                    afterLabel: c => {
+                                        const idx = Math.min(c.dataIndex, entries.length - 1);
+                                        const e = entries[idx];
+                                        const vol = e.weight * (parseInt(e.sets) || 1) * (parseInt(e.reps) || 1);
+                                        const lines = [`  ${e.sets} sets × ${e.reps} reps`, `  Vol: ${vol.toLocaleString()} lbs`];
+                                        if (e.weight === pr) lines.push('  🏆 PR!');
+                                        return lines;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: { color: 'rgba(255,255,255,0.06)' },
+                                border: { color: 'rgba(255,255,255,0.08)', dash: [4, 4] },
+                                ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, padding: 6, callback: v => v + ' lbs' }
+                            },
+                            x: {
+                                grid: { color: 'rgba(255,255,255,0.03)' },
+                                border: { color: 'rgba(255,255,255,0.08)' },
+                                ticks: { color: '#666', font: { family: 'Roboto Mono', size: 10 }, padding: 6, maxRotation: 40 }
+                            }
+                        },
+                        interaction: { intersect: false, mode: 'index' }
+                    }
+                });
             });
 
-            // History table
+            // History table — newest first
             const tbody = document.getElementById('historyTableBody');
             if (tbody) {
-                const rows=[...entries].reverse();
-                tbody.innerHTML=rows.map((e,i)=>{ const prev=rows[i+1]; let trend='<span style="color:#444;">—</span>'; if(prev){const d=e.weight-prev.weight; if(d>0)trend=`<span style="color:#4ade80;">↑ +${d}</span>`; else if(d<0)trend=`<span style="color:#f87171;">↓ ${d}</span>`;} const vol=e.weight*(parseInt(e.sets)||1)*(parseInt(e.reps)||1); const isPR=e.weight===pr; return `<tr style="${isPR?'background:rgba(255,179,71,0.07);':''}">${[`<td style="white-space:nowrap;">${e.dateLabel}${isPR?' <span style="background:var(--primary);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:4px;vertical-align:middle;">PR</span>':''}</td>`,`<td style="color:#fff;font-weight:600;">${e.weight} lbs</td>`,`<td>${e.sets}×${e.reps}</td>`,`<td style="color:#888;">${vol.toLocaleString()}</td>`].join('')}</tr>`; }).join('');
+                const rows = [...entries].reverse();
+                tbody.innerHTML = rows.map((e, i) => {
+                    const prev = rows[i + 1];
+                    let trend = '<span style="color:#444;">—</span>';
+                    if (prev) {
+                        const d = e.weight - prev.weight;
+                        if (d > 0) trend = `<span style="color:#4ade80;">↑ +${d}</span>`;
+                        else if (d < 0) trend = `<span style="color:#f87171;">↓ ${d}</span>`;
+                    }
+                    const vol  = e.weight * (parseInt(e.sets) || 1) * (parseInt(e.reps) || 1);
+                    const isPR = e.weight === pr;
+                    return `<tr style="${isPR ? 'background:rgba(255,179,71,0.08);' : ''}">
+                        <td style="white-space:nowrap;">${e.dateLabel}${isPR ? ' <span style="background:var(--primary);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:4px;vertical-align:middle;">PR</span>' : ''}</td>
+                        <td style="color:#fff;font-weight:600;">${e.weight} lbs</td>
+                        <td>${e.sets}×${e.reps}</td>
+                        <td style="color:#888;">${vol.toLocaleString()}</td>
+                        <td>${trend}</td>
+                    </tr>`;
+                }).join('');
             }
         }
 
@@ -3270,6 +3513,169 @@
             if (content) content.classList.toggle('active');
         }
 
+        // ── SIMPLE FEED CARD BUILDER ─────────────────────────────────────────
+        function buildSimpleCard(opts) {
+            // opts: { name, duration, exercises, photoSrc, caption, dateStr, avatarUrl, initials, userName }
+            const { name, duration, exercises=[], photoSrc, caption, dateStr, avatarUrl, initials, userName } = opts;
+
+            const photoHTML   = photoSrc ? `<img src="${photoSrc}" class="workout-photo" alt="" style="width:100%;max-height:360px;object-fit:cover;display:block;">` : '';
+            const captionHTML = caption  ? `<p style="padding:12px 18px 0;font-size:14px;color:#ccc;line-height:1.5;">"${caption}"</p>` : '';
+
+            const pills = exercises.slice(0, 6).map(ex =>
+                `<span class="ex-pill">${ex.name}${ex.weight ? ' · ' + ex.weight + 'lb' : ''}</span>`
+            ).join('');
+            const moreCount = exercises.length - 6;
+            const morePill  = moreCount > 0 ? `<span class="ex-pill">+${moreCount} more</span>` : '';
+
+            const card = document.createElement('div');
+            card.className = 'activity-card';
+            // Store workout data on the element for the detail modal
+            card._workoutData = opts;
+            card.innerHTML = `
+                <div class="activity-header">
+                    ${avatarHTML(avatarUrl||'', initials||'??', 46)}
+                    <div class="activity-user-info">
+                        <h3 style="font-size:16px;">${userName||'Unknown'}</h3>
+                        <span class="activity-time">${dateStr||'Just now'}</span>
+                    </div>
+                </div>
+                <h2 class="workout-title" style="padding:8px 18px;font-size:22px;">${name.toUpperCase()}</h2>
+                ${photoHTML}${captionHTML}
+                <div class="card-exercises-row">${pills}${morePill}</div>
+                <div class="card-meta-row">
+                    <span class="card-duration">${duration ? '⏱ ' + duration + ' min' : ''}</span>
+                    <button class="view-workout-btn" onclick="openWorkoutDetail(this.closest('.activity-card'))">View Full Workout</button>
+                </div>
+                <div class="activity-actions" style="padding:12px 18px;">
+                    <button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">👊</span><span>0 Respect</span></button>
+                    <button class="action-btn"><span class="action-icon">💬</span><span>0 Comments</span></button>
+                </div>`;
+            return card;
+        }
+
+        // ── WORKOUT DETAIL MODAL ─────────────────────────────────────────────
+        let _detailBarChart = null;
+
+        function openWorkoutDetail(cardEl) {
+            const data = cardEl?._workoutData;
+            if (!data) return;
+            const { name, duration, exercises=[], dateStr, avatarUrl, initials, userName } = data;
+
+            document.getElementById('detailWorkoutName').textContent = name.toUpperCase();
+            document.getElementById('detailWorkoutMeta').textContent =
+                [dateStr, duration ? duration + ' min' : null, userName].filter(Boolean).join(' · ');
+
+            // Table
+            const tbody = document.getElementById('detailExBody');
+            if (tbody) {
+                tbody.innerHTML = exercises.length ? exercises.map(ex => {
+                    const vol = (parseFloat(ex.weight)||0) * (parseInt(ex.sets)||1) * (parseInt(ex.reps)||1);
+                    return `<tr>
+                        <td>${ex.name}</td>
+                        <td>${ex.sets||'—'}</td>
+                        <td>${ex.reps||'—'}</td>
+                        <td>${ex.weight ? ex.weight + ' lb' : '—'}</td>
+                        <td style="color:#555;">${vol ? vol.toLocaleString() : '—'}</td>
+                    </tr>`;
+                }).join('') : '<tr><td colspan="5" style="color:#444;text-align:center;padding:20px;">No exercises recorded</td></tr>';
+            }
+
+            // Bar chart
+            requestAnimationFrame(() => {
+                const canvas = document.getElementById('detailBarChart');
+                if (!canvas) return;
+                if (_detailBarChart) { _detailBarChart.destroy(); _detailBarChart = null; }
+
+                const exWithWeight = exercises.filter(e => parseFloat(e.weight) > 0);
+                if (exWithWeight.length === 0) {
+                    canvas.style.display = 'none';
+                    document.querySelector('.detail-section-label')?.style && (document.querySelectorAll('.detail-section-label')[0].style.display = 'none');
+                    return;
+                }
+                canvas.style.display = 'block';
+
+                const labels  = exWithWeight.map(e => e.name.length > 14 ? e.name.slice(0,13)+'…' : e.name);
+                const weights = exWithWeight.map(e => parseFloat(e.weight)||0);
+                const volumes = exWithWeight.map(e => (parseFloat(e.weight)||0)*(parseInt(e.sets)||1)*(parseInt(e.reps)||1));
+
+                const ctx = canvas.getContext('2d');
+                _detailBarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Weight (lbs)',
+                                data: weights,
+                                backgroundColor: 'rgba(255,107,53,0.75)',
+                                borderColor: '#ff6b35',
+                                borderWidth: 1.5,
+                                borderRadius: 4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Volume (lbs)',
+                                data: volumes,
+                                backgroundColor: 'rgba(255,179,71,0.35)',
+                                borderColor: '#ffb347',
+                                borderWidth: 1.5,
+                                borderRadius: 4,
+                                yAxisID: 'y2'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 500 },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: { color: '#666', font: { family: 'Oswald', size: 11 }, boxWidth: 12, padding: 14 }
+                            },
+                            tooltip: {
+                                backgroundColor: '#1a1a1a',
+                                titleColor: '#ff6b35',
+                                bodyColor: '#eee',
+                                borderColor: '#333',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                padding: 10,
+                                titleFont: { family: 'Oswald', size: 12 },
+                                bodyFont:  { family: 'Roboto Mono', size: 11 }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                position: 'left',
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                ticks: { color: '#555', font: { family: 'Roboto Mono', size: 9 }, callback: v => v + 'lb' }
+                            },
+                            y2: {
+                                position: 'right',
+                                beginAtZero: true,
+                                grid: { display: false },
+                                ticks: { color: '#555', font: { family: 'Roboto Mono', size: 9 }, callback: v => v.toLocaleString() }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#666', font: { family: 'Roboto Mono', size: 9 }, maxRotation: 35 }
+                            }
+                        }
+                    }
+                });
+            });
+
+            const modal = document.getElementById('workoutDetailModal');
+            if (modal) modal.classList.add('active');
+        }
+
+        function closeWorkoutDetail() {
+            const modal = document.getElementById('workoutDetailModal');
+            if (modal) modal.classList.remove('active');
+        }
+
         function handleRespect(btn) {
             const span = btn.querySelector('span:last-child');
             const count = parseInt(span.textContent) + 1;
@@ -3355,42 +3761,17 @@
             }
 
             // Build feed card
-            const photoHTML   = photoSrc ? `<img src="${photoSrc}" class="workout-photo" alt="">` : '';
-            const captionHTML = caption  ? `<p class="workout-caption">"${caption}"</p>` : '';
-            const exHTML = exercises.length
-                ? exercises.map(ex => `<div class="exercise-item"><span class="exercise-name">${ex.name}</span><span class="exercise-details">${ex.sets||'?'} × ${ex.reps||'?'}${ex.weight ? ' @ '+ex.weight+' lbs' : ''}</span></div>`).join('')
-                : '<div class="exercise-item"><span class="exercise-name">No exercises logged</span></div>';
-
-            const card = document.createElement('div');
-            card.className = 'activity-card';
-            card.style.animation = 'fadeInUp 0.5s ease-out';
-            card.innerHTML = `
-                <div class="activity-header">
-                    ${avatarHTML(userAvUrl, initials, 50)}
-                    <div class="activity-user-info">
-                        <h3>${userName}</h3>
-                        <span class="activity-time">Just now</span>
-                    </div>
-                </div>
-                <h2 class="workout-title">${workoutName.toUpperCase()}</h2>
-                ${photoHTML}${captionHTML}
-                <div class="workout-details">
-                    <button class="details-toggle" onclick="toggleDetails(this)">
-                        <span>View Workout Details</span><span class="details-toggle-icon">▼</span>
-                    </button>
-                    <div class="workout-details-content">
-                        <div class="workout-stats">
-                            <div class="workout-stat"><div class="workout-stat-value">${exercises.length}</div><div class="workout-stat-label">Exercises</div></div>
-                            <div class="workout-stat"><div class="workout-stat-value">${duration||'—'}</div><div class="workout-stat-label">Minutes</div></div>
-                        </div>
-                        <div class="exercise-list">${exHTML}</div>
-                    </div>
-                </div>
-                <div class="activity-actions">
-                    <button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">👊</span><span>0 Respect</span></button>
-                    <button class="action-btn"><span class="action-icon">💬</span><span>0 Comments</span></button>
-                    <button class="action-btn"><span class="action-icon">🔥</span><span>PR!</span></button>
-                </div>`;
+            const card = buildSimpleCard({
+                name:      workoutName,
+                duration,
+                exercises,
+                photoSrc,
+                caption,
+                dateStr:   'Just now',
+                avatarUrl: userAvUrl,
+                initials,
+                userName
+            });
 
             const feed = document.querySelector('.activity-feed');
             if (feed) feed.insertBefore(card, feed.firstChild);
@@ -3633,61 +4014,32 @@
             if (!feed) return;
             const workouts = user.workouts || [];
             if (workouts.length === 0) {
-                feed.innerHTML = `<div style="text-align:center; padding:60px 20px; color:#999;">
-                    <div style="font-size:48px; margin-bottom:15px;">🏋️</div>
-                    <h3 style="font-family:'Bebas Neue',cursive; font-size:28px; color:var(--primary); margin-bottom:10px;">No Workouts Yet</h3>
+                feed.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#999;">
+                    <div style="font-size:48px;margin-bottom:15px;">🏋️</div>
+                    <h3 style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">No Workouts Yet</h3>
                     <p>Hit the + button to log your first workout!</p>
                 </div>`;
                 return;
             }
-            feed.innerHTML = workouts.map(w => {
-                const exerciseListHTML = (w.exercises || []).map(ex =>
-                    `<div class="exercise-item">
-                        <span class="exercise-name">${ex.name}</span>
-                        <span class="exercise-details">${ex.sets||'?'} × ${ex.reps||'?'}${ex.weight ? ' @ '+ex.weight+' lbs' : ''}</span>
-                    </div>`).join('') || '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
-                const captionHTML = w.caption ? `<p class="workout-caption">"${w.caption}"</p>` : '';
+            feed.innerHTML = '';
+            const displayName = user.full_name || user.fullName || user.username || 'You';
+            const initials    = user.initials || displayName.slice(0,2).toUpperCase();
+            workouts.forEach(w => {
                 const rawDate = w.created_at || w.date;
-                const dateStr = rawDate ? new Date(rawDate).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : 'Just now';
-                const displayName = user.full_name || user.fullName || user.username || 'You';
-                return `<div class="activity-card">
-                    <div class="activity-header">
-                        ${avatarHTML(user.avatar_url||'', user.initials || displayName.slice(0,2).toUpperCase(), 50)}
-                        <div class="activity-user-info">
-                            <h3>${displayName}</h3>
-                            <span class="activity-time">${dateStr}</span>
-                        </div>
-                    </div>
-                    <h2 class="workout-title">${w.name.toUpperCase()}</h2>
-                    ${captionHTML}
-                    <div class="workout-details">
-                        <button class="details-toggle" onclick="toggleDetails(this)">
-                            <span>View Workout Details</span>
-                            <span class="details-toggle-icon">▼</span>
-                        </button>
-                        <div class="workout-details-content">
-                            <div class="workout-stats">
-                                <div class="workout-stat">
-                                    <div class="workout-stat-value">${w.exercises?.length || 0}</div>
-                                    <div class="workout-stat-label">Exercises</div>
-                                </div>
-                                <div class="workout-stat">
-                                    <div class="workout-stat-value">${w.duration || '—'}</div>
-                                    <div class="workout-stat-label">Minutes</div>
-                                </div>
-                            </div>
-                            <div class="exercise-list">${exerciseListHTML}</div>
-                        </div>
-                    </div>
-                    <div class="activity-actions">
-                        <button class="action-btn" onclick="handleRespect(this)">
-                            <span class="action-icon">👊</span><span>0 Respect</span>
-                        </button>
-                        <button class="action-btn"><span class="action-icon">💬</span><span>0 Comments</span></button>
-                        <button class="action-btn"><span class="action-icon">🔥</span><span>PR!</span></button>
-                    </div>
-                </div>`;
-            }).join('');
+                const dateStr = rawDate ? new Date(rawDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'Just now';
+                const card = buildSimpleCard({
+                    name:      w.name,
+                    duration:  w.duration,
+                    exercises: w.exercises || [],
+                    photoSrc:  w.photo_url || null,
+                    caption:   w.caption   || null,
+                    dateStr,
+                    avatarUrl: user.avatar_url || '',
+                    initials,
+                    userName:  displayName
+                });
+                feed.appendChild(card);
+            });
         }
 
         function refreshAchievements(user) {
@@ -3907,40 +4259,18 @@
             const name     = profile?.full_name || profile?.username || 'Unknown';
             const initials = profile?.initials  || (name !== 'Unknown' ? name.slice(0,2).toUpperCase() : '??');
             const avUrl    = profile?.avatar_url || '';
-            const exercises = w.exercises || [];
-            const photoHTML   = w.photo_url ? `<img src="${w.photo_url}" class="workout-photo" alt="">` : '';
-            const captionHTML = w.caption   ? `<p class="workout-caption">"${w.caption}"</p>` : '';
-            const exHTML = exercises.length
-                ? exercises.map(ex=>`<div class="exercise-item"><span class="exercise-name">${ex.name}</span><span class="exercise-details">${ex.sets||'?'} × ${ex.reps||'?'}${ex.weight?' @ '+ex.weight+' lbs':''}</span></div>`).join('')
-                : '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
-            const dateStr = w.created_at ? new Date(w.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'Just now';
-            const card = document.createElement('div');
-            card.className = 'activity-card';
-            card.innerHTML = `
-                <div class="activity-header">
-                    ${avatarHTML(avUrl, initials, 50)}
-                    <div class="activity-user-info"><h3>${name}</h3><span class="activity-time">${dateStr}</span></div>
-                </div>
-                <h2 class="workout-title">${w.name.toUpperCase()}</h2>
-                ${photoHTML}${captionHTML}
-                <div class="workout-details">
-                    <button class="details-toggle" onclick="toggleDetails(this)">
-                        <span>View Workout Details</span><span class="details-toggle-icon">▼</span>
-                    </button>
-                    <div class="workout-details-content">
-                        <div class="workout-stats">
-                            <div class="workout-stat"><div class="workout-stat-value">${exercises.length}</div><div class="workout-stat-label">Exercises</div></div>
-                            <div class="workout-stat"><div class="workout-stat-value">${w.duration||'—'}</div><div class="workout-stat-label">Minutes</div></div>
-                        </div>
-                        <div class="exercise-list">${exHTML}</div>
-                    </div>
-                </div>
-                <div class="activity-actions">
-                    <button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">👊</span><span>0 Respect</span></button>
-                    <button class="action-btn"><span class="action-icon">💬</span><span>0 Comments</span></button>
-                    <button class="action-btn"><span class="action-icon">🔥</span><span>PR!</span></button>
-                </div>`;
-            return card;
+            const dateStr  = w.created_at ? new Date(w.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'Just now';
+            return buildSimpleCard({
+                name:      w.name,
+                duration:  w.duration,
+                exercises: w.exercises || [],
+                photoSrc:  w.photo_url || null,
+                caption:   w.caption   || null,
+                dateStr,
+                avatarUrl: avUrl,
+                initials,
+                userName:  name
+            });
         }
 
         // ── GROUP WORKOUT PHOTO WIRING ────────────────────────────────────────
