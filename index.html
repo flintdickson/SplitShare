@@ -3141,18 +3141,32 @@
             workouts.forEach(w => {
                 const rawDate = w.created_at || w.date || new Date().toISOString();
                 const date = new Date(rawDate);
-                (w.exercises || []).forEach(ex => {
+
+                // exercises may be a JSON string if Supabase column is text
+                let exList = w.exercises || [];
+                if (typeof exList === 'string') {
+                    try { exList = JSON.parse(exList); } catch(e) { exList = []; }
+                }
+                if (!Array.isArray(exList)) exList = [];
+
+                exList.forEach(ex => {
+                    if (!ex || !ex.name) return;
                     const weight = parseFloat(ex.weight);
-                    if (!ex.name || !weight || isNaN(weight)) return;
+                    if (!weight || isNaN(weight) || weight <= 0) return; // skip bodyweight / no weight
                     const key = ex.name.trim();
                     if (!map[key]) map[key] = [];
                     map[key].push({
-                        date, dateLabel: date.toLocaleDateString('en-US',{month:'short',day:'numeric'}),
-                        weight, sets: ex.sets||'?', reps: ex.reps||'?',
-                        volume: weight*(parseInt(ex.sets)||1)*(parseInt(ex.reps)||1)
+                        date,
+                        dateLabel: date.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'2-digit'}),
+                        weight,
+                        sets: ex.sets || '?',
+                        reps: ex.reps || '?',
+                        volume: weight * (parseInt(ex.sets)||1) * (parseInt(ex.reps)||1),
+                        workoutName: w.name || ''
                     });
                 });
             });
+            // Sort each exercise's entries chronologically
             Object.keys(map).forEach(k => map[k].sort((a,b) => a.date - b.date));
             return map;
         }
@@ -3201,15 +3215,18 @@
             }
             if(emptyState) emptyState.style.display='none';
 
-            const prev = dropdown ? dropdown.value : '';
+            // Keep previously selected lift if still valid, otherwise auto-select first
+            const prev    = dropdown ? dropdown.value : '';
+            const toSelect = (prev && exercises.includes(prev)) ? prev : exercises[0];
+
             if (dropdown) {
                 dropdown.innerHTML = '<option value="">— Choose a lift —</option>' +
-                    exercises.map(n=>`<option value="${n.replace(/"/g,'&quot;')}"${n===prev?' selected':''}>${n}</option>`).join('');
+                    exercises.map(n=>`<option value="${n.replace(/"/g,'&quot;')}"${n===toSelect?' selected':''}>${n}</option>`).join('');
             }
-            if (prev && exercises.includes(prev)) {
-                if(liftDetail) liftDetail.style.display='block';
-                requestAnimationFrame(() => requestAnimationFrame(() => renderProgressChart(prev)));
-            }
+
+            // Always show chart section with selected lift
+            if(liftDetail) liftDetail.style.display='block';
+            requestAnimationFrame(() => requestAnimationFrame(() => renderProgressChart(toSelect)));
         }
 
         function onLiftDropdownChange(val) {
@@ -3334,24 +3351,29 @@
             const tbody = g('historyTableBody');
             if (tbody) {
                 const rows = [...entries].reverse();
-                tbody.innerHTML = rows.map((e, i) => {
-                    const prev = rows[i + 1];
-                    let trend = '<span style="color:#444;">—</span>';
-                    if (prev) {
-                        const d = e.weight - prev.weight;
-                        if (d > 0) trend = `<span style="color:#4ade80;">↑ +${d}</span>`;
-                        else if (d < 0) trend = `<span style="color:#f87171;">↓ ${d}</span>`;
-                    }
-                    const vol  = e.weight * (parseInt(e.sets)||1) * (parseInt(e.reps)||1);
-                    const isPR = e.weight === pr;
-                    return `<tr style="${isPR ? 'background:rgba(255,179,71,0.08);' : ''}">
-                        <td style="white-space:nowrap;">${e.dateLabel}${isPR ? ' <span style="background:var(--primary);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:4px;vertical-align:middle;">PR</span>' : ''}</td>
-                        <td style="color:#fff;font-weight:600;">${e.weight} lbs</td>
-                        <td>${e.sets}×${e.reps}</td>
-                        <td style="color:#888;">${vol.toLocaleString()}</td>
-                        <td>${trend}</td>
-                    </tr>`;
-                }).join('');
+                if (rows.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#444;padding:20px;font-family:\'Oswald\',sans-serif;font-size:13px;letter-spacing:1px;">No sessions logged yet</td></tr>';
+                } else {
+                    tbody.innerHTML = rows.map((e, i) => {
+                        const prevRow = rows[i + 1];
+                        let trend = '<span style="color:#444;">—</span>';
+                        if (prevRow) {
+                            const d = e.weight - prevRow.weight;
+                            if (d > 0) trend = `<span style="color:#4ade80;">↑ +${d}</span>`;
+                            else if (d < 0) trend = `<span style="color:#f87171;">↓ ${d}</span>`;
+                            else trend = `<span style="color:#666;">→</span>`;
+                        }
+                        const vol  = e.weight * (parseInt(e.sets)||1) * (parseInt(e.reps)||1);
+                        const isPR = e.weight === pr;
+                        return `<tr style="${isPR ? 'background:rgba(255,179,71,0.08);' : ''}">
+                            <td style="white-space:nowrap;color:#aaa;">${e.dateLabel}${isPR ? ' <span style="background:var(--primary);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:4px;vertical-align:middle;">PR</span>' : ''}</td>
+                            <td style="color:#fff;font-weight:600;">${e.weight} lbs</td>
+                            <td style="color:#aaa;">${e.sets}×${e.reps}</td>
+                            <td style="color:#666;">${vol.toLocaleString()}</td>
+                            <td>${trend}</td>
+                        </tr>`;
+                    }).join('');
+                }
             }
         }
 
