@@ -2990,6 +2990,25 @@
         }
 
         // â”€â”€ PROFILE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        function refreshProfileStats(user) {
+            const workouts = user.workouts || [];
+            const el = id => document.getElementById(id);
+            if (el('statTotalWorkouts'))  el('statTotalWorkouts').textContent  = workouts.length;
+            if (el('statTotalExercises')) el('statTotalExercises').textContent = workouts.reduce((s,w) => s+(w.exercises?.length||0), 0);
+            if (el('statTotalMinutes'))   el('statTotalMinutes').textContent   = workouts.reduce((s,w) => s+(parseInt(w.duration)||0), 0);
+            if (el('profileWorkoutCount')) el('profileWorkoutCount').textContent = workouts.length;
+            const list = document.getElementById('recentWorkoutsList');
+            if (list) {
+                if (workouts.length === 0) { list.innerHTML = '<p style="color:#999;text-align:center;padding:30px;">No workouts yet.</p>'; return; }
+                list.innerHTML = `<h3 style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px;color:var(--primary);margin-bottom:15px;">Recent Workouts</h3>` +
+                    workouts.slice(0,10).map(w => `<div style="background:var(--steel);border-left:3px solid var(--primary);padding:15px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-radius:0 8px 8px 0;">
+                        <div><div style="font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:1px;">${w.name.toUpperCase()}</div>
+                        <div style="font-size:12px;color:#999;margin-top:3px;">${w.exercises?.length||0} exercises · ${w.duration||0} min</div></div>
+                        <div style="font-size:12px;color:#666;font-family:'Roboto Mono',monospace;">${new Date(w.created_at||w.date).toLocaleDateString()}</div>
+                    </div>`).join('');
+            }
+        }
+
         function loadProfileForUser(user) {
             const el = id => document.getElementById(id);
             if (el('profileName'))     el('profileName').textContent    = user.full_name || user.fullName || '';
