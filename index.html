@@ -2017,7 +2017,7 @@
                         <span>📅 Created Jan 2026</span>
                         <span>👤 Leader: Marcus King</span>
                     </div>
-                    <button class="post-workout-btn" onclick="openPostWorkoutModal()">📝 Post New Workout Challenge</button>
+
                 </div>
 
                 <div class="group-workout-feed">
@@ -2295,9 +2295,33 @@
             <span>Progress</span>
         </a>
         <div class="log-btn-container">
-            <button class="log-btn" onclick="openModal()">
+            <button class="log-btn" onclick="openActionPicker()">
                 <span>+</span>
             </button>
+        </div>
+
+        <!-- Action Picker Sheet -->
+        <div id="actionPicker" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1999;background:rgba(0,0,0,0.7);" onclick="if(event.target===this)closeActionPicker()">
+            <div style="background:var(--iron);border-top:2px solid var(--primary);padding:24px 20px calc(24px + env(safe-area-inset-bottom));animation:slideUp 0.3s ease-out;">
+                <div style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px;color:var(--primary);margin-bottom:18px;text-align:center;">What are you logging?</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    <button onclick="closeActionPicker();openModal();" style="background:var(--steel);border:2px solid #444;color:var(--white);padding:18px 24px;font-family:'Oswald',sans-serif;font-size:17px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;text-align:left;display:flex;align-items:center;gap:14px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#444'">
+                        <svg viewBox="0 0 24 24" fill="var(--primary)" width="26" height="26"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.35C18 2.53 15.48 1 13.35 1c-1.3 0-2.67.52-3.54 1.39L9 3.2 8.19 2.39C7.32 1.52 5.95 1 4.65 1 2.52 1 0 2.53 0 4.65c0 .47.1.91.18 1.35H0v2h24v-2h-.18zm-11.78 0c-.02-.07-.22-.73-.22-1.35C8 3.43 9.43 3 10.65 3c.58 0 1.35.23 1.82.7L13.8 5H8.22zM16 3c1.22 0 2.65.43 2.65 1.65 0 .62-.2 1.28-.22 1.35H11l1.33-1.3C12.8 4.23 13.57 3 14.15 3zM0 20c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2v-1H0v1zm0-8h24v5H0z"/></svg>
+                        <div>
+                            <div>Personal Workout</div>
+                            <div style="font-size:12px;color:#999;font-weight:400;text-transform:none;letter-spacing:0;margin-top:2px;">Log a workout for yourself</div>
+                        </div>
+                    </button>
+                    <button onclick="closeActionPicker();openGroupWorkoutModal();" style="background:var(--steel);border:2px solid #444;color:var(--white);padding:18px 24px;font-family:'Oswald',sans-serif;font-size:17px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;text-align:left;display:flex;align-items:center;gap:14px;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#444'">
+                        <svg viewBox="0 0 24 24" fill="var(--primary)" width="26" height="26"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        <div>
+                            <div>Group Workout</div>
+                            <div style="font-size:12px;color:#999;font-weight:400;text-transform:none;letter-spacing:0;margin-top:2px;">Post a workout challenge to a group</div>
+                        </div>
+                    </button>
+                </div>
+                <button onclick="closeActionPicker()" style="background:transparent;border:none;color:#666;font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;width:100%;margin-top:16px;padding:10px;">Cancel</button>
+            </div>
         </div>
         <a href="#" class="nav-link" data-page="groups">
             <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="24" height="24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
@@ -2373,6 +2397,66 @@
                 </div>
 
                 <button type="button" class="submit-btn" onclick="handleLogWorkout()">Log Workout</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Group Workout Modal -->
+    <div class="modal" id="groupWorkoutModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeGroupWorkoutModal()">×</button>
+            <h2 style="color:var(--primary);">Post Group Workout</h2>
+            <form id="groupWorkoutForm">
+                <div class="form-group">
+                    <label>Workout Name</label>
+                    <input id="gwName" type="text" placeholder="e.g., MONDAY PUSH DAY CHALLENGE" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Post To Group</label>
+                    <select id="gwGroupSelect" required style="width:100%;padding:15px;background:var(--iron);border:2px solid #333;color:var(--white);font-family:'Oswald',sans-serif;font-size:16px;">
+                        <option value="">— Select a group —</option>
+                        <option value="morning-grind">Morning Grind Crew</option>
+                        <option value="powerlifting">Powerlifting Gang</option>
+                        <option value="summer-shred">Summer Shred</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Description / Instructions</label>
+                    <textarea id="gwDescription" rows="3" placeholder="Tell your group what to do and how to crush it! 💪"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Add Photo (Optional)</label>
+                    <div class="photo-upload-zone" id="gwPhotoZone" onclick="document.getElementById('gwPhotoInput').click()">
+                        <div class="upload-icon">📸</div>
+                        <div class="upload-text">Click to upload workout photo</div>
+                        <img id="gwPreviewImage" class="preview-image" alt="Workout preview">
+                        <button type="button" class="remove-photo" id="gwRemovePhoto">×</button>
+                    </div>
+                    <input type="file" id="gwPhotoInput" accept="image/*" style="display:none;">
+                </div>
+
+                <div class="form-group">
+                    <label>Exercises</label>
+                    <div id="gwExerciseContainer">
+                        <div class="exercise-inputs">
+                            <input type="text" placeholder="Exercise name">
+                            <input type="number" placeholder="Sets">
+                            <input type="number" placeholder="Reps">
+                            <input type="number" placeholder="Weight (lbs)">
+                        </div>
+                    </div>
+                    <button type="button" class="add-exercise-btn" onclick="addGroupExercise()">+ Add Exercise</button>
+                </div>
+
+                <div class="form-group">
+                    <label>Notes (Optional)</label>
+                    <textarea id="gwNotes" rows="2" placeholder="Any tips, targets, or motivation..."></textarea>
+                </div>
+
+                <button type="button" class="submit-btn" onclick="handlePostGroupWorkout()">Post to Group</button>
             </form>
         </div>
     </div>
@@ -2517,10 +2601,6 @@
 
         function openCreateGroupModal() {
             alert('Create Group modal would open here! In the full version, you would enter group name, description, and invite members.');
-        }
-
-        function openPostWorkoutModal() {
-            alert('Post Workout Challenge modal would open here! Leaders can post new workout challenges for the group.');
         }
 
         // Exercise Data
@@ -2682,6 +2762,17 @@
             });
         }
 
+        // ── ACTION PICKER ────────────────────────────────────────────────────
+        function openActionPicker() {
+            const picker = document.getElementById('actionPicker');
+            if (picker) picker.style.display = 'block';
+        }
+
+        function closeActionPicker() {
+            const picker = document.getElementById('actionPicker');
+            if (picker) picker.style.display = 'none';
+        }
+
         // ── MODAL & WORKOUT FUNCTIONS ────────────────────────────────────────
         function openModal() {
             const modal = document.getElementById('workoutModal');
@@ -2691,6 +2782,136 @@
         function closeModal() {
             const modal = document.getElementById('workoutModal');
             if (modal) modal.classList.remove('active');
+        }
+
+        function openGroupWorkoutModal() {
+            // Populate group dropdown from user's groups
+            const user = getCurrentUser();
+            const sel = document.getElementById('gwGroupSelect');
+            if (sel && user) {
+                // Keep static options as fallback — in a full build this would fetch from Supabase groups
+                sel.innerHTML = '<option value="">— Select a group —</option>' +
+                    '<option value="morning-grind">Morning Grind Crew</option>' +
+                    '<option value="powerlifting">Powerlifting Gang</option>' +
+                    '<option value="summer-shred">Summer Shred</option>';
+            }
+            const modal = document.getElementById('groupWorkoutModal');
+            if (modal) modal.classList.add('active');
+        }
+
+        function closeGroupWorkoutModal() {
+            const modal = document.getElementById('groupWorkoutModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function addGroupExercise() {
+            const container = document.getElementById('gwExerciseContainer');
+            if (!container) return;
+            const row = document.createElement('div');
+            row.className = 'exercise-inputs';
+            row.innerHTML = `
+                <input type="text" placeholder="Exercise name">
+                <input type="number" placeholder="Sets">
+                <input type="number" placeholder="Reps">
+                <input type="number" placeholder="Weight (lbs)">`;
+            container.appendChild(row);
+        }
+
+        async function handlePostGroupWorkout() {
+            const name      = document.getElementById('gwName')?.value.trim();
+            const groupId   = document.getElementById('gwGroupSelect')?.value;
+            const desc      = document.getElementById('gwDescription')?.value.trim();
+            const notes     = document.getElementById('gwNotes')?.value.trim();
+            const prevImg   = document.getElementById('gwPreviewImage');
+            const photoSrc  = prevImg?.classList.contains('active') ? prevImg.src : null;
+
+            if (!name)    { alert('Please enter a workout name.'); return; }
+            if (!groupId) { alert('Please select a group to post to.'); return; }
+
+            // Gather exercises
+            const exercises = [];
+            document.querySelectorAll('#gwExerciseContainer .exercise-inputs').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const n = inputs[0]?.value.trim();
+                if (n) exercises.push({ name: n, sets: inputs[1]?.value||'', reps: inputs[2]?.value||'', weight: inputs[3]?.value||'' });
+            });
+
+            const user      = getCurrentUser();
+            const userName  = user ? (user.full_name || user.fullName || user.username) : 'Anonymous';
+            const initials  = user ? (user.initials || userName.slice(0,2).toUpperCase()) : '??';
+
+            // Map groupId to display name
+            const groupNames = {
+                'morning-grind': 'Morning Grind Crew',
+                'powerlifting':  'Powerlifting Gang',
+                'summer-shred':  'Summer Shred'
+            };
+            const groupDisplayName = groupNames[groupId] || groupId;
+
+            // Build exercise list HTML
+            const exHTML = exercises.length
+                ? exercises.map(ex => `<div class="exercise-item"><span class="exercise-name">${ex.name}</span><span class="exercise-details">${ex.sets||'?'} × ${ex.reps||'?'}${ex.weight ? ' @ '+ex.weight+' lbs' : ''}</span></div>`).join('')
+                : '<div class="exercise-item"><span class="exercise-name">No exercises listed</span></div>';
+
+            const photoHTML = photoSrc
+                ? `<div style="position:relative;width:100%;padding-bottom:125%;overflow:hidden;background:#111;"><img src="${photoSrc}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"></div>` : '';
+            const descHTML  = desc  ? `<p class="workout-challenge-description">${desc}</p>` : '';
+            const notesHTML = notes ? `<p style="padding:0 30px 20px;color:#888;font-size:13px;font-style:italic;">${notes}</p>` : '';
+
+            // Inject into the group workout feed (the group detail section)
+            const feed = document.querySelector('.group-workout-feed');
+            if (feed) {
+                const card = document.createElement('div');
+                card.className = 'group-workout-card';
+                card.style.animation = 'fadeInUp 0.5s ease-out';
+                card.innerHTML = `
+                    <div class="workout-posted-by">
+                        <div class="posted-by-label">Posted to ${groupDisplayName}</div>
+                        <div class="posted-by-name">${userName}</div>
+                    </div>
+                    ${photoHTML}
+                    <h3 class="workout-challenge-title">${name.toUpperCase()}</h3>
+                    ${descHTML}
+                    <div class="workout-challenge-exercises"><div class="exercise-list">${exHTML}</div></div>
+                    ${notesHTML}
+                    <div class="completions-section">
+                        <div class="completions-header">
+                            <div class="completions-title">Completions (0)</div>
+                            <button class="complete-workout-btn" onclick="completeWorkout(this)">✓ Mark Complete</button>
+                        </div>
+                        <div class="completions-grid"></div>
+                    </div>`;
+                feed.insertBefore(card, feed.firstChild);
+            }
+
+            // Reset form
+            document.getElementById('groupWorkoutForm')?.reset();
+            const pImg  = document.getElementById('gwPreviewImage');
+            const pZone = document.getElementById('gwPhotoZone');
+            const rPhoto = document.getElementById('gwRemovePhoto');
+            if (pImg)   pImg.classList.remove('active');
+            if (pZone)  pZone.classList.remove('has-image');
+            if (rPhoto) rPhoto.classList.remove('active');
+            const uIcon = pZone?.querySelector('.upload-icon');
+            const uText = pZone?.querySelector('.upload-text');
+            if (uIcon) uIcon.style.display = 'block';
+            if (uText) uText.style.display = 'block';
+            const gwContainer = document.getElementById('gwExerciseContainer');
+            if (gwContainer) gwContainer.innerHTML = `<div class="exercise-inputs">
+                <input type="text" placeholder="Exercise name">
+                <input type="number" placeholder="Sets">
+                <input type="number" placeholder="Reps">
+                <input type="number" placeholder="Weight (lbs)">
+            </div>`;
+
+            closeGroupWorkoutModal();
+
+            // Navigate to the matching group detail
+            openGroup(groupId);
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.querySelector('.nav-link[data-page="groups"]')?.classList.add('active');
+            document.querySelectorAll('.feed-page,.progress-page,.groups-page,.profile-page').forEach(p => p.classList.remove('active'));
+            document.querySelector('.groups-page')?.classList.add('active');
         }
 
         function toggleDetails(button) {
@@ -3344,6 +3565,49 @@
                 </div>`;
             return card;
         }
+
+        // ── GROUP WORKOUT PHOTO WIRING ────────────────────────────────────────
+        (function() {
+            const gwInput  = document.getElementById('gwPhotoInput');
+            const gwZone   = document.getElementById('gwPhotoZone');
+            const gwImg    = document.getElementById('gwPreviewImage');
+            const gwRemove = document.getElementById('gwRemovePhoto');
+            if (!gwInput || !gwZone || !gwImg || !gwRemove) return;
+
+            gwInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    gwImg.src = ev.target.result;
+                    gwImg.classList.add('active');
+                    gwZone.classList.add('has-image');
+                    gwRemove.classList.add('active');
+                    const uIcon = gwZone.querySelector('.upload-icon');
+                    const uText = gwZone.querySelector('.upload-text');
+                    if (uIcon) uIcon.style.display = 'none';
+                    if (uText) uText.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            });
+
+            gwRemove.addEventListener('click', function(e) {
+                e.stopPropagation();
+                gwInput.value = '';
+                gwImg.classList.remove('active');
+                gwZone.classList.remove('has-image');
+                gwRemove.classList.remove('active');
+                const uIcon = gwZone.querySelector('.upload-icon');
+                const uText = gwZone.querySelector('.upload-text');
+                if (uIcon) uIcon.style.display = 'block';
+                if (uText) uText.style.display = 'block';
+            });
+        })();
+
+        // Close group workout modal on outside click
+        document.getElementById('groupWorkoutModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeGroupWorkoutModal();
+        });
 
         // ── NAVIGATE ─────────────────────────────────────────────────────────
         function navigateToFeed() {
