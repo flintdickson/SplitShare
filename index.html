@@ -139,9 +139,20 @@
         }
 
         nav a::before {
-            content: attr(data-icon);
-            font-size: 24px;
+            display: none;
+        }
+
+        nav a svg {
             transition: all 0.3s ease;
+            color: #888;
+            fill: #888;
+            opacity: 0.8;
+        }
+
+        nav a:hover svg {
+            color: var(--primary);
+            fill: var(--primary);
+            opacity: 1;
         }
 
         nav a:hover {
@@ -150,6 +161,13 @@
 
         nav a.active {
             color: var(--primary);
+        }
+
+        nav a.active svg {
+            color: var(--primary);
+            fill: var(--primary);
+            opacity: 1;
+            filter: drop-shadow(0 0 6px rgba(255, 107, 53, 0.5));
         }
 
         nav a::after {
@@ -2475,10 +2493,12 @@
 
     <!-- Bottom Navigation -->
     <nav>
-        <a href="#" class="nav-link active" data-page="feed" data-icon="🏠">
+        <a href="#" class="nav-link active" data-page="feed">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="24" height="24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             <span>Feed</span>
         </a>
-        <a href="#" class="nav-link" data-page="progress" data-icon="📊">
+        <a href="#" class="nav-link" data-page="progress">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="24" height="24"><path d="M5 12h2v9H5zm4-5h2v14H9zm4-4h2v18h-2zm4 9h2v9h-2z"/></svg>
             <span>Progress</span>
         </a>
         <div class="log-btn-container">
@@ -2486,10 +2506,12 @@
                 <span>+</span>
             </button>
         </div>
-        <a href="#" class="nav-link" data-page="groups" data-icon="👥">
+        <a href="#" class="nav-link" data-page="groups">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="24" height="24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
             <span>Groups</span>
         </a>
-        <a href="#" class="nav-link" data-page="profile" data-icon="👤">
+        <a href="#" class="nav-link" data-page="profile">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="24" height="24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
             <span>Profile</span>
         </a>
     </nav>
