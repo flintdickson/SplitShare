@@ -2233,7 +2233,7 @@
                             </div>
                         </div>
                         <div class="profile-actions">
-                            <button class="edit-profile-btn">Edit Profile</button>
+                            <button class="edit-profile-btn" onclick="openEditProfileModal()">Edit Profile</button>
                             <button class="logout-btn" onclick="logout()">Logout</button>
                         </div>
                     </div>
@@ -2397,6 +2397,29 @@
                 </div>
 
                 <button type="button" class="submit-btn" onclick="handleLogWorkout()">Log Workout</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeEditProfileModal()">×</button>
+            <h2>Edit Profile</h2>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input id="epName" type="text" placeholder="Your full name">
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input id="epUsername" type="text" placeholder="username">
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea id="epBio" rows="3" placeholder="Tell the world what you lift for 💪"></textarea>
+                </div>
+                <button type="button" class="submit-btn" onclick="handleSaveProfile()">Save Changes</button>
             </form>
         </div>
     </div>
@@ -2802,6 +2825,62 @@
         function closeGroupWorkoutModal() {
             const modal = document.getElementById('groupWorkoutModal');
             if (modal) modal.classList.remove('active');
+        }
+
+        // ── EDIT PROFILE ──────────────────────────────────────────────────────
+        function openEditProfileModal() {
+            const user = getCurrentUser();
+            if (!user) return;
+            const nameEl = document.getElementById('epName');
+            const userEl = document.getElementById('epUsername');
+            const bioEl  = document.getElementById('epBio');
+            if (nameEl) nameEl.value = user.full_name || user.fullName || '';
+            if (userEl) userEl.value = user.username || '';
+            if (bioEl)  bioEl.value  = user.bio || '';
+            const modal = document.getElementById('editProfileModal');
+            if (modal) modal.classList.add('active');
+        }
+
+        function closeEditProfileModal() {
+            const modal = document.getElementById('editProfileModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        async function handleSaveProfile() {
+            const newName     = document.getElementById('epName')?.value.trim();
+            const newUsername = document.getElementById('epUsername')?.value.trim().toLowerCase();
+            const newBio      = document.getElementById('epBio')?.value.trim();
+
+            if (!newName || !newUsername) { alert('Name and username are required.'); return; }
+
+            const btn = document.querySelector('#editProfileForm .submit-btn');
+            if (btn) { btn.textContent = 'Saving...'; btn.disabled = true; }
+
+            try {
+                const newInitials = newName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                await sb(`profiles?id=eq.${window._sbUserId}`, {
+                    method: 'PATCH',
+                    prefer: 'return=representation',
+                    body: { full_name: newName, username: newUsername, bio: newBio || '', initials: newInitials }
+                });
+
+                // Update local user
+                const user = getCurrentUser();
+                if (user) {
+                    user.full_name = newName;
+                    user.fullName  = newName;
+                    user.username  = newUsername;
+                    user.bio       = newBio || '';
+                    user.initials  = newInitials;
+                    setCurrentUser(user);
+                    loadProfileForUser(user);
+                }
+                closeEditProfileModal();
+            } catch(e) {
+                alert('Failed to save: ' + e.message);
+            } finally {
+                if (btn) { btn.textContent = 'Save Changes'; btn.disabled = false; }
+            }
         }
 
         function addGroupExercise() {
@@ -3275,12 +3354,14 @@
                         <span class="exercise-details">${ex.sets||'?'} × ${ex.reps||'?'}${ex.weight ? ' @ '+ex.weight+' lbs' : ''}</span>
                     </div>`).join('') || '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
                 const captionHTML = w.caption ? `<p class="workout-caption">"${w.caption}"</p>` : '';
-                const dateStr = new Date(w.date).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+                const rawDate = w.created_at || w.date;
+                const dateStr = rawDate ? new Date(rawDate).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : 'Just now';
+                const displayName = user.full_name || user.fullName || user.username || 'You';
                 return `<div class="activity-card">
                     <div class="activity-header">
-                        <div class="user-avatar">${user.initials}</div>
+                        <div class="user-avatar">${user.initials || displayName.slice(0,2).toUpperCase()}</div>
                         <div class="activity-user-info">
-                            <h3>${user.fullName}</h3>
+                            <h3>${displayName}</h3>
                             <span class="activity-time">${dateStr}</span>
                         </div>
                     </div>
@@ -3607,6 +3688,11 @@
         // Close group workout modal on outside click
         document.getElementById('groupWorkoutModal')?.addEventListener('click', function(e) {
             if (e.target === this) closeGroupWorkoutModal();
+        });
+
+        // Close edit profile modal on outside click
+        document.getElementById('editProfileModal')?.addEventListener('click', function(e) {
+            if (e.target === this) closeEditProfileModal();
         });
 
         // ── NAVIGATE ─────────────────────────────────────────────────────────
