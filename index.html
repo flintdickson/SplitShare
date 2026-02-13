@@ -1062,6 +1062,65 @@
             letter-spacing: 1px;
         }
 
+        /* ── DETAIL SHEET COMMENTS ────────────────────────────────── */
+        .detail-comment {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #161616;
+        }
+        .detail-comment-avatar {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,var(--primary),var(--accent));
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 12px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .detail-comment-avatar img { width:100%;height:100%;object-fit:cover; }
+        .detail-comment-name { font-family:'Oswald',sans-serif; font-size:12px; font-weight:600; color:#fff; margin-bottom:2px; }
+        .detail-comment-text { font-size:13px; color:#bbb; line-height:1.4; }
+        .detail-comment-time { font-family:'Roboto Mono',monospace; font-size:10px; color:#444; margin-top:3px; }
+        .detail-comment-input-wrap {
+            position: sticky;
+            bottom: 0;
+            background: #111;
+            border-top: 1px solid #1e1e1e;
+            padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .detail-comment-input {
+            flex: 1;
+            background: #1a1a1a;
+            border: 1.5px solid #2a2a2a;
+            border-radius: 20px;
+            color: #fff;
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            padding: 10px 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .detail-comment-input:focus { border-color: var(--primary); }
+        .detail-comment-input::placeholder { color: #444; }
+        .detail-comment-send {
+            background: var(--primary);
+            border: none;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .detail-comment-send:hover { background: var(--primary-dark); }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .hero-stats {
@@ -1828,8 +1887,10 @@
 
         .profile-header {
             background: linear-gradient(135deg, var(--steel), var(--iron));
-            padding: 40px;
+            padding: 40px 40px 30px;
             margin-bottom: 30px;
+            margin-left: -20px;
+            margin-right: -20px;
             border-bottom: 3px solid var(--primary);
             animation: fadeInUp 0.6s ease-out;
         }
@@ -1945,6 +2006,9 @@
             gap: 0;
             border-bottom: 2px solid #333;
             margin-bottom: 30px;
+            margin-left: -20px;
+            margin-right: -20px;
+            padding-left: 10px;
         }
 
         .profile-tab {
@@ -2442,18 +2506,40 @@
         <div class="detail-sheet">
             <div class="detail-drag-handle"></div>
             <div class="detail-header">
-                <div class="detail-workout-name" id="detailWorkoutName"></div>
-                <div class="detail-meta" id="detailWorkoutMeta"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div class="detail-workout-name" id="detailWorkoutName"></div>
+                        <div class="detail-meta" id="detailWorkoutMeta"></div>
+                    </div>
+                    <button onclick="closeWorkoutDetail()" style="background:transparent;border:none;color:#555;font-size:24px;cursor:pointer;padding:0 4px;line-height:1;">×</button>
+                </div>
             </div>
-            <div class="detail-section-label">Exercise Breakdown</div>
-            <div class="detail-chart-wrap">
-                <canvas id="detailBarChart" style="width:100%;max-height:200px;"></canvas>
+            <div class="detail-section-label" id="detailChartLabel">Exercise Breakdown</div>
+            <div class="detail-chart-wrap" id="detailChartWrap">
+                <canvas id="detailBarChart" style="width:100%;height:190px;"></canvas>
             </div>
             <div class="detail-section-label">Sets & Reps</div>
             <table class="detail-ex-table" id="detailExTable">
                 <thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Weight</th><th>Vol</th></tr></thead>
                 <tbody id="detailExBody"></tbody>
             </table>
+            <!-- Likes row -->
+            <div style="display:flex;align-items:center;gap:20px;padding:14px 20px;border-top:1px solid #1e1e1e;">
+                <button id="detailLikeBtn" onclick="toggleDetailLike()" style="background:transparent;border:none;cursor:pointer;display:flex;align-items:center;gap:7px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;color:#666;letter-spacing:1px;padding:0;transition:color 0.2s;">
+                    <span id="detailLikeIcon" style="font-size:18px;">👊</span>
+                    <span id="detailLikeCount">0 Respect</span>
+                </button>
+            </div>
+            <!-- Comments -->
+            <div class="detail-section-label" style="margin-top:4px;">Comments</div>
+            <div id="detailCommentsList" style="min-height:40px;"></div>
+            <!-- Sticky comment input -->
+            <div class="detail-comment-input-wrap">
+                <div id="detailCommentAvatar" class="detail-comment-avatar" style="width:30px;height:30px;font-size:12px;"></div>
+                <input class="detail-comment-input" id="detailCommentInput" type="text" placeholder="Add a comment…" maxlength="200"
+                    onkeydown="if(event.key==='Enter')submitDetailComment()">
+                <button class="detail-comment-send" onclick="submitDetailComment()">↑</button>
+            </div>
         </div>
     </div>
 
@@ -3642,74 +3728,126 @@
             closeSearchDropdown();
             document.getElementById('feedSearchInput').value = '';
 
-            // Build a lightweight profile overlay
             let overlay = document.getElementById('userProfileOverlay');
             if (!overlay) {
                 overlay = document.createElement('div');
                 overlay.id = 'userProfileOverlay';
-                overlay.style.cssText = `
-                    position:fixed;top:0;left:0;right:0;bottom:0;
-                    z-index:1997;background:#0a0a0a;
-                    overflow-y:auto;padding-bottom:90px;
-                    transform:translateX(100%);
-                    transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);
-                    -webkit-overflow-scrolling:touch;
-                `;
+                overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:1997;background:#0a0a0a;overflow-y:auto;padding-bottom:90px;transform:translateX(100%);transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);-webkit-overflow-scrolling:touch;';
                 document.body.appendChild(overlay);
             }
 
             const avHtml = avatarUrl
-                ? `<img src="${avatarUrl}" style="width:76px;height:76px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);">`
-                : `<div style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:30px;">${initials}</div>`;
+                ? `<img src="${avatarUrl}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);">`
+                : `<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:32px;">${initials}</div>`;
 
             overlay.innerHTML = `
-                <!-- sticky back bar -->
-                <div style="position:sticky;top:0;z-index:10;background:rgba(10,10,10,0.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #1a1a1a;padding:14px 18px;display:flex;align-items:center;gap:14px;">
+                <div style="position:sticky;top:0;z-index:10;background:rgba(10,10,10,0.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #1a1a1a;padding:14px 18px;">
                     <button onclick="closeUserProfile()" style="background:transparent;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;color:#888;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;padding:0;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-                        Back
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>Back
                     </button>
                 </div>
-                <!-- profile header -->
-                <div style="padding:24px 18px 20px;border-bottom:1px solid #161616;">
-                    <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+                <div style="padding:24px 18px 0;">
+                    <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:18px;">
                         ${avHtml}
-                        <div>
+                        <div style="flex:1;">
                             <div style="font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:2px;color:#fff;line-height:1.1;">${name}</div>
-                            <div style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--primary);margin-top:2px;">@${username}</div>
+                            <div style="font-family:'Roboto Mono',monospace;font-size:12px;color:var(--primary);margin-top:2px;margin-bottom:10px;">@${username}</div>
+                            <div id="upBio" style="font-size:13px;color:#777;line-height:1.5;"></div>
                         </div>
                     </div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;">
+                        <div style="background:#1a1a1a;border-radius:10px;padding:12px 8px;text-align:center;">
+                            <div id="upWorkouts" style="font-family:'Bebas Neue',cursive;font-size:26px;color:var(--primary);">—</div>
+                            <div style="font-family:'Oswald',sans-serif;font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Workouts</div>
+                        </div>
+                        <div style="background:#1a1a1a;border-radius:10px;padding:12px 8px;text-align:center;">
+                            <div id="upFollowers" style="font-family:'Bebas Neue',cursive;font-size:26px;color:var(--primary);">—</div>
+                            <div style="font-family:'Oswald',sans-serif;font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Followers</div>
+                        </div>
+                        <div style="background:#1a1a1a;border-radius:10px;padding:12px 8px;text-align:center;">
+                            <div id="upFollowing" style="font-family:'Bebas Neue',cursive;font-size:26px;color:var(--primary);">—</div>
+                            <div style="font-family:'Oswald',sans-serif;font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">Following</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;border-bottom:1px solid #1e1e1e;margin-bottom:0;">
+                        <button id="upTabPosts" onclick="switchUpTab('posts')" style="flex:1;background:transparent;border:none;border-bottom:2px solid var(--primary);color:var(--primary);font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:12px 0;cursor:pointer;transition:all 0.2s;">Posts</button>
+                        <button id="upTabAchievements" onclick="switchUpTab('achievements')" style="flex:1;background:transparent;border:none;border-bottom:2px solid transparent;color:#444;font-family:'Oswald',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:12px 0;cursor:pointer;transition:all 0.2s;">Achievements</button>
+                    </div>
                 </div>
-                <!-- workouts feed -->
-                <div style="padding:14px 0 0;" id="userProfileWorkouts">
-                    <div style="text-align:center;padding:50px 20px;color:#333;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;">Loading…</div>
-                </div>`;
+                <div id="upTabPosts-content" style="padding-top:8px;"><div style="text-align:center;padding:40px;color:#333;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;">Loading…</div></div>
+                <div id="upTabAchievements-content" style="display:none;padding:16px;"><div style="text-align:center;padding:40px;color:#333;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;">Loading…</div></div>`;
 
             overlay.style.display = 'block';
-            // Trigger slide-in
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => { overlay.style.transform = 'translateX(0)'; });
-            });
+            requestAnimationFrame(() => requestAnimationFrame(() => { overlay.style.transform = 'translateX(0)'; }));
 
-            // Load their workouts
             try {
-                const workouts = await sb(`workouts?user_id=eq.${userId}&order=created_at.desc&limit=20&select=*`);
-                const feed = document.getElementById('userProfileWorkouts');
-                if (!feed) return;
-                if (!workouts || workouts.length === 0) {
-                    feed.innerHTML = `<div style="text-align:center;padding:50px 20px;color:#333;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;">No workouts yet</div>`;
-                    return;
+                const [profiles, workouts] = await Promise.all([
+                    sb(`profiles?id=eq.${userId}&select=*`).catch(()=>[]),
+                    sb(`workouts?user_id=eq.${userId}&order=created_at.desc&limit=30&select=*`).catch(()=>[])
+                ]);
+                const profile = profiles?.[0];
+                const wList   = workouts || [];
+
+                const bioEl = document.getElementById('upBio');
+                const wkEl  = document.getElementById('upWorkouts');
+                const flEl  = document.getElementById('upFollowers');
+                const fiEl  = document.getElementById('upFollowing');
+                if (bioEl) bioEl.textContent = profile?.bio || '';
+                if (wkEl)  wkEl.textContent  = wList.length;
+                if (flEl)  flEl.textContent  = profile?.followers ?? 0;
+                if (fiEl)  fiEl.textContent  = profile?.following ?? 0;
+
+                const postsFeed = document.getElementById('upTabPosts-content');
+                if (postsFeed) {
+                    if (wList.length === 0) {
+                        postsFeed.innerHTML = `<div style="text-align:center;padding:50px 20px;color:#333;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;">No workouts yet</div>`;
+                    } else {
+                        postsFeed.innerHTML = '';
+                        wList.forEach(w => {
+                            const dateStr = w.created_at ? new Date(w.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+                            postsFeed.appendChild(buildSimpleCard({ name:w.name, duration:w.duration, exercises:w.exercises||[], photoSrc:w.photo_url||null, caption:w.caption||null, dateStr, avatarUrl:profile?.avatar_url||avatarUrl, initials, userName:name }));
+                        });
+                    }
                 }
-                feed.innerHTML = '';
-                workouts.forEach(w => {
-                    const dateStr = w.created_at ? new Date(w.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
-                    const card = buildSimpleCard({ name:w.name, duration:w.duration, exercises:w.exercises||[], photoSrc:w.photo_url||null, caption:w.caption||null, dateStr, avatarUrl, initials, userName:name });
-                    feed.appendChild(card);
-                });
+
+                const achDiv = document.getElementById('upTabAchievements-content');
+                if (achDiv) achDiv.innerHTML = buildAchievementsHTML(wList);
+
             } catch(e) {
-                const feed = document.getElementById('userProfileWorkouts');
-                if (feed) feed.innerHTML = `<div style="text-align:center;padding:40px;color:#333;">Could not load workouts</div>`;
+                const f = document.getElementById('upTabPosts-content');
+                if (f) f.innerHTML = `<div style="text-align:center;padding:40px;color:#333;">Could not load profile</div>`;
             }
+        }
+
+        function switchUpTab(tab) {
+            ['posts','achievements'].forEach(t => {
+                const key = t.charAt(0).toUpperCase()+t.slice(1);
+                const btn = document.getElementById('upTab'+key);
+                const con = document.getElementById('upTab'+key+'-content');
+                const active = t === tab;
+                if (btn) { btn.style.borderBottomColor = active ? 'var(--primary)' : 'transparent'; btn.style.color = active ? 'var(--primary)' : '#444'; }
+                if (con) con.style.display = active ? 'block' : 'none';
+            });
+        }
+
+        function buildAchievementsHTML(workouts) {
+            const count = workouts.length;
+            const totalMins = workouts.reduce((s,w) => s+(parseInt(w.duration)||0), 0);
+            const allEx = workouts.flatMap(w => (w.exercises||[]).map(e => e.name?.toLowerCase()));
+            const weekMap = {};
+            workouts.forEach(w => { const d=new Date(w.created_at||w.date); const k=`${d.getFullYear()}-W${Math.floor((d-new Date(d.getFullYear(),0,1))/604800000)}`; weekMap[k]=(weekMap[k]||0)+1; });
+            const all = [
+                { icon:'🥇', title:'First Rep',    desc:'Log your first workout',  earned:count>=1 },
+                { icon:'🔟', title:'10 Club',      desc:'Log 10 workouts',          earned:count>=10 },
+                { icon:'🏆', title:'25 Club',      desc:'Log 25 workouts',          earned:count>=25 },
+                { icon:'💯', title:'100 Club',     desc:'Log 100 workouts',         earned:count>=100 },
+                { icon:'⏱️', title:'Hour Grinder', desc:'60+ min in one workout',  earned:workouts.some(w=>w.duration>=60) },
+                { icon:'🕐', title:'Time Warrior', desc:'Log 1,000 total minutes',  earned:totalMins>=1000 },
+                { icon:'💪', title:'Variety Pack', desc:'5 different exercises',    earned:new Set(allEx.filter(Boolean)).size>=5 },
+                { icon:'🔥', title:'On Fire',      desc:'3 workouts in one week',   earned:Object.values(weekMap).some(v=>v>=3) },
+            ];
+            const rowStyle = (earned) => `display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1e1e1e;${earned?'':'opacity:0.3;'}`;
+            return all.map(a => `<div style="${rowStyle(a.earned)}"><div style="font-size:26px;width:34px;text-align:center;">${a.earned?a.icon:'🔒'}</div><div><div style="font-family:'Oswald',sans-serif;font-size:13px;color:${a.earned?'#fff':'#555'};font-weight:600;">${a.title}</div><div style="font-size:11px;color:#444;margin-top:1px;">${a.desc}</div></div></div>`).join('');
         }
 
         function closeUserProfile() {
@@ -3718,6 +3856,7 @@
             overlay.style.transform = 'translateX(100%)';
             setTimeout(() => { overlay.style.display = 'none'; }, 320);
         }
+
 
         // ── STEP NAVIGATION ──────────────────────────────────────────────────
         function goToStep1() {
@@ -3762,8 +3901,8 @@
 
         // ── SIMPLE FEED CARD BUILDER ─────────────────────────────────────────
         function buildSimpleCard(opts) {
-            // opts: { name, duration, exercises, photoSrc, caption, dateStr, avatarUrl, initials, userName }
-            const { name, duration, exercises=[], photoSrc, caption, dateStr, avatarUrl, initials, userName } = opts;
+            // opts: { workoutId, name, duration, exercises, photoSrc, caption, dateStr, avatarUrl, initials, userName }
+            const { workoutId, name, duration, exercises=[], photoSrc, caption, dateStr, avatarUrl, initials, userName } = opts;
 
             const photoHTML   = photoSrc ? `<img src="${photoSrc}" class="workout-photo" alt="">` : '';
             const captionHTML = caption  ? `<p style="padding:12px 18px 0;font-size:14px;color:#ccc;line-height:1.5;">"${caption}"</p>` : '';
@@ -3778,6 +3917,7 @@
             card.className = 'activity-card';
             // Store workout data on the element for the detail modal
             card._workoutData = opts;
+            card._workoutId   = workoutId || null;
             card.innerHTML = `
                 <div class="activity-header">
                     ${avatarHTML(avatarUrl||'', initials||'??', 46)}
@@ -3802,11 +3942,13 @@
 
         // ── WORKOUT DETAIL MODAL ─────────────────────────────────────────────
         let _detailBarChart = null;
+        let _detailWorkoutId = null;
 
-        function openWorkoutDetail(cardEl) {
+        async function openWorkoutDetail(cardEl) {
             const data = cardEl?._workoutData;
             if (!data) return;
             const { name, duration, exercises=[], dateStr, avatarUrl, initials, userName } = data;
+            _detailWorkoutId = cardEl._workoutId || null;
 
             document.getElementById('detailWorkoutName').textContent = name.toUpperCase();
             document.getElementById('detailWorkoutMeta').textContent =
@@ -3816,111 +3958,167 @@
             const tbody = document.getElementById('detailExBody');
             if (tbody) {
                 tbody.innerHTML = exercises.length ? exercises.map(ex => {
-                    const vol = (parseFloat(ex.weight)||0) * (parseInt(ex.sets)||1) * (parseInt(ex.reps)||1);
-                    return `<tr>
-                        <td>${ex.name}</td>
-                        <td>${ex.sets||'—'}</td>
-                        <td>${ex.reps||'—'}</td>
-                        <td>${ex.weight ? ex.weight + ' lb' : '—'}</td>
-                        <td style="color:#555;">${vol ? vol.toLocaleString() : '—'}</td>
-                    </tr>`;
+                    const vol = (parseFloat(ex.weight)||0)*(parseInt(ex.sets)||1)*(parseInt(ex.reps)||1);
+                    return `<tr><td>${ex.name}</td><td>${ex.sets||'—'}</td><td>${ex.reps||'—'}</td><td>${ex.weight?ex.weight+' lb':'—'}</td><td style="color:#555;">${vol?vol.toLocaleString():'—'}</td></tr>`;
                 }).join('') : '<tr><td colspan="5" style="color:#444;text-align:center;padding:20px;">No exercises recorded</td></tr>';
             }
 
             // Bar chart
+            const chartWrap = document.getElementById('detailChartWrap');
+            const chartLabel = document.getElementById('detailChartLabel');
             requestAnimationFrame(() => {
                 const canvas = document.getElementById('detailBarChart');
                 if (!canvas) return;
                 if (_detailBarChart) { _detailBarChart.destroy(); _detailBarChart = null; }
-
                 const exWithWeight = exercises.filter(e => parseFloat(e.weight) > 0);
                 if (exWithWeight.length === 0) {
-                    canvas.style.display = 'none';
-                    document.querySelector('.detail-section-label')?.style && (document.querySelectorAll('.detail-section-label')[0].style.display = 'none');
+                    if (chartWrap)  chartWrap.style.display  = 'none';
+                    if (chartLabel) chartLabel.style.display = 'none';
                     return;
                 }
-                canvas.style.display = 'block';
-
+                if (chartWrap)  chartWrap.style.display  = 'block';
+                if (chartLabel) chartLabel.style.display = 'block';
                 const labels  = exWithWeight.map(e => e.name.length > 14 ? e.name.slice(0,13)+'…' : e.name);
                 const weights = exWithWeight.map(e => parseFloat(e.weight)||0);
                 const volumes = exWithWeight.map(e => (parseFloat(e.weight)||0)*(parseInt(e.sets)||1)*(parseInt(e.reps)||1));
-
                 const ctx = canvas.getContext('2d');
                 _detailBarChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels,
-                        datasets: [
-                            {
-                                label: 'Weight (lbs)',
-                                data: weights,
-                                backgroundColor: 'rgba(255,107,53,0.75)',
-                                borderColor: '#ff6b35',
-                                borderWidth: 1.5,
-                                borderRadius: 4,
-                                yAxisID: 'y'
-                            },
-                            {
-                                label: 'Volume (lbs)',
-                                data: volumes,
-                                backgroundColor: 'rgba(255,179,71,0.35)',
-                                borderColor: '#ffb347',
-                                borderWidth: 1.5,
-                                borderRadius: 4,
-                                yAxisID: 'y2'
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 500 },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                labels: { color: '#666', font: { family: 'Oswald', size: 11 }, boxWidth: 12, padding: 14 }
-                            },
-                            tooltip: {
-                                backgroundColor: '#1a1a1a',
-                                titleColor: '#ff6b35',
-                                bodyColor: '#eee',
-                                borderColor: '#333',
-                                borderWidth: 1,
-                                cornerRadius: 8,
-                                padding: 10,
-                                titleFont: { family: 'Oswald', size: 12 },
-                                bodyFont:  { family: 'Roboto Mono', size: 11 }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                position: 'left',
-                                beginAtZero: true,
-                                grid: { color: 'rgba(255,255,255,0.05)' },
-                                ticks: { color: '#555', font: { family: 'Roboto Mono', size: 9 }, callback: v => v + 'lb' }
-                            },
-                            y2: {
-                                position: 'right',
-                                beginAtZero: true,
-                                grid: { display: false },
-                                ticks: { color: '#555', font: { family: 'Roboto Mono', size: 9 }, callback: v => v.toLocaleString() }
-                            },
-                            x: {
-                                grid: { display: false },
-                                ticks: { color: '#666', font: { family: 'Roboto Mono', size: 9 }, maxRotation: 35 }
-                            }
-                        }
-                    }
+                    type:'bar', data:{ labels, datasets:[{ label:'Weight (lbs)', data:weights, backgroundColor:'rgba(255,107,53,0.75)', borderColor:'#ff6b35', borderWidth:1.5, borderRadius:4, yAxisID:'y' },{ label:'Volume', data:volumes, backgroundColor:'rgba(255,179,71,0.35)', borderColor:'#ffb347', borderWidth:1.5, borderRadius:4, yAxisID:'y2' }] },
+                    options:{ responsive:true, maintainAspectRatio:false, animation:{duration:500}, plugins:{ legend:{display:true,labels:{color:'#666',font:{family:'Oswald',size:11},boxWidth:12,padding:14}}, tooltip:{backgroundColor:'#1a1a1a',titleColor:'#ff6b35',bodyColor:'#eee',borderColor:'#333',borderWidth:1,cornerRadius:8,padding:10,titleFont:{family:'Oswald',size:12},bodyFont:{family:'Roboto Mono',size:11}} }, scales:{ y:{position:'left',beginAtZero:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#555',font:{family:'Roboto Mono',size:9},callback:v=>v+'lb'}}, y2:{position:'right',beginAtZero:true,grid:{display:false},ticks:{color:'#555',font:{family:'Roboto Mono',size:9},callback:v=>v.toLocaleString()}}, x:{grid:{display:false},ticks:{color:'#666',font:{family:'Roboto Mono',size:9},maxRotation:35}} } }
                 });
             });
 
+            // Set up comment avatar
+            const me = getCurrentUser();
+            const caEl = document.getElementById('detailCommentAvatar');
+            if (caEl) {
+                if (me?.avatar_url) { caEl.innerHTML = `<img src="${me.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; }
+                else { caEl.textContent = me?.initials || '?'; }
+            }
+
+            // Open modal first, then load async data
             const modal = document.getElementById('workoutDetailModal');
             if (modal) modal.classList.add('active');
+
+            // Load likes + comments
+            if (_detailWorkoutId) {
+                loadDetailLikes(_detailWorkoutId);
+                loadDetailComments(_detailWorkoutId);
+            } else {
+                // No DB workout — reset
+                const lc = document.getElementById('detailLikeCount'); if(lc) lc.textContent = '0 Respect';
+                const lb = document.getElementById('detailLikeBtn'); if(lb) { lb.style.color='#666'; lb._liked=false; }
+                const cl = document.getElementById('detailCommentsList'); if(cl) cl.innerHTML = '';
+            }
+        }
+
+        async function loadDetailLikes(workoutId) {
+            const btn   = document.getElementById('detailLikeBtn');
+            const count = document.getElementById('detailLikeCount');
+            const icon  = document.getElementById('detailLikeIcon');
+            if (!btn || !count) return;
+            try {
+                const likes = await sb(`workout_likes?workout_id=eq.${workoutId}&select=user_id`);
+                const me = getCurrentUser();
+                const myId = window._sbUserId;
+                const liked = myId && (likes||[]).some(l => l.user_id === myId);
+                count.textContent = `${(likes||[]).length} Respect`;
+                btn._liked = liked;
+                btn.style.color = liked ? 'var(--primary)' : '#666';
+                if (icon) icon.textContent = liked ? '👊' : '👊';
+                if (liked) btn.style.color = 'var(--primary)';
+            } catch(e) { /* table may not exist yet */ }
+        }
+
+        async function toggleDetailLike() {
+            const workoutId = _detailWorkoutId;
+            if (!workoutId || !window._sbUserId) return;
+            const btn   = document.getElementById('detailLikeBtn');
+            const count = document.getElementById('detailLikeCount');
+            const liked = btn?._liked;
+            const cur   = parseInt(count?.textContent) || 0;
+
+            // Optimistic UI
+            if (btn) { btn._liked = !liked; btn.style.color = !liked ? 'var(--primary)' : '#666'; }
+            if (count) count.textContent = `${liked ? Math.max(0,cur-1) : cur+1} Respect`;
+
+            try {
+                if (liked) {
+                    await sb(`workout_likes?workout_id=eq.${workoutId}&user_id=eq.${window._sbUserId}`, { method:'DELETE', prefer:'return=minimal' });
+                } else {
+                    await sb('workout_likes', { method:'POST', body:{ workout_id:workoutId, user_id:window._sbUserId } });
+                }
+            } catch(e) {
+                // Revert on error
+                if (btn) { btn._liked = liked; btn.style.color = liked ? 'var(--primary)' : '#666'; }
+                if (count) count.textContent = `${cur} Respect`;
+            }
+        }
+
+        async function loadDetailComments(workoutId) {
+            const list = document.getElementById('detailCommentsList');
+            if (!list) return;
+            list.innerHTML = '<div style="padding:16px;text-align:center;color:#333;font-size:12px;">Loading…</div>';
+            try {
+                const comments = await sb(`workout_comments?workout_id=eq.${workoutId}&order=created_at.asc&select=*,profiles(full_name,initials,avatar_url)`);
+                renderDetailComments(comments || []);
+            } catch(e) { list.innerHTML = ''; }
+        }
+
+        function renderDetailComments(comments) {
+            const list = document.getElementById('detailCommentsList');
+            if (!list) return;
+            if (comments.length === 0) {
+                list.innerHTML = '<div style="padding:16px 20px;color:#333;font-family:\'Oswald\',sans-serif;font-size:12px;letter-spacing:1px;">Be the first to comment…</div>';
+                return;
+            }
+            list.innerHTML = comments.map(c => {
+                const name     = c.profiles?.full_name || 'Unknown';
+                const initials = c.profiles?.initials  || name.slice(0,2).toUpperCase();
+                const avHtml   = c.profiles?.avatar_url
+                    ? `<img src="${c.profiles.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+                    : initials;
+                const timeStr = c.created_at ? timeAgo(new Date(c.created_at)) : '';
+                return `<div class="detail-comment">
+                    <div class="detail-comment-avatar">${avHtml}</div>
+                    <div style="flex:1;">
+                        <div class="detail-comment-name">${name} <span class="detail-comment-time">${timeStr}</span></div>
+                        <div class="detail-comment-text">${c.body || ''}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function submitDetailComment() {
+            const input = document.getElementById('detailCommentInput');
+            const body = input?.value.trim();
+            if (!body || !_detailWorkoutId || !window._sbUserId) return;
+            input.value = '';
+            const me = getCurrentUser();
+            // Optimistic insert
+            const tempComment = [{
+                body,
+                created_at: new Date().toISOString(),
+                profiles: { full_name: me?.full_name||me?.fullName||'You', initials: me?.initials||'?', avatar_url: me?.avatar_url||null }
+            }];
+            // Append to existing
+            const list = document.getElementById('detailCommentsList');
+            if (list) {
+                const existing = list.innerHTML === '<div style="padding:16px 20px;color:#333;font-family:\'Oswald\',sans-serif;font-size:12px;letter-spacing:1px;">Be the first to comment…</div>' ? '' : list.innerHTML;
+                const c = tempComment[0];
+                const avHtml = c.profiles?.avatar_url ? `<img src="${c.profiles.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : (c.profiles?.initials||'?');
+                list.innerHTML = existing + `<div class="detail-comment"><div class="detail-comment-avatar">${avHtml}</div><div style="flex:1;"><div class="detail-comment-name">${c.profiles.full_name} <span class="detail-comment-time">Just now</span></div><div class="detail-comment-text">${c.body}</div></div></div>`;
+                list.scrollTop = list.scrollHeight;
+            }
+            try {
+                await sb('workout_comments', { method:'POST', body:{ workout_id:_detailWorkoutId, user_id:window._sbUserId, body } });
+            } catch(e) { console.warn('Comment save failed:', e.message); }
         }
 
         function closeWorkoutDetail() {
             const modal = document.getElementById('workoutDetailModal');
             if (modal) modal.classList.remove('active');
+            document.getElementById('detailCommentInput') && (document.getElementById('detailCommentInput').value = '');
         }
 
         function handleRespect(btn) {
@@ -4508,6 +4706,7 @@
             const avUrl    = profile?.avatar_url || '';
             const dateStr  = w.created_at ? new Date(w.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'Just now';
             return buildSimpleCard({
+                workoutId: w.id || null,
                 name:      w.name,
                 duration:  w.duration,
                 exercises: w.exercises || [],
