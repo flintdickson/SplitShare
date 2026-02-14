@@ -2657,47 +2657,110 @@
         </div>
     </div>
 
+
     <script>
-        // Navigation System
-        function getAllPages() {
-            return [
-                document.querySelector('.feed-page'),
-                document.querySelector('.progress-page'),
-                document.querySelector('.groups-page'),
-                document.querySelector('.profile-page'),
-                document.getElementById('searchPage')
-            ];
+
+        // ── SUPABASE CONFIG ───────────────────────────────────────────────
+        const SUPABASE_URL = 'https://nygqoszurqvvdtndpufo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55Z3Fvc3p1cnF2dmR0bmRwdWZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3NzU5NDksImV4cCI6MjA4NjM1MTk0OX0.KSd3SPRK2RULFCikjS7WpAlf8YvBiZnwsyA3OT6dzPY';
+
+        window._ssCurrentUser = null;
+        window._sbToken       = null;
+        window._sbUserId      = null;
+        window._following     = new Set(JSON.parse(localStorage.getItem('ss_following') || '[]'));
+        window._exerciseMap   = {};
+        window.progressChart  = null;
+
+        // ── REST HELPERS ──────────────────────────────────────────────────
+        async function sb(path, opts) {
+            opts = opts || {};
+            const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+                method: opts.method || 'GET',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': 'Bearer ' + (window._sbToken || SUPABASE_KEY),
+                    'Content-Type': 'application/json',
+                    'Prefer': opts.prefer || 'return=representation'
+                },
+                body: opts.body ? JSON.stringify(opts.body) : undefined
+            });
+            if (!res.ok) {
+                const e = await res.json().catch(function() { return {}; });
+                throw new Error(e.message || e.error_description || res.statusText);
+            }
+            return res.status === 204 ? null : res.json();
         }
 
+        async function sbAuth(endpoint, email, password) {
+            const res = await fetch(SUPABASE_URL + '/auth/v1/' + endpoint, {
+                method: 'POST',
+                headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, password: password })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error_description || data.msg || 'Auth failed');
+            return data;
+        }
+
+        function getCurrentUser()  { return window._ssCurrentUser; }
+        function setCurrentUser(u) { window._ssCurrentUser = u; }
+
+        function saveSession(data) {
+            try {
+                localStorage.setItem('sb_session', JSON.stringify({
+                    access_token: data.access_token,
+                    user_id: data.user.id,
+                    expires_at: data.expires_at || (Date.now() / 1000 + 3600)
+                }));
+            } catch(e) {}
+        }
+
+        function saveFollowing() {
+            try { localStorage.setItem('ss_following', JSON.stringify([...window._following])); } catch(e) {}
+        }
+
+        // ── NAVIGATION ────────────────────────────────────────────────────
         function showPage(page) {
-            getAllPages().forEach(function(p) { if (p) p.classList.remove('active'); });
+            var pages = ['feed', 'progress', 'groups', 'profile', 'search'];
+            pages.forEach(function(p) {
+                var el = document.getElementById(p + '-page') || document.querySelector('.' + p + '-page');
+                if (el) el.classList.remove('active');
+            });
+            // Also hide search page by id
+            var sp = document.getElementById('searchPage');
+            if (sp) sp.classList.remove('active');
+
             document.querySelectorAll('.nav-link').forEach(function(l) { l.classList.remove('active'); });
             var link = document.querySelector('.nav-link[data-page="' + page + '"]');
             if (link) link.classList.add('active');
 
-            var feedPage     = document.querySelector('.feed-page');
-            var progressPage = document.querySelector('.progress-page');
-            var groupsPage   = document.querySelector('.groups-page');
-            var profilePage  = document.querySelector('.profile-page');
-            var searchPage   = document.getElementById('searchPage');
-
-            if (page === 'feed' && feedPage) {
-                feedPage.classList.add('active');
-            } else if (page === 'progress' && progressPage) {
-                progressPage.classList.add('active');
-                setTimeout(function() { renderProgressPage(); }, 100);
-            } else if (page === 'groups' && groupsPage) {
-                groupsPage.classList.add('active');
-                closeGroup();
-            } else if (page === 'profile' && profilePage) {
-                profilePage.classList.add('active');
-            } else if (page === 'search' && searchPage) {
-                searchPage.classList.add('active');
-                loadPeopleFeed();
+            if (page === 'feed') {
+                var fp = document.querySelector('.feed-page');
+                if (fp) fp.classList.add('active');
+            } else if (page === 'progress') {
+                var pp = document.querySelector('.progress-page');
+                if (pp) { pp.classList.add('active'); setTimeout(renderProgressPage, 100); }
+            } else if (page === 'groups') {
+                var gp = document.querySelector('.groups-page');
+                if (gp) { gp.classList.add('active'); closeGroup(); }
+            } else if (page === 'profile') {
+                var prp = document.querySelector('.profile-page');
+                if (prp) prp.classList.add('active');
+            } else if (page === 'search') {
+                if (sp) { sp.classList.add('active'); loadPeopleFeed(); }
             }
         }
 
         function navigateToPage(page) { showPage(page); }
+
+        function navigateToFeed() {
+            var sp = document.getElementById('signupPage');
+            var lp = document.getElementById('loginPage');
+            if (sp) { sp.classList.remove('active'); sp.style.display = 'none'; }
+            if (lp) { lp.classList.remove('active'); lp.style.display = 'none'; }
+            showPage('feed');
+            loadFeedFromSupabase();
+        }
 
         document.querySelectorAll('.nav-link').forEach(function(link) {
             link.addEventListener('click', function(e) {
@@ -2706,410 +2769,192 @@
             });
         });
 
-        // Groups functionality
+        // ── GROUPS ────────────────────────────────────────────────────────
         function openGroup(groupId) {
-            const groupsGrid = document.querySelector('.groups-grid');
-            const groupsHeader = document.querySelector('.groups-header');
-            const groupDetail = document.getElementById('groupDetail');
-            
-            if (groupsGrid) groupsGrid.style.display = 'none';
+            var groupsGrid   = document.querySelector('.groups-grid');
+            var groupsHeader = document.querySelector('.groups-header');
+            var groupDetail  = document.getElementById('groupDetail');
+            if (groupsGrid)   groupsGrid.style.display   = 'none';
             if (groupsHeader) groupsHeader.style.display = 'none';
-            if (groupDetail) groupDetail.classList.add('active');
+            if (groupDetail)  groupDetail.classList.add('active');
         }
 
         function closeGroup() {
-            const groupsGrid = document.querySelector('.groups-grid');
-            const groupsHeader = document.querySelector('.groups-header');
-            const groupDetail = document.getElementById('groupDetail');
-            
-            if (groupsGrid) groupsGrid.style.display = 'grid';
+            var groupsGrid   = document.querySelector('.groups-grid');
+            var groupsHeader = document.querySelector('.groups-header');
+            var groupDetail  = document.getElementById('groupDetail');
+            if (groupsGrid)   groupsGrid.style.display   = 'grid';
             if (groupsHeader) groupsHeader.style.display = 'flex';
-            if (groupDetail) groupDetail.classList.remove('active');
+            if (groupDetail)  groupDetail.classList.remove('active');
         }
 
         function completeWorkout(button) {
             if (button.classList.contains('completed')) {
                 button.classList.remove('completed');
-                button.textContent = 'âœ“ Mark Complete';
+                button.textContent = 'Mark Complete';
             } else {
                 button.classList.add('completed');
-                button.textContent = 'âœ… Completed!';
-                // In a real app, this would add the user to the completions list
-                setTimeout(() => {
-                    alert('Great work! Your completion has been posted to the group!');
-                }, 300);
+                button.textContent = 'Completed!';
+                setTimeout(function() { alert('Great work! Completion posted to the group!'); }, 300);
             }
         }
 
         function openCreateGroupModal() {
-            alert('Create Group modal would open here! In the full version, you would enter group name, description, and invite members.');
+            alert('Create Group - coming soon!');
         }
 
         function openPostWorkoutModal() {
-            alert('Post Workout Challenge modal would open here! Leaders can post new workout challenges for the group.');
+            alert('Post Workout Challenge - coming soon!');
         }
 
-        // Exercise Data
-        const exerciseData = {
-            bench: {
-                name: 'Bench Press',
-                pr: '225 lbs',
-                increase: '+45 lbs',
-                avgGain: '+7.5 lbs',
-                data: [
-                    { date: 'Dec 1', weight: 180 },
-                    { date: 'Dec 15', weight: 185 },
-                    { date: 'Jan 1', weight: 195 },
-                    { date: 'Jan 15', weight: 205 },
-                    { date: 'Jan 29', weight: 210 },
-                    { date: 'Feb 5', weight: 220 },
-                    { date: 'Feb 8', weight: 225 }
-                ]
-            },
-            squat: {
-                name: 'Squat',
-                pr: '315 lbs',
-                increase: '+65 lbs',
-                avgGain: '+10.8 lbs',
-                data: [
-                    { date: 'Dec 1', weight: 250 },
-                    { date: 'Dec 15', weight: 265 },
-                    { date: 'Jan 1', weight: 275 },
-                    { date: 'Jan 15', weight: 285 },
-                    { date: 'Jan 29', weight: 295 },
-                    { date: 'Feb 5', weight: 305 },
-                    { date: 'Feb 8', weight: 315 }
-                ]
-            },
-            deadlift: {
-                name: 'Deadlift',
-                pr: '405 lbs',
-                increase: '+55 lbs',
-                avgGain: '+9.2 lbs',
-                data: [
-                    { date: 'Dec 1', weight: 350 },
-                    { date: 'Dec 15', weight: 360 },
-                    { date: 'Jan 1', weight: 370 },
-                    { date: 'Jan 15', weight: 385 },
-                    { date: 'Jan 29', weight: 395 },
-                    { date: 'Feb 5', weight: 400 },
-                    { date: 'Feb 8', weight: 405 }
-                ]
-            },
-            ohp: {
-                name: 'Overhead Press',
-                pr: '155 lbs',
-                increase: '+30 lbs',
-                avgGain: '+5 lbs',
-                data: [
-                    { date: 'Dec 1', weight: 125 },
-                    { date: 'Dec 15', weight: 130 },
-                    { date: 'Jan 1', weight: 135 },
-                    { date: 'Jan 15', weight: 140 },
-                    { date: 'Jan 29', weight: 145 },
-                    { date: 'Feb 5', weight: 150 },
-                    { date: 'Feb 8', weight: 155 }
-                ]
-            }
-        };
-
-        // Chart initialization
-        let progressChart = null;
-
-        function initProgressChart() {
-            const canvas = document.getElementById('progressChart');
-            if (!canvas) {
-                console.error('Canvas not found');
-                return;
-            }
-            
-            const ctx = canvas.getContext('2d');
-            const data = exerciseData.bench;
-
-            if (window.progressChart) {
-                window.progressChart.destroy();
-            }
-
-            progressChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.data.map(d => d.date),
-                    datasets: [{
-                        label: 'Weight (lbs)',
-                        data: data.data.map(d => d.weight),
-                        borderColor: '#ff6b35',
-                        backgroundColor: 'rgba(255, 107, 53, 0.2)',
-                        borderWidth: 4,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 7,
-                        pointBackgroundColor: '#ff6b35',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 3,
-                        pointHoverRadius: 10,
-                        pointHoverBackgroundColor: '#ff8c61',
-                        pointHoverBorderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#2a2a2a',
-                            titleColor: '#ff6b35',
-                            bodyColor: '#fff',
-                            borderColor: '#ff6b35',
-                            borderWidth: 2,
-                            padding: 15,
-                            displayColors: false,
-                            titleFont: {
-                                size: 14,
-                                family: 'Oswald'
-                            },
-                            bodyFont: {
-                                size: 16,
-                                family: 'Bebas Neue'
-                            },
-                            callbacks: {
-                                label: function(context) {
-                                    return context.parsed.y + ' lbs';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.08)',
-                                lineWidth: 1
-                            },
-                            border: {
-                                color: '#333'
-                            },
-                            ticks: {
-                                color: '#999',
-                                font: {
-                                    family: 'Roboto Mono',
-                                    size: 13,
-                                    weight: '500'
-                                },
-                                padding: 10,
-                                callback: function(value) {
-                                    return value + ' lbs';
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.08)',
-                                lineWidth: 1
-                            },
-                            border: {
-                                color: '#333'
-                            },
-                            ticks: {
-                                color: '#999',
-                                font: {
-                                    family: 'Roboto Mono',
-                                    size: 13,
-                                    weight: '500'
-                                },
-                                padding: 10
-                            }
-                        }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    }
-                }
-            });
-
-            window.progressChart = progressChart;
+        // ── MODAL ─────────────────────────────────────────────────────────
+        function openModal() {
+            document.getElementById('workoutModal').classList.add('active');
+        }
+        function closeModal() {
+            document.getElementById('workoutModal').classList.remove('active');
         }
 
-        // Exercise selector
-        document.querySelectorAll('.exercise-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const exercise = this.dataset.exercise;
-                const data = exerciseData[exercise];
-
-                // Update active button
-                document.querySelectorAll('.exercise-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-
-                // Update chart title and stats
-                document.getElementById('chartTitle').innerHTML = `${data.name} Progress <span class="pr-badge">PR: ${data.pr}</span>`;
-                document.getElementById('currentPR').textContent = data.pr;
-                document.getElementById('totalIncrease').textContent = data.increase;
-                document.getElementById('avgGain').textContent = data.avgGain;
-
-                // Update chart
-                if (progressChart) {
-                    progressChart.data.labels = data.data.map(d => d.date);
-                    progressChart.data.datasets[0].data = data.data.map(d => d.weight);
-                    progressChart.update();
-                }
-            });
+        document.getElementById('workoutModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
         });
 
-        // Toggle workout details
-        function toggleDetails(button) {
-            button.classList.toggle('active');
-            const content = button.nextElementSibling;
-            content.classList.toggle('active');
+        function addExercise() {
+            var container = document.getElementById('exerciseContainer');
+            var div = document.createElement('div');
+            div.className = 'exercise-inputs';
+            div.innerHTML = '<input type="text" placeholder="Exercise name">' +
+                '<input type="number" placeholder="Sets">' +
+                '<input type="number" placeholder="Reps">' +
+                '<input type="number" placeholder="Weight (lbs)">';
+            container.appendChild(div);
         }
 
-        // Photo Upload Functionality
-        const photoInput = document.getElementById('photoInput');
-        const photoZone = document.getElementById('photoZone');
-        const previewImage = document.getElementById('previewImage');
-        const removePhoto = document.getElementById('removePhoto');
+        // ── PHOTO UPLOAD ──────────────────────────────────────────────────
+        var photoInput  = document.getElementById('photoInput');
+        var photoZone   = document.getElementById('photoZone');
+        var previewImage = document.getElementById('previewImage');
+        var removePhoto  = document.getElementById('removePhoto');
 
-        if (photoInput && photoZone && previewImage && removePhoto) {
+        if (photoInput) {
             photoInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImage.src = e.target.result;
-                        previewImage.classList.add('active');
-                        photoZone.classList.add('has-image');
-                        removePhoto.classList.add('active');
-                        const uploadIcon = photoZone.querySelector('.upload-icon');
-                        const uploadText = photoZone.querySelector('.upload-text');
-                        if (uploadIcon) uploadIcon.style.display = 'none';
-                        if (uploadText) uploadText.style.display = 'none';
-                    }
-                    reader.readAsDataURL(file);
-                }
+                var file = e.target.files[0];
+                if (!file) return;
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.classList.add('active');
+                    photoZone.classList.add('has-image');
+                    removePhoto.classList.add('active');
+                    var icon = photoZone.querySelector('.upload-icon');
+                    var text = photoZone.querySelector('.upload-text');
+                    if (icon) icon.style.display = 'none';
+                    if (text) text.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
             });
+        }
 
+        if (removePhoto) {
             removePhoto.addEventListener('click', function(e) {
                 e.stopPropagation();
                 photoInput.value = '';
                 previewImage.classList.remove('active');
                 photoZone.classList.remove('has-image');
                 removePhoto.classList.remove('active');
-                const uploadIcon = photoZone.querySelector('.upload-icon');
-                const uploadText = photoZone.querySelector('.upload-text');
-                if (uploadIcon) uploadIcon.style.display = 'block';
-                if (uploadText) uploadText.style.display = 'block';
+                var icon = photoZone.querySelector('.upload-icon');
+                var text = photoZone.querySelector('.upload-text');
+                if (icon) icon.style.display = 'block';
+                if (text) text.style.display = 'block';
             });
         }
 
-        function openModal() {
-            document.getElementById('workoutModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('workoutModal').classList.remove('active');
-        }
-
-        function addExercise() {
-            const container = document.getElementById('exerciseContainer');
-            const newExercise = document.createElement('div');
-            newExercise.className = 'exercise-inputs';
-            newExercise.innerHTML = `
-                <input type="text" placeholder="Exercise name" required>
-                <input type="number" placeholder="Sets" required>
-                <input type="number" placeholder="Reps" required>
-                <input type="number" placeholder="Weight (lbs)" required>
-            `;
-            container.appendChild(newExercise);
+        // ── LOG WORKOUT ───────────────────────────────────────────────────
+        function resetWorkoutForm() {
+            document.getElementById('workoutForm').reset();
+            if (previewImage)  previewImage.classList.remove('active');
+            if (photoZone)     photoZone.classList.remove('has-image');
+            if (removePhoto)   removePhoto.classList.remove('active');
+            var icon = photoZone ? photoZone.querySelector('.upload-icon') : null;
+            var text = photoZone ? photoZone.querySelector('.upload-text') : null;
+            if (icon) icon.style.display = 'block';
+            if (text) text.style.display = 'block';
+            var container = document.getElementById('exerciseContainer');
+            if (container) {
+                container.innerHTML = '<div class="exercise-inputs">' +
+                    '<input type="text" placeholder="Exercise name">' +
+                    '<input type="number" placeholder="Sets">' +
+                    '<input type="number" placeholder="Reps">' +
+                    '<input type="number" placeholder="Weight (lbs)">' +
+                    '</div>';
+            }
         }
 
         async function handleLogWorkout() {
-            const workoutName = document.getElementById('workoutName')?.value.trim();
-            const duration    = parseInt(document.getElementById('workoutDuration')?.value) || 0;
-            const caption     = document.getElementById('captionInput')?.value.trim();
-            const previewImg  = document.getElementById('previewImage');
-            const photoSrc    = previewImg?.classList.contains('active') ? previewImg.src : null;
+            var workoutName = document.getElementById('workoutName').value.trim();
+            var duration    = parseInt(document.getElementById('workoutDuration').value) || 0;
+            var caption     = document.getElementById('captionInput').value.trim();
+            var photoSrc    = previewImage && previewImage.classList.contains('active') ? previewImage.src : null;
 
-            if (!workoutName) {
-                alert('Please enter a workout name.'); return;
-            }
+            if (!workoutName) { alert('Please enter a workout name.'); return; }
 
-            // Gather exercises
-            const exerciseRows = document.querySelectorAll('#exerciseContainer .exercise-inputs');
-            const exercises = [];
-            exerciseRows.forEach(row => {
-                const inputs = row.querySelectorAll('input');
-                const name   = inputs[0]?.value.trim();
-                const sets   = inputs[1]?.value;
-                const reps   = inputs[2]?.value;
-                const weight = inputs[3]?.value;
-                if (name) exercises.push({ name, sets, reps, weight });
+            var exercises = [];
+            document.querySelectorAll('#exerciseContainer .exercise-inputs').forEach(function(row) {
+                var inputs = row.querySelectorAll('input');
+                var name   = inputs[0] ? inputs[0].value.trim() : '';
+                if (name) exercises.push({ name: name, sets: inputs[1].value, reps: inputs[2].value, weight: inputs[3].value });
             });
 
-            // Get logged in user
-            const user = getCurrentUser();
-            const userName     = user ? (user.full_name || user.fullName || 'Anonymous') : 'Anonymous';
-            const userInitials = user ? (user.initials || (user.full_name||user.fullName||'').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '??') : '??';
+            var user        = getCurrentUser();
+            var displayName = user ? (user.full_name || user.fullName || user.username || 'You') : 'You';
+            var initials    = user ? (user.initials || displayName.split(' ').map(function(x){return x[0]||'';}).join('').toUpperCase().slice(0,2)) : '??';
+            var now         = new Date().toISOString();
 
-            // Save workout to Supabase
+            // Save to Supabase
             if (user) {
-                const now = new Date().toISOString();
-                const workoutRecord = {
-                    user_id:   window._sbUserId,
-                    name:      workoutName,
-                    duration,
-                    caption:   caption || null,
-                    exercises,
+                var record = {
+                    user_id: window._sbUserId,
+                    name: workoutName,
+                    duration: duration,
+                    caption: caption || null,
+                    exercises: exercises,
                     photo_url: photoSrc || null,
-                    created_at: now,
-                    date: now
+                    created_at: now
                 };
                 try {
-                    const saved = await sb('workouts', { method: 'POST', body: workoutRecord });
-                    // Update local user workouts cache
+                    var saved = await sb('workouts', { method: 'POST', body: record });
                     if (!user.workouts) user.workouts = [];
-                    user.workouts.unshift({ ...workoutRecord, id: saved[0]?.id, created_at: new Date().toISOString(), date: new Date().toISOString() });
+                    user.workouts.unshift(Object.assign({}, record, { id: saved && saved[0] ? saved[0].id : null }));
                     setCurrentUser(user);
                     refreshProfileStats(user);
                     refreshProfileWorkouts(user);
                     refreshAchievements(user);
                 } catch(e) {
-                    console.warn('Failed to save workout:', e.message);
-                    // Still cache locally even if DB save failed
+                    console.warn('Save failed:', e.message);
                     if (!user.workouts) user.workouts = [];
-                    const now2 = new Date().toISOString();
-                    user.workouts.unshift({ ...workoutRecord, created_at: now2, date: now2 });
+                    user.workouts.unshift({ name: workoutName, duration: duration, caption: caption, exercises: exercises, created_at: now });
                     setCurrentUser(user);
-                    refreshProfileStats(user);
-                    refreshProfileWorkouts(user);
-                    refreshAchievements(user);
                 }
             }
 
-            // Build card
-            const photoHTML = photoSrc
-                ? `<img src="${photoSrc}" alt="Workout photo" class="workout-photo">` : '';
-            var captionHTML = caption ? '<p class="workout-caption">&ldquo;' + caption + '&rdquo;</p>' : '';
-            var exItems = exercises.filter(function(ex){ return ex && ex.name; }).map(function(ex) {
-                return '<div class="exercise-item"><span class="exercise-name">' + ex.name + '</span>' +
-                    '<span class="exercise-details">' + (ex.sets||'?') + ' x ' + (ex.reps||'?') + (ex.weight ? ' @ '+ex.weight+' lbs' : '') + '</span></div>';
-            }).join('');
-            var exerciseListHTML = exItems || '<div class="exercise-item"><span class="exercise-name">No exercises logged</span></div>';
+            // Build and insert card into feed
+            var exHTML = exercises.length
+                ? exercises.map(function(ex) {
+                    return '<div class="exercise-item"><span class="exercise-name">' + ex.name + '</span>' +
+                        '<span class="exercise-details">' + (ex.sets||'?') + ' x ' + (ex.reps||'?') + (ex.weight ? ' @ '+ex.weight+' lbs' : '') + '</span></div>';
+                  }).join('')
+                : '<div class="exercise-item"><span class="exercise-name">No exercises logged</span></div>';
 
             var card = document.createElement('div');
             card.className = 'activity-card';
-            card.style.animation = 'fadeInUp 0.5s ease-out';
             card.innerHTML =
                 '<div class="activity-header">' +
-                    '<div class="user-avatar">' + userInitials + '</div>' +
-                    '<div class="activity-user-info">' +
-                        '<h3>' + userName + '</h3>' +
-                        '<span class="activity-time">Just now</span>' +
-                    '</div>' +
+                    '<div class="user-avatar">' + initials + '</div>' +
+                    '<div class="activity-user-info"><h3>' + displayName + '</h3><span class="activity-time">Just now</span></div>' +
                 '</div>' +
                 '<h2 class="workout-title">' + workoutName.toUpperCase() + '</h2>' +
-                photoHTML + captionHTML +
+                (photoSrc ? '<img src="' + photoSrc + '" class="workout-photo" alt="">' : '') +
+                (caption  ? '<p class="workout-caption">&ldquo;' + caption + '&rdquo;</p>' : '') +
                 '<div class="workout-details">' +
                     '<button class="details-toggle" onclick="toggleDetails(this)">' +
                         '<span>View Workout Details</span>' +
@@ -3118,219 +2963,129 @@
                     '<div class="workout-details-content">' +
                         '<div class="workout-stats">' +
                             '<div class="workout-stat"><div class="workout-stat-value">' + exercises.length + '</div><div class="workout-stat-label">Exercises</div></div>' +
-                            '<div class="workout-stat"><div class="workout-stat-value">' + (duration || '?') + '</div><div class="workout-stat-label">Minutes</div></div>' +
+                            '<div class="workout-stat"><div class="workout-stat-value">' + (duration||'?') + '</div><div class="workout-stat-label">Minutes</div></div>' +
                         '</div>' +
-                        '<div class="exercise-list">' + exerciseListHTML + '</div>' +
+                        '<div class="exercise-list">' + exHTML + '</div>' +
                     '</div>' +
                 '</div>' +
                 '<div class="activity-actions">' +
-                    '<button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">&#128074;</span><span>0 Respect</span></button>' +
-                    '<button class="action-btn"><span class="action-icon">&#128172;</span><span>0 Comments</span></button>' +
-                    '<button class="action-btn"><span class="action-icon">&#128293;</span><span>PR!</span></button>' +
+                    '<button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">&#128074;</span> <span>0 Respect</span></button>' +
+                    '<button class="action-btn"><span class="action-icon">&#128172;</span> <span>0 Comments</span></button>' +
                 '</div>';
 
-            // Add to top of main feed
-            var feed = document.getElementById('mainFeed') || document.querySelector('.activity-feed');
-            if (feed) feed.insertBefore(card, feed.firstChild);
+            var feed = document.getElementById('mainFeed');
+            if (feed) { feed.insertBefore(card, feed.firstChild); }
 
-
-            // Reset form
-            document.getElementById('workoutForm').reset();
-            const pImg = document.getElementById('previewImage');
-            const pZone = document.getElementById('photoZone');
-            const rPhoto = document.getElementById('removePhoto');
-            if (pImg) pImg.classList.remove('active');
-            if (pZone) pZone.classList.remove('has-image');
-            if (rPhoto) rPhoto.classList.remove('active');
-            const uIcon = pZone?.querySelector('.upload-icon');
-            const uText = pZone?.querySelector('.upload-text');
-            if (uIcon) uIcon.style.display = 'block';
-            if (uText) uText.style.display = 'block';
-
-            // Reset exercises to one row
-            const container = document.getElementById('exerciseContainer');
-            if (container) {
-                container.innerHTML = `<div class="exercise-inputs">
-                    <input type="text" placeholder="Exercise name">
-                    <input type="number" placeholder="Sets">
-                    <input type="number" placeholder="Reps">
-                    <input type="number" placeholder="Weight (lbs)">
-                </div>`;
-            }
-
+            resetWorkoutForm();
             closeModal();
             navigateToFeed();
         }
 
-        function refreshProfileStats(user) {
-            const workouts = user.workouts || [];
-            const totalWorkouts   = workouts.length;
-            const totalExercises  = workouts.reduce((sum, w) => sum + (w.exercises?.length || 0), 0);
-            const totalMinutes    = workouts.reduce((sum, w) => sum + (w.duration || 0), 0);
+        // ── FEED ──────────────────────────────────────────────────────────
+        function buildWorkoutCard(w, profile) {
+            var name     = profile ? (profile.full_name || profile.username || 'Unknown') : 'Unknown';
+            var initials = profile ? (profile.initials || name.split(' ').map(function(x){return x[0]||'';}).join('').toUpperCase().slice(0,2)) : '??';
+            var exercises = Array.isArray(w.exercises) ? w.exercises : [];
+            var exHTML = exercises.filter(function(ex){ return ex && ex.name; }).map(function(ex) {
+                return '<div class="exercise-item"><span class="exercise-name">' + ex.name + '</span>' +
+                    '<span class="exercise-details">' + (ex.sets||'?') + ' x ' + (ex.reps||'?') + (ex.weight ? ' @ '+ex.weight+' lbs' : '') + '</span></div>';
+            }).join('') || '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
+            var rawDate = w.created_at || w.date || null;
+            var d = rawDate ? new Date(rawDate) : null;
+            var dateStr = (d && !isNaN(d)) ? d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : 'Recently';
+            var wName = (w.name || 'Untitled').toUpperCase();
+            var card = document.createElement('div');
+            card.className = 'activity-card';
+            card.innerHTML =
+                '<div class="activity-header">' +
+                    '<div class="user-avatar">' + initials + '</div>' +
+                    '<div class="activity-user-info"><h3>' + name + '</h3><span class="activity-time">' + dateStr + '</span></div>' +
+                '</div>' +
+                '<h2 class="workout-title">' + wName + '</h2>' +
+                (w.photo_url ? '<img src="' + w.photo_url + '" class="workout-photo" alt="">' : '') +
+                (w.caption   ? '<p class="workout-caption">&ldquo;' + w.caption + '&rdquo;</p>' : '') +
+                '<div class="workout-details">' +
+                    '<button class="details-toggle" onclick="toggleDetails(this)">' +
+                        '<span>View Workout Details</span>' +
+                        '<span class="details-toggle-icon" style="display:inline-block;transition:transform 0.3s">&#9660;</span>' +
+                    '</button>' +
+                    '<div class="workout-details-content">' +
+                        '<div class="workout-stats">' +
+                            '<div class="workout-stat"><div class="workout-stat-value">' + exercises.length + '</div><div class="workout-stat-label">Exercises</div></div>' +
+                            '<div class="workout-stat"><div class="workout-stat-value">' + (w.duration||'&mdash;') + '</div><div class="workout-stat-label">Minutes</div></div>' +
+                        '</div>' +
+                        '<div class="exercise-list">' + exHTML + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="activity-actions">' +
+                    '<button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">&#128074;</span> <span>0 Respect</span></button>' +
+                    '<button class="action-btn"><span class="action-icon">&#128172;</span> <span>0 Comments</span></button>' +
+                '</div>';
+            return card;
+        }
 
-            const tw = document.getElementById('statTotalWorkouts');
-            const te = document.getElementById('statTotalExercises');
-            const tm = document.getElementById('statTotalMinutes');
-            const wc = document.getElementById('profileWorkoutCount');
-
-            if (tw) tw.textContent = totalWorkouts;
-            if (te) te.textContent = totalExercises;
-            if (tm) tm.textContent = totalMinutes;
-            if (wc) wc.textContent = totalWorkouts;
-
-            // Show recent workouts list
-            const list = document.getElementById('recentWorkoutsList');
-            if (list) {
-                if (workouts.length === 0) {
-                    list.innerHTML = `<p style="color:#999; text-align:center; padding:30px;">No workouts logged yet. Hit the + button to log your first workout!</p>`;
-                } else {
-                    list.innerHTML = `
-                        <h3 style="font-family:'Bebas Neue',cursive; font-size:22px; letter-spacing:2px; color:var(--primary); margin-bottom:15px;">Recent Workouts</h3>
-                        ${workouts.slice(0, 10).map(w => `
-                            <div style="background:var(--steel); border-left:3px solid var(--primary); padding:15px 20px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-                                <div>
-                                    <div style="font-family:'Bebas Neue',cursive; font-size:18px; letter-spacing:1px;">${w.name.toUpperCase()}</div>
-                                    <div style="font-size:12px; color:#999; margin-top:3px;">${w.exercises?.length || 0} exercises Â· ${w.duration || 0} min</div>
-                                </div>
-                                <div style="font-size:12px; color:#666; font-family:'Roboto Mono',monospace;">${new Date(w.created_at || w.date || Date.now()).toLocaleDateString()}</div>
-                            </div>`).join('')}`;
+        async function loadFeedFromSupabase() {
+            var feed = document.getElementById('mainFeed');
+            if (!feed) return;
+            try {
+                var workouts = await sb('workouts?order=created_at.desc&limit=50&select=*,profiles(full_name,initials,username)');
+                if (!workouts || !workouts.length) {
+                    feed.innerHTML =
+                        '<div style="text-align:center;padding:60px 20px;color:#555;">' +
+                        '<div style="font-size:64px;margin-bottom:20px;opacity:0.3">&#127947;</div>' +
+                        '<h3 style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:#444;letter-spacing:3px;margin-bottom:10px;">No Workouts Yet</h3>' +
+                        '<p style="color:#555;font-size:14px;letter-spacing:1px;">Be the first to log a workout!</p></div>';
+                    return;
                 }
+                feed.innerHTML = '';
+                workouts.forEach(function(w) {
+                    if (!w || !w.name) return;
+                    var card = buildWorkoutCard(w, w.profiles);
+                    feed.appendChild(card);
+                });
+            } catch(e) {
+                console.warn('Feed load error:', e.message);
+                feed.innerHTML = '<div style="text-align:center;padding:40px;color:#555;">Could not load feed.</div>';
             }
         }
 
-        const workoutForm = document.getElementById('workoutForm');
-        if (workoutForm) workoutForm.addEventListener('submit', e => e.preventDefault());
+        // ── WORKOUT DETAILS TOGGLE ────────────────────────────────────────
+        function toggleDetails(button) {
+            button.classList.toggle('active');
+            var icon    = button.querySelector('.details-toggle-icon');
+            var content = button.nextElementSibling;
+            if (icon)    icon.style.transform = button.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
+            if (content) content.classList.toggle('active');
+        }
 
+        // ── RESPECT ───────────────────────────────────────────────────────
         function handleRespect(btn) {
-            const span = btn.querySelector('span:last-child');
-            const count = parseInt(span.textContent) + 1;
+            var span  = btn.querySelector('span:last-child');
+            var count = parseInt(span.textContent) + 1;
             span.textContent = count + ' Respect';
             btn.style.color = 'var(--primary)';
         }
 
-        // Filter tabs functionality
-        document.querySelectorAll('.filter-tab').forEach(tab => {
+        // Filter tabs
+        document.querySelectorAll('.filter-tab').forEach(function(tab) {
             tab.addEventListener('click', function() {
-                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
                 this.classList.add('active');
             });
         });
 
-        // Action buttons
-        document.querySelectorAll('.action-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const text = this.textContent;
-                if (text.includes('Respect')) {
-                    const count = parseInt(text.match(/\d+/)[0]) + 1;
-                    this.innerHTML = `<span class="action-icon">Š</span><span>${count} Respect</span>`;
-                }
-            });
-        });
-
-        // Close modal on outside click
-        const workoutModal = document.getElementById('workoutModal');
-        if (workoutModal) {
-            workoutModal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeModal();
-                }
-            });
-        }
-
-        // â”€â”€ SUPABASE CONFIG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        const SUPABASE_URL = 'https://nygqoszurqvvdtndpufo.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55Z3Fvc3p1cnF2dmR0bmRwdWZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3NzU5NDksImV4cCI6MjA4NjM1MTk0OX0.KSd3SPRK2RULFCikjS7WpAlf8YvBiZnwsyA3OT6dzPY';
-
-        window._ssCurrentUser = null;
-        window._sbToken       = null;
-        window._sbUserId      = null;
-
-        // â”€â”€ CONNECTION TEST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        // Show a helpful banner if Supabase can't be reached
-        async function testConnection() {
-            try {
-                const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?limit=1`, {
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-                });
-                if (res.ok || res.status === 401 || res.status === 406) {
-                    // Any HTTP response means we can reach Supabase â€” good
-                    return true;
-                }
-                throw new Error(`HTTP ${res.status}`);
-            } catch(e) {
-                // Show a helpful overlay
-                const banner = document.createElement('div');
-                banner.style.cssText = `position:fixed;top:0;left:0;right:0;z-index:9999;background:#1a0a00;border-bottom:3px solid #ff6b35;padding:20px 25px;font-family:'Oswald',sans-serif;color:#fff;`;
-                banner.innerHTML = `
-                    <div style="font-size:18px;color:#ff6b35;font-weight:bold;margin-bottom:8px;">âš ï¸ CANNOT CONNECT TO SERVER</div>
-                    <div style="font-size:14px;color:#ccc;line-height:1.6;">
-                        Opening this file directly won't work because browsers block network requests from local files.<br>
-                        <strong style="color:#ff6b35;">Fix:</strong> Host this file on any web server, or use VS Code's Live Server extension.
-                    </div>`;
-                document.body.appendChild(banner);
-                // Push content down
-                document.querySelector('main')?.style.setProperty('padding-top', '100px');
-                return false;
-            }
-        }
-        testConnection();
-
-        // REST helper
-        async function sb(path, opts = {}) {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-                method: opts.method || 'GET',
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${window._sbToken || SUPABASE_KEY}`,
-                    'Content-Type': 'application/json',
-                    'Prefer': opts.prefer || 'return=representation',
-                    ...opts.headers
-                },
-                body: opts.body ? JSON.stringify(opts.body) : undefined
-            });
-            if (!res.ok) {
-                const e = await res.json().catch(() => ({}));
-                throw new Error(e.message || e.error_description || res.statusText);
-            }
-            return res.status === 204 ? null : res.json();
-        }
-
-        async function sbAuth(endpoint, email, password) {
-            const res = await fetch(`${SUPABASE_URL}/auth/v1/${endpoint}`, {
-                method: 'POST',
-                headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error_description || data.msg || 'Auth failed');
-            return data;
-        }
-
-        function getCurrentUser() { return window._ssCurrentUser; }
-        function setCurrentUser(u) { window._ssCurrentUser = u; }
-
-        function saveSession(data) {
-            try {
-                localStorage.setItem('sb_session', JSON.stringify({
-                    access_token: data.access_token,
-                    user_id: data.user.id,
-                    expires_at: data.expires_at
-                }));
-            } catch(e) {}
-        }
-
-        // â”€â”€ AUTH UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── AUTH UI ───────────────────────────────────────────────────────
         function showSignup() {
-            const sp = document.getElementById('signupPage');
-            const lp = document.getElementById('loginPage');
+            var sp = document.getElementById('signupPage');
+            var lp = document.getElementById('loginPage');
             if (sp) { sp.style.display = 'flex'; sp.classList.add('active'); }
             if (lp) { lp.style.display = 'none';  lp.classList.remove('active'); }
             clearAuthErrors();
         }
 
         function showLogin() {
-            const lp = document.getElementById('loginPage');
-            const sp = document.getElementById('signupPage');
+            var lp = document.getElementById('loginPage');
+            var sp = document.getElementById('signupPage');
             if (lp) { lp.style.display = 'flex'; lp.classList.add('active'); }
             if (sp) { sp.style.display = 'none';  sp.classList.remove('active'); }
             clearAuthErrors();
@@ -3341,29 +3096,28 @@
             window._sbToken = null;
             window._sbUserId = null;
             try { localStorage.removeItem('sb_session'); } catch(e) {}
-            document.querySelectorAll('.feed-page,.progress-page,.groups-page,.profile-page').forEach(p => p.classList.remove('active'));
+            showPage('feed');
             showSignup();
         }
 
         function showAuthError(formId, msg) {
-            const el = document.getElementById(formId + 'Error');
+            var el = document.getElementById(formId + 'Error');
             if (el) { el.textContent = msg; el.style.display = 'block'; }
         }
 
         function clearAuthErrors() {
-            document.querySelectorAll('.auth-error').forEach(el => { el.textContent = ''; el.style.display = 'none'; });
+            document.querySelectorAll('.auth-error').forEach(function(el) { el.textContent = ''; el.style.display = 'none'; });
         }
 
-        // â”€â”€ PROFILE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── PROFILE ───────────────────────────────────────────────────────
         function loadProfileForUser(user) {
-            // Normalize field names from Supabase (full_name) vs legacy (fullName)
             user.fullName = user.full_name || user.fullName || user.username || '';
-            user.initials = user.initials || user.fullName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '??';
-            const el = id => document.getElementById(id);
-            if (el('profileName'))     el('profileName').textContent    = user.fullName;
-            if (el('profileUsername')) el('profileUsername').textContent = '@' + user.username;
-            if (el('profileBio'))      el('profileBio').textContent      = user.bio || 'No bio yet.';
-            if (el('profileInitials')) el('profileInitials').textContent = user.initials || '';
+            user.initials = user.initials || user.fullName.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2) || '??';
+            var el = function(id) { return document.getElementById(id); };
+            if (el('profileName'))     el('profileName').textContent     = user.fullName;
+            if (el('profileUsername')) el('profileUsername').textContent  = '@' + user.username;
+            if (el('profileBio'))      el('profileBio').textContent       = user.bio || 'No bio yet.';
+            if (el('profileInitials')) el('profileInitials').textContent  = user.initials;
             if (el('profileFollowers')) el('profileFollowers').textContent = user.followers || 0;
             if (el('profileFollowing')) el('profileFollowing').textContent = user.following || 0;
             refreshProfileStats(user);
@@ -3371,91 +3125,79 @@
             refreshAchievements(user);
         }
 
-        // â”€â”€ SESSION CHECK ON LOAD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        (async function init() {
-            try {
-                const stored = localStorage.getItem('sb_session');
-                if (stored) {
-                    const sess = JSON.parse(stored);
-                    if (sess.expires_at > Date.now() / 1000) {
-                        window._sbToken  = sess.access_token;
-                        window._sbUserId = sess.user_id;
-                        const profiles = await sb(`profiles?id=eq.${sess.user_id}&select=*`);
-                        if (profiles && profiles[0]) {
-                            const workouts = await sb(`workouts?user_id=eq.${sess.user_id}&order=created_at.desc&select=*`);
-                            profiles[0].workouts = workouts || [];
-                            setCurrentUser(profiles[0]);
-                            loadProfileForUser(profiles[0]);
-                            await loadFeedFromSupabase();
-                await loadFollowsFromDB();
-                            navigateToFeed();
-                            return;
-                        }
-                    }
-                }
-            } catch(e) { console.warn('Session restore failed:', e.message); }
-            // Still load the feed so visitors can see workouts even before logging in
-            loadFeedFromSupabase().catch(function(){});
-            showSignup();
-        })();
-
-        // â”€â”€ PROFILE TAB SWITCHING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function switchProfileTab(tabName) {
-            document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.profile-tab').forEach(t => {
-                if (t.getAttribute('onclick')?.includes(tabName)) t.classList.add('active');
+            document.querySelectorAll('.profile-tab').forEach(function(t) {
+                t.classList.toggle('active', t.getAttribute('onclick') && t.getAttribute('onclick').includes(tabName));
             });
-            document.querySelectorAll('.profile-tab-content').forEach(c => c.classList.remove('active'));
-            const tc = document.getElementById(tabName + '-tab');
+            document.querySelectorAll('.profile-tab-content').forEach(function(c) { c.classList.remove('active'); });
+            var tc = document.getElementById(tabName + '-tab');
             if (tc) tc.classList.add('active');
-            const u = getCurrentUser();
+            var u = getCurrentUser();
             if (!u) return;
             if (tabName === 'stats')        refreshProfileStats(u);
             if (tabName === 'workouts')     refreshProfileWorkouts(u);
             if (tabName === 'achievements') refreshAchievements(u);
         }
 
+        function refreshProfileStats(user) {
+            var workouts       = user.workouts || [];
+            var totalWorkouts  = workouts.length;
+            var totalExercises = workouts.reduce(function(s,w){ return s + (w.exercises ? w.exercises.length : 0); }, 0);
+            var totalMinutes   = workouts.reduce(function(s,w){ return s + (w.duration||0); }, 0);
+            var set = function(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
+            set('statTotalWorkouts', totalWorkouts);
+            set('statTotalExercises', totalExercises);
+            set('statTotalMinutes', totalMinutes);
+            set('profileWorkoutCount', totalWorkouts);
+
+            var list = document.getElementById('recentWorkoutsList');
+            if (!list) return;
+            if (workouts.length === 0) {
+                list.innerHTML = '<p style="color:#999;text-align:center;padding:30px;">No workouts logged yet.</p>';
+                return;
+            }
+            list.innerHTML = '<h3 style="font-family:\'Bebas Neue\',cursive;font-size:22px;letter-spacing:2px;color:var(--primary);margin-bottom:15px;">Recent Workouts</h3>' +
+                workouts.slice(0,10).map(function(w) {
+                    var rawDate = w.created_at || w.date || null;
+                    var d = rawDate ? new Date(rawDate) : null;
+                    var dateStr = (d && !isNaN(d)) ? d.toLocaleDateString() : 'Recently';
+                    return '<div style="background:var(--steel);border-left:3px solid var(--primary);padding:15px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">' +
+                        '<div><div style="font-family:\'Bebas Neue\',cursive;font-size:18px;letter-spacing:1px;">' + (w.name||'Untitled').toUpperCase() + '</div>' +
+                        '<div style="font-size:12px;color:#999;margin-top:3px;">' + (w.exercises?w.exercises.length:0) + ' exercises &middot; ' + (w.duration||0) + ' min</div></div>' +
+                        '<div style="font-size:12px;color:#666;font-family:\'Roboto Mono\',monospace;">' + dateStr + '</div></div>';
+                }).join('');
+        }
+
         function refreshProfileWorkouts(user) {
-            const feed = document.getElementById('profileWorkoutFeed');
+            var feed = document.getElementById('profileWorkoutFeed');
             if (!feed) return;
-            const allWorkouts = user.workouts || [];
-            const workouts = allWorkouts.filter(w => w && (w.name || w.workout_name));
-            const displayName = user.full_name || user.fullName || user.username || 'You';
-            const initials = user.initials || displayName.split(' ').map(function(x){return x[0]||'';}).join('').toUpperCase().slice(0,2) || '??';
+            var workouts    = (user.workouts || []).filter(function(w) { return w && w.name; });
+            var displayName = user.full_name || user.fullName || user.username || 'You';
+            var initials    = user.initials || displayName.split(' ').map(function(x){return x[0]||'';}).join('').toUpperCase().slice(0,2) || '??';
 
             if (workouts.length === 0) {
-                feed.innerHTML = '<div style="text-align:center; padding:60px 20px; color:#999;">' +
-                    '<div style="font-size:48px; margin-bottom:15px;">&#127947;</div>' +
-                    '<h3 style="font-family:Bebas Neue,cursive; font-size:28px; color:var(--primary); margin-bottom:10px;">No Workouts Yet</h3>' +
-                    '<p>Hit the + button to log your first workout!</p>' +
-                    '</div>';
+                feed.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#999;">' +
+                    '<h3 style="font-family:\'Bebas Neue\',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">No Workouts Yet</h3>' +
+                    '<p>Hit the + button to log your first workout!</p></div>';
                 return;
             }
 
             feed.innerHTML = workouts.map(function(w) {
-                const wName = (w.name || w.workout_name || 'Untitled').toUpperCase();
-                const exercises = Array.isArray(w.exercises) ? w.exercises : [];
-                const exItems = exercises.filter(function(ex){ return ex && ex.name; }).map(function(ex) {
-                    return '<div class="exercise-item">' +
-                        '<span class="exercise-name">' + ex.name + '</span>' +
-                        '<span class="exercise-details">' + (ex.sets||'?') + ' x ' + (ex.reps||'?') + (ex.weight ? ' @ ' + ex.weight + ' lbs' : '') + '</span>' +
-                        '</div>';
-                }).join('');
-                const exerciseListHTML = exItems || '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
-                const captionHTML = w.caption ? '<p class="workout-caption">&ldquo;' + w.caption + '&rdquo;</p>' : '';
-                const rawDate = w.created_at || w.date || w.logged_at || null;
-                const d = rawDate ? new Date(rawDate) : null;
-                const dateStr = (d && !isNaN(d)) ? d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : 'Recently';
+                var exs = Array.isArray(w.exercises) ? w.exercises.filter(function(e){return e&&e.name;}) : [];
+                var exHTML = exs.map(function(ex) {
+                    return '<div class="exercise-item"><span class="exercise-name">' + ex.name + '</span>' +
+                        '<span class="exercise-details">' + (ex.sets||'?') + ' x ' + (ex.reps||'?') + (ex.weight?' @ '+ex.weight+' lbs':'') + '</span></div>';
+                }).join('') || '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
+                var rawDate = w.created_at || w.date || null;
+                var d = rawDate ? new Date(rawDate) : null;
+                var dateStr = (d && !isNaN(d)) ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'Recently';
                 return '<div class="activity-card">' +
                     '<div class="activity-header">' +
                         '<div class="user-avatar">' + initials + '</div>' +
-                        '<div class="activity-user-info">' +
-                            '<h3>' + displayName + '</h3>' +
-                            '<span class="activity-time">' + dateStr + '</span>' +
-                        '</div>' +
+                        '<div class="activity-user-info"><h3>' + displayName + '</h3><span class="activity-time">' + dateStr + '</span></div>' +
                     '</div>' +
-                    '<h2 class="workout-title">' + wName + '</h2>' +
-                    captionHTML +
+                    '<h2 class="workout-title">' + w.name.toUpperCase() + '</h2>' +
+                    (w.caption ? '<p class="workout-caption">&ldquo;' + w.caption + '&rdquo;</p>' : '') +
                     '<div class="workout-details">' +
                         '<button class="details-toggle" onclick="toggleDetails(this)">' +
                             '<span>View Workout Details</span>' +
@@ -3463,150 +3205,131 @@
                         '</button>' +
                         '<div class="workout-details-content">' +
                             '<div class="workout-stats">' +
-                                '<div class="workout-stat"><div class="workout-stat-value">' + exercises.length + '</div><div class="workout-stat-label">Exercises</div></div>' +
-                                '<div class="workout-stat"><div class="workout-stat-value">' + (w.duration || '&mdash;') + '</div><div class="workout-stat-label">Minutes</div></div>' +
+                                '<div class="workout-stat"><div class="workout-stat-value">' + exs.length + '</div><div class="workout-stat-label">Exercises</div></div>' +
+                                '<div class="workout-stat"><div class="workout-stat-value">' + (w.duration||'&mdash;') + '</div><div class="workout-stat-label">Minutes</div></div>' +
                             '</div>' +
-                            '<div class="exercise-list">' + exerciseListHTML + '</div>' +
+                            '<div class="exercise-list">' + exHTML + '</div>' +
                         '</div>' +
                     '</div>' +
                     '<div class="activity-actions">' +
-                        '<button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">&#128074;</span><span>0 Respect</span></button>' +
-                        '<button class="action-btn"><span class="action-icon">&#128172;</span><span>0 Comments</span></button>' +
-                        '<button class="action-btn"><span class="action-icon">&#128293;</span><span>PR!</span></button>' +
-                    '</div>' +
-                '</div>';
+                        '<button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">&#128074;</span> <span>0 Respect</span></button>' +
+                        '<button class="action-btn"><span class="action-icon">&#128172;</span> <span>0 Comments</span></button>' +
+                    '</div></div>';
             }).join('');
         }
 
         function refreshAchievements(user) {
             var grid = document.getElementById('achievementsGrid');
             if (!grid) return;
-            var workouts = (user.workouts || []).filter(function(w){ return w; });
-            var count = workouts.length;
-            var totalMinutes = workouts.reduce(function(s,w){ return s + (w.duration||0); }, 0);
-            var allExNames = new Set();
-            workouts.forEach(function(w){
-                (w.exercises||[]).forEach(function(e){ if(e && e.name) allExNames.add(e.name.toLowerCase()); });
+            var workouts     = (user.workouts || []).filter(function(w){return w;});
+            var count        = workouts.length;
+            var totalMinutes = workouts.reduce(function(s,w){return s+(w.duration||0);}, 0);
+            var allExNames   = new Set();
+            workouts.forEach(function(w) {
+                (w.exercises||[]).forEach(function(e){ if(e&&e.name) allExNames.add(e.name.toLowerCase()); });
             });
-
             var all = [
-                { icon:'&#127949;', title:'First Rep',        desc:'Log your first workout',         earned: count >= 1 },
-                { icon:'&#128287;', title:'10 Workout Club',  desc:'Log 10 workouts',                earned: count >= 10 },
-                { icon:'&#127942;', title:'25 Workout Club',  desc:'Log 25 workouts',                earned: count >= 25 },
-                { icon:'&#128175;', title:'100 Workout Club', desc:'Log 100 workouts',               earned: count >= 100 },
-                { icon:'&#9203;',   title:'Hour Grinder',     desc:'Log 60+ min in one workout',     earned: workouts.some(function(w){ return w.duration >= 60; }) },
-                { icon:'&#128336;', title:'Time Warrior',     desc:'Log 1,000 total minutes',        earned: totalMinutes >= 1000 },
-                { icon:'&#128170;', title:'Variety Pack',     desc:'Log 5 different exercises',      earned: allExNames.size >= 5 },
-                { icon:'&#128293;', title:'On Fire',          desc:'Log 3 workouts in one week',     earned: hasWorkoutsInWeek(workouts, 3) },
-                { icon:'&#9889;',   title:'Consistent',       desc:'Log workouts 2 weeks in a row',  earned: hasWeeklyStreak(workouts, 2) },
-                { icon:'&#129470;', title:'Iron Habit',       desc:'Log workouts 4 weeks in a row',  earned: hasWeeklyStreak(workouts, 4) },
+                { icon:'&#127949;', title:'First Rep',        desc:'Log your first workout',        earned: count >= 1 },
+                { icon:'&#128287;', title:'10 Workout Club',  desc:'Log 10 workouts',               earned: count >= 10 },
+                { icon:'&#127942;', title:'25 Workout Club',  desc:'Log 25 workouts',               earned: count >= 25 },
+                { icon:'&#9203;',   title:'Hour Grinder',     desc:'Log 60+ min in one workout',    earned: workouts.some(function(w){return w.duration>=60;}) },
+                { icon:'&#128336;', title:'Time Warrior',     desc:'Log 1,000 total minutes',       earned: totalMinutes>=1000 },
+                { icon:'&#128170;', title:'Variety Pack',     desc:'Log 5 different exercises',     earned: allExNames.size>=5 },
+                { icon:'&#128293;', title:'On Fire',          desc:'Log 3 workouts in one week',    earned: hasWorkoutsInWeek(workouts,3) },
+                { icon:'&#9889;',   title:'Consistent',       desc:'Log workouts 2 weeks in a row', earned: hasWeeklyStreak(workouts,2) },
             ];
-
-            var earned = all.filter(function(a){ return a.earned; });
-            var locked = all.filter(function(a){ return !a.earned; });
-
+            var earned = all.filter(function(a){return a.earned;});
+            var locked = all.filter(function(a){return !a.earned;});
             var html = '';
             if (earned.length === 0) {
-                html += '<div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:#999;">' +
-                    '<div style="font-size:48px;margin-bottom:15px;">&#127919;</div>' +
-                    '<h3 style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">No Achievements Yet</h3>' +
-                    '<p>Log workouts to start earning achievements!</p></div>';
+                html += '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">' +
+                    '<h3 style="font-family:\'Bebas Neue\',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">No Achievements Yet</h3>' +
+                    '<p>Log workouts to start earning!</p></div>';
             } else {
-                html += '<div style="grid-column:1/-1;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;color:var(--primary);padding:10px 0 5px;">EARNED (' + earned.length + ')</div>';
-                earned.forEach(function(a){ html += earnedCard(a); });
+                html += '<div style="grid-column:1/-1;font-family:\'Bebas Neue\',cursive;font-size:18px;letter-spacing:2px;color:var(--primary);padding:10px 0 5px;">EARNED (' + earned.length + ')</div>';
+                earned.forEach(function(a) {
+                    html += '<div class="achievement-card" style="border-color:var(--primary);">' +
+                        '<div class="achievement-icon">' + a.icon + '</div>' +
+                        '<div class="achievement-title">' + a.title + '</div>' +
+                        '<div class="achievement-description">' + a.desc + '</div></div>';
+                });
             }
             if (locked.length > 0) {
-                html += '<div style="grid-column:1/-1;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;color:#555;padding:20px 0 5px;">LOCKED (' + locked.length + ')</div>';
-                locked.forEach(function(a){ html += lockedCard(a); });
+                html += '<div style="grid-column:1/-1;font-family:\'Bebas Neue\',cursive;font-size:18px;letter-spacing:2px;color:#555;padding:20px 0 5px;">LOCKED (' + locked.length + ')</div>';
+                locked.forEach(function(a) {
+                    html += '<div class="achievement-card" style="opacity:0.35;filter:grayscale(1);">' +
+                        '<div class="achievement-icon">&#128274;</div>' +
+                        '<div class="achievement-title" style="color:#666;">' + a.title + '</div>' +
+                        '<div class="achievement-description">' + a.desc + '</div></div>';
+                });
             }
             grid.innerHTML = html;
         }
 
-        function earnedCard(a) {
-            return '<div class="achievement-card" style="border-color:var(--primary);">' +
-                '<div class="achievement-icon">' + a.icon + '</div>' +
-                '<div class="achievement-title">' + a.title + '</div>' +
-                '<div class="achievement-description">' + a.desc + '</div>' +
-                '</div>';
-        }
-
-        function lockedCard(a) {
-            return '<div class="achievement-card" style="opacity:0.35;filter:grayscale(1);">' +
-                '<div class="achievement-icon">&#128274;</div>' +
-                '<div class="achievement-title" style="color:#666;">' + a.title + '</div>' +
-                '<div class="achievement-description">' + a.desc + '</div>' +
-                '</div>';
-        }
-
         function hasWorkoutsInWeek(workouts, n) {
-            const weeks = {};
-            workouts.forEach(w => {
-                const d = new Date(w.created_at || w.date || Date.now());
-                const key = `${d.getFullYear()}-W${Math.floor((d - new Date(d.getFullYear(),0,1)) / 604800000)}`;
-                weeks[key] = (weeks[key] || 0) + 1;
+            var weeks = {};
+            workouts.forEach(function(w) {
+                var d   = new Date(w.created_at || w.date || Date.now());
+                var key = d.getFullYear() + '-W' + Math.floor((d - new Date(d.getFullYear(),0,1)) / 604800000);
+                weeks[key] = (weeks[key]||0) + 1;
             });
-            return Object.values(weeks).some(v => v >= n);
+            return Object.values(weeks).some(function(v){return v>=n;});
         }
 
         function hasWeeklyStreak(workouts, weeks) {
-            if (workouts.length === 0) return false;
-            const weekNums = [...new Set(workouts.map(w => {
-                const d = new Date(w.created_at || w.date || Date.now());
-                return `${d.getFullYear()}-W${Math.floor((d - new Date(d.getFullYear(),0,1)) / 604800000)}`;
+            if (!workouts.length) return false;
+            var weekNums = [...new Set(workouts.map(function(w) {
+                var d = new Date(w.created_at || w.date || Date.now());
+                return d.getFullYear() + '-W' + Math.floor((d - new Date(d.getFullYear(),0,1)) / 604800000);
             }))].sort();
-            let streak = 1, best = 1;
-            for (let i = 1; i < weekNums.length; i++) {
-                const prev = weekNums[i-1].split('-W'), cur = weekNums[i].split('-W');
-                const diff = (parseInt(cur[1]) - parseInt(prev[1])) + (parseInt(cur[0]) - parseInt(prev[0])) * 52;
-                streak = diff === 1 ? streak + 1 : 1;
+            var streak = 1, best = 1;
+            for (var i = 1; i < weekNums.length; i++) {
+                var prev = weekNums[i-1].split('-W'), cur = weekNums[i].split('-W');
+                var diff = (parseInt(cur[1])-parseInt(prev[1])) + (parseInt(cur[0])-parseInt(prev[0]))*52;
+                streak = diff === 1 ? streak+1 : 1;
                 best = Math.max(best, streak);
             }
             return best >= weeks;
         }
 
-        // â”€â”€ SIGNUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── SIGNUP ────────────────────────────────────────────────────────
         async function handleSignup() {
-            const fullName = document.getElementById('signupName').value.trim();
-            const username = document.getElementById('signupUsername').value.trim().toLowerCase();
-            const email    = document.getElementById('signupEmail').value.trim().toLowerCase();
-            const password = document.getElementById('signupPassword').value;
+            var fullName = document.getElementById('signupName').value.trim();
+            var username = document.getElementById('signupUsername').value.trim().toLowerCase();
+            var email    = document.getElementById('signupEmail').value.trim().toLowerCase();
+            var password = document.getElementById('signupPassword').value;
 
-            if (!fullName || !username || !email || !password) { showAuthError('signup','Please fill in all fields.'); return; }
+            if (!fullName||!username||!email||!password) { showAuthError('signup','Please fill in all fields.'); return; }
             if (username.length < 3) { showAuthError('signup','Username must be at least 3 characters.'); return; }
             if (password.length < 6) { showAuthError('signup','Password must be at least 6 characters.'); return; }
 
-            const btn = document.querySelector('#signupForm .auth-submit-btn');
+            var btn = document.querySelector('#signupForm .auth-submit-btn');
             btn.textContent = 'Creating...'; btn.disabled = true;
 
             try {
-                // Check username availability
-                const taken = await sb(`profiles?username=eq.${username}&select=id`);
+                var taken = await sb('profiles?username=eq.' + username + '&select=id');
                 if (taken && taken.length > 0) { showAuthError('signup','Username already taken.'); btn.textContent='Create Account'; btn.disabled=false; return; }
 
-                const authData = await sbAuth('signup', email, password);
-
-                // Supabase may require email confirmation â€” handle both cases
-                const userId = authData.user?.id || authData.session?.user?.id;
-                const token  = authData.access_token || authData.session?.access_token;
+                var authData = await sbAuth('signup', email, password);
+                var userId   = authData.user && authData.user.id;
+                var token    = authData.access_token || (authData.session && authData.session.access_token);
 
                 if (!userId) {
-                    showAuthError('signup', 'Please check your email and confirm your account, then log in.');
+                    showAuthError('signup', 'Check your email to confirm your account, then log in.');
                     btn.textContent = 'Create Account'; btn.disabled = false; return;
                 }
 
                 window._sbToken  = token;
                 window._sbUserId = userId;
-                if (token) saveSession({ access_token: token, user: { id: userId }, expires_at: authData.expires_at || (Date.now()/1000 + 3600) });
+                if (token) saveSession({ access_token: token, user: { id: userId }, expires_at: authData.expires_at || (Date.now()/1000+3600) });
 
-                const initials = fullName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-                const profile = { id: userId, username, full_name: fullName, fullName, initials, bio: '', followers: 0, following: 0 };
-                await sb('profiles', { method:'POST', body: profile });
+                var initials = fullName.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2);
+                var profile  = { id: userId, username: username, full_name: fullName, fullName: fullName, initials: initials, bio: '', followers: 0, following: 0, workouts: [] };
+                await sb('profiles', { method:'POST', body: { id: userId, username: username, full_name: fullName, initials: initials, bio: '', followers: 0, following: 0 } });
 
-                profile.workouts = [];
                 setCurrentUser(profile);
                 loadProfileForUser(profile);
                 await loadFeedFromSupabase();
-                await loadFollowsFromDB();
                 navigateToFeed();
             } catch(err) {
                 showAuthError('signup', err.message);
@@ -3614,55 +3337,34 @@
             }
         }
 
-        // â”€â”€ LOGIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // ── LOGIN ─────────────────────────────────────────────────────────
         async function handleLogin() {
-            const identifier = document.getElementById('loginIdentifier').value.trim().toLowerCase();
-            const password   = document.getElementById('loginPassword').value;
+            var email    = document.getElementById('loginIdentifier').value.trim().toLowerCase();
+            var password = document.getElementById('loginPassword').value;
 
-            if (!identifier || !password) { showAuthError('login','Please fill in all fields.'); return; }
+            if (!email||!password) { showAuthError('login','Please fill in all fields.'); return; }
 
-            const btn = document.querySelector('#loginForm .auth-submit-btn');
+            var btn = document.querySelector('#loginForm .auth-submit-btn');
             btn.textContent = 'Logging in...'; btn.disabled = true;
 
             try {
-                // Allow login by username â€” look up their email first
-                let email = identifier;
-                if (!identifier.includes('@')) {
-                    const rows = await sb(`profiles?username=eq.${identifier}&select=id`);
-                    if (!rows || rows.length === 0) { showAuthError('login','No account with that username.'); btn.textContent='Log In'; btn.disabled=false; return; }
-                    // We need email â€” prompt them to use email
-                    showAuthError('login', 'Please log in with your email address (username login coming soon).');
-                    btn.textContent='Log In'; btn.disabled=false; return;
-                }
-
-                const authData = await sbAuth('token?grant_type=password', email, password);
+                var authData = await sbAuth('token?grant_type=password', email, password);
                 window._sbToken  = authData.access_token;
                 window._sbUserId = authData.user.id;
                 saveSession(authData);
 
-                // Load profile
-                const profiles = await sb(`profiles?id=eq.${authData.user.id}&select=*`);
-                let profile = profiles && profiles[0];
-
-                // Profile might not exist yet (e.g. email confirmation was on during signup)
+                var profiles = await sb('profiles?id=eq.' + authData.user.id + '&select=*');
+                var profile  = profiles && profiles[0];
                 if (!profile) {
-                    profile = {
-                        id: authData.user.id,
-                        username: email.split('@')[0],
-                        full_name: email.split('@')[0],
-                        initials: email.slice(0,2).toUpperCase(),
-                        bio: '', followers: 0, following: 0
-                    };
-                    await sb('profiles', { method: 'POST', body: profile });
+                    profile = { id: authData.user.id, username: email.split('@')[0], full_name: email.split('@')[0], initials: email.slice(0,2).toUpperCase(), bio:'', followers:0, following:0 };
+                    await sb('profiles', { method:'POST', body: profile });
                 }
-
-                const workouts = await sb(`workouts?user_id=eq.${authData.user.id}&order=created_at.desc&select=*`);
+                var workouts = await sb('workouts?user_id=eq.' + authData.user.id + '&order=created_at.desc&select=*');
                 profile.workouts = workouts || [];
 
                 setCurrentUser(profile);
                 loadProfileForUser(profile);
                 await loadFeedFromSupabase();
-                await loadFollowsFromDB();
                 navigateToFeed();
             } catch(err) {
                 showAuthError('login', err.message.includes('Invalid') ? 'Incorrect email or password.' : err.message);
@@ -3670,470 +3372,216 @@
             }
         }
 
-        // â”€â”€ FEED FROM SUPABASE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        async function loadFeedFromSupabase() {
-            try {
-                var workouts = await sb('workouts?order=created_at.desc&limit=50&select=*,profiles(full_name,initials,username)');
-                var feed = document.getElementById('mainFeed') || document.querySelector('.activity-feed');
-                if (!feed) return;
-                if (!workouts || !workouts.length) {
-                    feed.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#555;">' +
-                        '<div style="font-size:64px;margin-bottom:20px;opacity:0.4">&#127947;</div>' +
-                        '<h3 style="font-family:Bebas Neue,cursive;font-size:32px;color:#444;letter-spacing:3px;margin-bottom:10px;">No Workouts Yet</h3>' +
-                        '<p style="color:#555;font-size:14px;letter-spacing:1px;">Log in and hit the + to post your first workout.</p></div>';
-                    return;
-                }
-                // Clear existing DB cards
-                feed.querySelectorAll('.activity-card[data-db]').forEach(function(c){ c.remove(); });
-                var frag = document.createDocumentFragment();
-                workouts.forEach(function(w) {
-                    if (!w || !(w.name || w.workout_name)) return;
-                    var card = buildWorkoutCard(w, w.profiles);
-                    card.dataset.db = '1';
-                    frag.appendChild(card);
-                });
-                feed.innerHTML = '';
-                feed.appendChild(frag);
-            } catch(e) { console.warn('Feed load error:', e.message); }
-        }
-
-        function buildWorkoutCard(w, profile) {
-            var name     = (profile && (profile.full_name || profile.username)) || 'Unknown';
-            var initials = (profile && profile.initials) || name.split(' ').map(function(x){return x[0]||'';}).join('').toUpperCase().slice(0,2) || '??';
-            var exercises = Array.isArray(w.exercises) ? w.exercises : [];
-            var photoHTML   = w.photo_url ? '<img src="' + w.photo_url + '" class="workout-photo" alt="">' : '';
-            var captionHTML = w.caption   ? '<p class="workout-caption">&ldquo;' + w.caption + '&rdquo;</p>' : '';
-            var exHTML = exercises.length
-                ? exercises.filter(function(ex){ return ex && ex.name; }).map(function(ex){
-                    return '<div class="exercise-item"><span class="exercise-name">' + ex.name + '</span>' +
-                        '<span class="exercise-details">' + (ex.sets||'?') + ' x ' + (ex.reps||'?') + (ex.weight ? ' @ '+ex.weight+' lbs' : '') + '</span></div>';
-                  }).join('')
-                : '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
-            var rawDate = w.created_at || w.date || null;
-            var d = rawDate ? new Date(rawDate) : null;
-            var dateStr = (d && !isNaN(d)) ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'Recently';
-            var wName = (w.name || w.workout_name || 'Untitled').toUpperCase();
-            var card = document.createElement('div');
-            card.className = 'activity-card';
-            card.innerHTML =
-                '<div class="activity-header">' +
-                    '<div class="user-avatar">' + initials + '</div>' +
-                    '<div class="activity-user-info"><h3>' + name + '</h3><span class="activity-time">' + dateStr + '</span></div>' +
-                '</div>' +
-                '<h2 class="workout-title">' + wName + '</h2>' +
-                photoHTML + captionHTML +
-                '<div class="workout-details">' +
-                    '<button class="details-toggle" onclick="toggleDetails(this)">' +
-                        '<span>View Workout Details</span>' +
-                        '<span class="details-toggle-icon" style="display:inline-block;transition:transform 0.3s">&#9660;</span>' +
-                    '</button>' +
-                    '<div class="workout-details-content">' +
-                        '<div class="workout-stats">' +
-                            '<div class="workout-stat"><div class="workout-stat-value">' + exercises.length + '</div><div class="workout-stat-label">Exercises</div></div>' +
-                            '<div class="workout-stat"><div class="workout-stat-value">' + (w.duration || '&mdash;') + '</div><div class="workout-stat-label">Minutes</div></div>' +
-                        '</div>' +
-                        '<div class="exercise-list">' + exHTML + '</div>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="activity-actions">' +
-                    '<button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">&#128074;</span><span>0 Respect</span></button>' +
-                    '<button class="action-btn"><span class="action-icon">&#128172;</span><span>0 Comments</span></button>' +
-                    '<button class="action-btn"><span class="action-icon">&#128293;</span><span>PR!</span></button>' +
-                '</div>';
-            return card;
-        }
-
-
-        // â”€â”€ NAVIGATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        function navigateToFeed() {
-            var sp = document.getElementById('signupPage');
-            var lp = document.getElementById('loginPage');
-            if (sp) { sp.classList.remove('active'); sp.style.display = 'none'; }
-            if (lp) { lp.classList.remove('active'); lp.style.display = 'none'; }
-            getAllPages().forEach(function(p) { if (p) p.classList.remove('active'); });
-            var fp = document.querySelector('.feed-page');
-            if (fp) fp.classList.add('active');
-            document.querySelectorAll('.nav-link').forEach(function(l) { l.classList.remove('active'); });
-            var feedLink = document.querySelector('.nav-link[data-page="feed"]');
-            if (feedLink) feedLink.classList.add('active');
-            loadFeedFromSupabase().catch(function(){});
-        }
-
-        // ── FOLLOW SYSTEM ──────────────────────────────────────────────
-        // In-memory follow state (persists per session)
-        window._following = new Set(
-            JSON.parse(localStorage.getItem('ss_following') || '[]')
-        );
-
-        function saveFollowing() {
-            try { localStorage.setItem('ss_following', JSON.stringify([...window._following])); } catch(e) {}
-        }
-
-        async function loadFollowsFromDB() {
-            if (!window._sbUserId) return;
-            try {
-                const rows = await sb(`follows?follower_id=eq.${window._sbUserId}&select=following_id`);
-                if (rows) {
-                    rows.forEach(r => window._following.add(String(r.following_id)));
-                    saveFollowing();
-                }
-            } catch(e) { console.warn('Load follows error:', e.message); }
-        }
-
-
+        // ── FOLLOW SYSTEM ─────────────────────────────────────────────────
         function isFollowing(userId) { return window._following.has(String(userId)); }
 
         async function toggleFollow(userId, btn) {
-            const uid = String(userId);
-            const currentUser = getCurrentUser();
-            if (!currentUser) { alert('Please log in to follow people.'); return; }
-
+            var uid = String(userId);
+            if (!getCurrentUser()) { alert('Please log in to follow people.'); return; }
             if (isFollowing(uid)) {
                 window._following.delete(uid);
                 btn.textContent = 'Follow';
                 btn.classList.remove('following');
-                // Update DB
-                try {
-                    await sb(`follows?follower_id=eq.${window._sbUserId}&following_id=eq.${uid}`,
-                        { method: 'DELETE', headers: { 'Prefer': '' } });
-                } catch(e) { console.warn('Unfollow DB error:', e.message); }
+                try { await sb('follows?follower_id=eq.' + window._sbUserId + '&following_id=eq.' + uid, { method:'DELETE', prefer:'' }); } catch(e) {}
             } else {
                 window._following.add(uid);
                 btn.textContent = 'Following';
                 btn.classList.add('following');
-                // Update DB
-                try {
-                    await sb('follows', { method: 'POST',
-                        body: { follower_id: window._sbUserId, following_id: uid }
-                    });
-                } catch(e) { console.warn('Follow DB error:', e.message); }
+                try { await sb('follows', { method:'POST', body:{ follower_id: window._sbUserId, following_id: uid } }); } catch(e) {}
             }
             saveFollowing();
-            // Refresh follower counts on search results
-            document.querySelectorAll(`[data-user-id="${uid}"] .person-stat-num`).forEach(el => {
-                // Optional: update displayed count live
-            });
         }
 
-        // ── SEARCH / PEOPLE FEED ───────────────────────────────────────
-        let _allProfiles = [];
+        // ── SEARCH / PEOPLE ───────────────────────────────────────────────
+        var _allProfiles = [];
 
         async function loadPeopleFeed() {
             try {
-                const profiles = await sb('profiles?select=id,username,full_name,initials,bio,followers,following&limit=50');
-                const currentUser = getCurrentUser();
-                _allProfiles = (profiles || []).filter(p => p.id !== currentUser?.id);
-                renderPeopleResults(_allProfiles);
+                var profiles = await sb('profiles?select=id,username,full_name,initials,bio,followers,following&limit=50');
+                var me = getCurrentUser();
+                _allProfiles = (profiles||[]).filter(function(p){ return !me || p.id !== me.id; });
+                renderPeopleResults(_allProfiles, '');
             } catch(e) {
                 console.warn('Load people error:', e.message);
-                renderPeopleResults([]);
+                renderPeopleResults([], '');
             }
         }
 
         function handlePeopleSearch(query) {
-            const q = query.trim().toLowerCase();
-            if (!q) {
-                renderPeopleResults(_allProfiles);
-                return;
-            }
-            const filtered = _allProfiles.filter(p =>
-                (p.full_name || '').toLowerCase().includes(q) ||
-                (p.username || '').toLowerCase().includes(q) ||
-                (p.bio || '').toLowerCase().includes(q)
-            );
-            renderPeopleResults(filtered, q);
+            var q = query.trim().toLowerCase();
+            if (!q) { renderPeopleResults(_allProfiles, ''); return; }
+            renderPeopleResults(_allProfiles.filter(function(p) {
+                return (p.full_name||'').toLowerCase().includes(q) ||
+                       (p.username||'').toLowerCase().includes(q) ||
+                       (p.bio||'').toLowerCase().includes(q);
+            }), q);
         }
 
         function renderPeopleResults(people, query) {
-            const grid = document.getElementById('peopleGrid');
-            const title = document.getElementById('searchResultsTitle');
-            const empty = document.getElementById('searchEmpty');
+            var grid  = document.getElementById('peopleGrid');
+            var title = document.getElementById('searchResultsTitle');
+            var empty = document.getElementById('searchEmpty');
             if (!grid) return;
-
-            if (title) {
-                if (query) {
-                    title.textContent = `Results for "${query}"`;
-                    title.style.display = 'block';
-                } else {
-                    title.textContent = 'All Athletes';
-                    title.style.display = 'block';
-                }
-            }
-
-            if (people.length === 0) {
-                grid.innerHTML = '';
-                if (empty) empty.style.display = 'block';
-                return;
-            }
+            if (title) { title.textContent = query ? 'Results for "' + query + '"' : 'All Athletes'; title.style.display = 'block'; }
+            if (!people.length) { grid.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
             if (empty) empty.style.display = 'none';
-
-            grid.innerHTML = people.map(p => {
-                const initials = p.initials || (p.full_name || '??').slice(0,2).toUpperCase();
-                const name = p.full_name || p.username || 'Unknown';
-                const bio = p.bio || 'No bio yet';
-                const following = isFollowing(p.id);
-                return `
-                <div class="person-card" data-user-id="${p.id}" onclick="openUserProfile('${p.id}')">
-                    <div class="person-avatar">${initials}</div>
-                    <div class="person-info">
-                        <div class="person-name">${name}</div>
-                        <div class="person-username">@${p.username || 'unknown'}</div>
-                        <div class="person-bio">${bio}</div>
-                    </div>
-                    <div class="person-stats">
-                        <div class="person-stat">
-                            <div class="person-stat-num">${p.followers || 0}</div>
-                            <div class="person-stat-lbl">Followers</div>
-                        </div>
-                        <div class="person-stat">
-                            <div class="person-stat-num">${p.following || 0}</div>
-                            <div class="person-stat-lbl">Following</div>
-                        </div>
-                    </div>
-                    <button class="follow-btn ${following ? 'following' : ''}"
-                        onclick="event.stopPropagation(); toggleFollow('${p.id}', this)">
-                        ${following ? 'Following' : 'Follow'}
-                    </button>
-                </div>`;
+            grid.innerHTML = people.map(function(p) {
+                var name     = p.full_name || p.username || 'Unknown';
+                var initials = p.initials  || name.split(' ').map(function(x){return x[0]||'';}).join('').toUpperCase().slice(0,2);
+                var following = isFollowing(p.id);
+                return '<div class="person-card" data-user-id="' + p.id + '">' +
+                    '<div class="person-avatar">' + initials + '</div>' +
+                    '<div class="person-info">' +
+                        '<div class="person-name">' + name + '</div>' +
+                        '<div class="person-username">@' + (p.username||'unknown') + '</div>' +
+                        '<div class="person-bio">' + (p.bio||'No bio yet') + '</div>' +
+                    '</div>' +
+                    '<div class="person-stats">' +
+                        '<div class="person-stat"><div class="person-stat-num">' + (p.followers||0) + '</div><div class="person-stat-lbl">Followers</div></div>' +
+                        '<div class="person-stat"><div class="person-stat-num">' + (p.following||0) + '</div><div class="person-stat-lbl">Following</div></div>' +
+                    '</div>' +
+                    '<button class="follow-btn ' + (following?'following':'') + '" onclick="event.stopPropagation();toggleFollow(\'' + p.id + '\',this)">' + (following?'Following':'Follow') + '</button>' +
+                    '</div>';
             }).join('');
         }
 
-        function openUserProfile(userId) {
-            // In a full app this would navigate to that user's profile page
-            // For now, load their workouts in a quick preview
-            console.log('View profile:', userId);
-        }
-
-        // ── PROGRESS PAGE – REAL DATA ───────────────────────────────────
+        // ── PROGRESS ──────────────────────────────────────────────────────
         function renderProgressPage() {
-            const user = getCurrentUser();
-            const workouts = user?.workouts || [];
-
-            // Build a map: exercise name -> sorted list of {date, weight}
-            const exerciseMap = {};
-            workouts.forEach(w => {
-                const date = w.created_at || w.date || new Date().toISOString();
-                (w.exercises || []).forEach(ex => {
-                    if (!ex.name || !ex.weight) return;
-                    const key = ex.name.trim().toLowerCase();
-                    if (!exerciseMap[key]) exerciseMap[key] = { displayName: ex.name.trim(), entries: [] };
-                    exerciseMap[key].entries.push({ date, weight: parseFloat(ex.weight) });
+            var user     = getCurrentUser();
+            var workouts = user ? (user.workouts||[]) : [];
+            var exMap    = {};
+            workouts.forEach(function(w) {
+                var date = w.created_at || w.date || new Date().toISOString();
+                (w.exercises||[]).forEach(function(ex) {
+                    if (!ex||!ex.name||!ex.weight) return;
+                    var key = ex.name.trim().toLowerCase();
+                    if (!exMap[key]) exMap[key] = { displayName: ex.name.trim(), entries: [] };
+                    exMap[key].entries.push({ date: date, weight: parseFloat(ex.weight) });
                 });
             });
-
-            // Sort entries by date
-            Object.values(exerciseMap).forEach(e => {
-                e.entries.sort((a, b) => new Date(a.date) - new Date(b.date));
+            Object.values(exMap).forEach(function(e) {
+                e.entries.sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
             });
 
-            const exerciseKeys = Object.keys(exerciseMap);
-
-            // Update exercise selector buttons
-            const selector = document.querySelector('.exercise-selector');
+            window._exerciseMap = exMap;
+            var keys = Object.keys(exMap);
+            var selector = document.querySelector('.exercise-selector');
             if (selector) {
-                if (exerciseKeys.length === 0) {
-                    selector.innerHTML = `<div style="color:#555; font-size:14px; padding:20px; text-align:center; grid-column:1/-1;">Log workouts with weights to see your progress here!</div>`;
-                } else {
-                    selector.innerHTML = exerciseKeys.map((key, i) =>
-                        `<button class="exercise-btn ${i===0?'active':''}" data-exercise="${key}"
-                            onclick="selectProgressExercise('${key}', this)">
-                            ${exerciseMap[key].displayName}
-                        </button>`
-                    ).join('');
-                }
+                selector.innerHTML = keys.length === 0
+                    ? '<div style="color:#555;font-size:14px;padding:20px;text-align:center;grid-column:1/-1;">Log workouts with weights to see progress here.</div>'
+                    : keys.map(function(key,i) {
+                        return '<button class="exercise-btn ' + (i===0?'active':'') + '" onclick="selectProgressExercise(\'' + key + '\',this)">' + exMap[key].displayName + '</button>';
+                      }).join('');
             }
 
-            // Show first exercise or no-data state
-            if (exerciseKeys.length > 0) {
-                renderProgressExercise(exerciseKeys[0], exerciseMap[exerciseKeys[0]]);
-                window._exerciseMap = exerciseMap;
+            if (keys.length > 0) {
+                renderProgressExercise(keys[0], exMap[keys[0]]);
             } else {
-                renderProgressNoData();
+                var titleEl = document.getElementById('chartTitle');
+                if (titleEl) titleEl.textContent = 'Your Progress';
+                ['currentPR','totalIncrease','avgGain'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent='&mdash;'; });
             }
-
-            // Update history table
             renderHistoryTable(workouts);
         }
 
         function selectProgressExercise(key, btn) {
-            document.querySelectorAll('.exercise-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.exercise-btn').forEach(function(b){ b.classList.remove('active'); });
             btn.classList.add('active');
-            const data = window._exerciseMap?.[key];
-            if (data) renderProgressExercise(key, data);
+            if (window._exerciseMap && window._exerciseMap[key]) renderProgressExercise(key, window._exerciseMap[key]);
         }
 
         function renderProgressExercise(key, exData) {
-            const entries = exData.entries;
-            const weights = entries.map(e => e.weight);
-            const pr = Math.max(...weights);
-            const first = weights[0] || 0;
-            const increase = pr - first;
-            const sessions = entries.length;
-
-            // Update title
-            const titleEl = document.getElementById('chartTitle');
-            if (titleEl) titleEl.innerHTML = `${exData.displayName} Progress <span class="pr-badge">PR: ${pr} LBS</span>`;
-
-            // Update stat boxes
-            const prEl = document.getElementById('currentPR');
-            const incEl = document.getElementById('totalIncrease');
-            const avgEl = document.getElementById('avgGain');
-            if (prEl) prEl.textContent = pr + ' lbs';
-            if (incEl) incEl.textContent = (increase >= 0 ? '+' : '') + increase + ' lbs';
-            if (avgEl) avgEl.textContent = sessions + ' sessions';
-
-            // Update/create chart
-            const canvas = document.getElementById('progressChart');
-            if (!canvas) return;
-
-            const labels = entries.map(e => {
-                const d = new Date(e.date);
-                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            });
-
+            var entries = exData.entries;
+            var weights = entries.map(function(e){return e.weight;});
+            var pr      = Math.max.apply(null, weights);
+            var increase = pr - (weights[0]||0);
+            var titleEl  = document.getElementById('chartTitle');
+            if (titleEl) titleEl.innerHTML = exData.displayName + ' Progress <span class="pr-badge">PR: ' + pr + ' LBS</span>';
+            var set = function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
+            set('currentPR', pr + ' lbs');
+            set('totalIncrease', (increase>=0?'+':'') + increase + ' lbs');
+            set('avgGain', entries.length + ' sessions');
+            var labels = entries.map(function(e){ var d=new Date(e.date); return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); });
             if (window.progressChart) {
                 window.progressChart.data.labels = labels;
                 window.progressChart.data.datasets[0].data = weights;
                 window.progressChart.update();
             } else {
-                initProgressChartWithData(labels, weights);
-            }
-        }
-
-        function renderProgressNoData() {
-            const chartContainer = document.querySelector('.chart-container');
-            if (!chartContainer) return;
-            const chartWrapper = chartContainer.querySelector('.chart-wrapper');
-            if (chartWrapper) {
-                chartWrapper.innerHTML = `<div class="no-data-notice">
-                    <div style="font-size:48px;margin-bottom:15px;">📈</div>
-                    <h3>No Lift Data Yet</h3>
-                    <p style="color:#666;font-size:14px;">Log workouts with exercises and weights<br>to track your progress here.</p>
-                </div>`;
-            }
-            const titleEl = document.getElementById('chartTitle');
-            if (titleEl) titleEl.textContent = 'Your Progress';
-            ['currentPR','totalIncrease','avgGain'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.textContent = '—';
-            });
-        }
-
-        function initProgressChartWithData(labels, data) {
-            const canvas = document.getElementById('progressChart');
-            if (!canvas) return;
-            if (window.progressChart) { window.progressChart.destroy(); window.progressChart = null; }
-            const ctx = canvas.getContext('2d');
-            window.progressChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels,
-                    datasets: [{
-                        label: 'Weight (lbs)',
-                        data,
-                        borderColor: '#ff6b35',
-                        backgroundColor: 'rgba(255, 107, 53, 0.2)',
-                        borderWidth: 4,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 7,
-                        pointBackgroundColor: '#ff6b35',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 3,
-                        pointHoverRadius: 10,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#2a2a2a',
-                            titleColor: '#ff6b35',
-                            bodyColor: '#fff',
-                            borderColor: '#ff6b35',
-                            borderWidth: 2,
-                            padding: 15,
-                            displayColors: false,
-                            callbacks: { label: ctx => ctx.parsed.y + ' lbs' }
+                var canvas = document.getElementById('progressChart');
+                if (canvas) {
+                    window.progressChart = new Chart(canvas.getContext('2d'), {
+                        type: 'line',
+                        data: { labels: labels, datasets: [{ label:'Weight (lbs)', data:weights, borderColor:'#ff6b35', backgroundColor:'rgba(255,107,53,0.2)', borderWidth:4, fill:true, tension:0.4, pointRadius:7, pointBackgroundColor:'#ff6b35', pointBorderColor:'#fff', pointBorderWidth:3 }] },
+                        options: { responsive:true, maintainAspectRatio:false,
+                            plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#2a2a2a', titleColor:'#ff6b35', bodyColor:'#fff', borderColor:'#ff6b35', borderWidth:2, padding:15, displayColors:false, callbacks:{ label:function(c){return c.parsed.y+' lbs';} } } },
+                            scales:{ y:{ beginAtZero:false, grid:{color:'rgba(255,255,255,0.08)'}, ticks:{color:'#999',font:{family:'Roboto Mono',size:13},callback:function(v){return v+' lbs';}} }, x:{ grid:{color:'rgba(255,255,255,0.08)'}, ticks:{color:'#999',font:{family:'Roboto Mono',size:13}} } }
                         }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: 'rgba(255,255,255,0.08)' },
-                            ticks: {
-                                color: '#999',
-                                font: { family: 'Roboto Mono', size: 13 },
-                                callback: v => v + ' lbs'
-                            }
-                        },
-                        x: {
-                            grid: { color: 'rgba(255,255,255,0.08)' },
-                            ticks: { color: '#999', font: { family: 'Roboto Mono', size: 13 } }
-                        }
-                    }
+                    });
                 }
-            });
+            }
         }
 
         function renderHistoryTable(workouts) {
-            const tbody = document.getElementById('historyTableBody');
+            var tbody = document.getElementById('historyTableBody');
             if (!tbody) return;
-            // Flatten all exercises from all workouts
-            const rows = [];
-            workouts.forEach(w => {
-                const date = w.created_at || w.date;
-                (w.exercises || []).forEach(ex => {
-                    if (!ex.name) return;
-                    rows.push({
-                        date: new Date(date),
-                        name: ex.name,
-                        weight: ex.weight ? parseFloat(ex.weight) : null,
-                        sets: ex.sets,
-                        reps: ex.reps,
-                    });
+            var rows = [];
+            workouts.forEach(function(w) {
+                var date = w.created_at || w.date;
+                (w.exercises||[]).forEach(function(ex) {
+                    if (!ex||!ex.name) return;
+                    rows.push({ date: new Date(date||Date.now()), name: ex.name, weight: ex.weight?parseFloat(ex.weight):null, sets:ex.sets, reps:ex.reps });
                 });
             });
-            rows.sort((a, b) => b.date - a.date);
-
+            rows.sort(function(a,b){return b.date-a.date;});
             if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#555;padding:30px;">No workout history yet. Log your first workout!</td></tr>`;
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#555;padding:30px;">No history yet.</td></tr>';
                 return;
             }
-
-            // Calculate trends
-            const lastWeightByExercise = {};
-            tbody.innerHTML = rows.slice(0, 20).map(row => {
-                const key = row.name.toLowerCase();
-                const prev = lastWeightByExercise[key];
-                let trendHtml = '<span class="trend-neutral">—</span>';
+            var lastWeight = {};
+            tbody.innerHTML = rows.slice(0,20).map(function(row) {
+                var key  = row.name.toLowerCase();
+                var prev = lastWeight[key];
+                var trend = '&mdash;';
                 if (row.weight && prev !== undefined) {
-                    const diff = row.weight - prev;
-                    if (diff > 0) trendHtml = `<span class="trend-up">↑ +${diff} lbs</span>`;
-                    else if (diff < 0) trendHtml = `<span class="trend-down">↓ ${diff} lbs</span>`;
-                    else trendHtml = `<span class="trend-neutral">—</span>`;
+                    var diff = row.weight - prev;
+                    trend = diff > 0 ? '<span class="trend-up">+' + diff + ' lbs</span>' : diff < 0 ? '<span class="trend-down">' + diff + ' lbs</span>' : '<span class="trend-neutral">&mdash;</span>';
                 }
-                // Note: we process in reverse chronological order, so "prev" is a more recent entry
-                lastWeightByExercise[key] = row.weight;
-
-                const volume = (row.sets && row.reps && row.weight)
-                    ? (parseInt(row.sets) * parseInt(row.reps) * row.weight).toLocaleString() + ' lbs'
-                    : '—';
-                return `<tr>
-                    <td>${row.date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</td>
-                    <td>${row.name}</td>
-                    <td>${row.weight ? row.weight + ' lbs' : '—'}</td>
-                    <td>${row.sets || '—'} × ${row.reps || '—'}</td>
-                    <td>${volume}</td>
-                    <td>${trendHtml}</td>
-                </tr>`;
+                lastWeight[key] = row.weight;
+                var vol = (row.sets&&row.reps&&row.weight) ? (parseInt(row.sets)*parseInt(row.reps)*row.weight).toLocaleString()+' lbs' : '&mdash;';
+                return '<tr><td>' + row.date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + '</td>' +
+                    '<td>' + row.name + '</td><td>' + (row.weight?row.weight+' lbs':'&mdash;') + '</td>' +
+                    '<td>' + (row.sets||'&mdash;') + ' x ' + (row.reps||'&mdash;') + '</td><td>' + vol + '</td><td>' + trend + '</td></tr>';
             }).join('');
         }
 
-        // Override old initProgressChart to use real data
-        function initProgressChart() { renderProgressPage(); }
+        // ── SESSION RESTORE ON LOAD ───────────────────────────────────────
+        (async function init() {
+            // Always load feed immediately so visitors see content
+            loadFeedFromSupabase();
+
+            try {
+                var stored = localStorage.getItem('sb_session');
+                if (stored) {
+                    var sess = JSON.parse(stored);
+                    if (sess.expires_at > Date.now() / 1000) {
+                        window._sbToken  = sess.access_token;
+                        window._sbUserId = sess.user_id;
+                        var profiles = await sb('profiles?id=eq.' + sess.user_id + '&select=*');
+                        if (profiles && profiles[0]) {
+                            var workouts = await sb('workouts?user_id=eq.' + sess.user_id + '&order=created_at.desc&select=*');
+                            profiles[0].workouts = workouts || [];
+                            setCurrentUser(profiles[0]);
+                            loadProfileForUser(profiles[0]);
+                            navigateToFeed();
+                            return;
+                        }
+                    }
+                }
+            } catch(e) { console.warn('Session restore failed:', e.message); }
+
+            // Not logged in - show signup but keep feed visible underneath
+            showSignup();
+        })();
 
     </script>
 
