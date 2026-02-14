@@ -3227,30 +3227,41 @@
 
             // Get logged in user
             const user = getCurrentUser();
-            const userName     = user ? user.fullName : 'Anonymous';
-            const userInitials = user ? user.initials : '??';
+            const userName     = user ? (user.full_name || user.fullName || 'Anonymous') : 'Anonymous';
+            const userInitials = user ? (user.initials || (user.full_name||user.fullName||'').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '??') : '??';
 
             // Save workout to Supabase
             if (user) {
+                const now = new Date().toISOString();
                 const workoutRecord = {
                     user_id:   window._sbUserId,
                     name:      workoutName,
                     duration,
                     caption:   caption || null,
                     exercises,
-                    photo_url: photoSrc || null
+                    photo_url: photoSrc || null,
+                    created_at: now,
+                    date: now
                 };
                 try {
                     const saved = await sb('workouts', { method: 'POST', body: workoutRecord });
                     // Update local user workouts cache
                     if (!user.workouts) user.workouts = [];
-                    user.workouts.unshift({ ...workoutRecord, id: saved[0]?.id, created_at: new Date().toISOString() });
+                    user.workouts.unshift({ ...workoutRecord, id: saved[0]?.id, created_at: new Date().toISOString(), date: new Date().toISOString() });
                     setCurrentUser(user);
                     refreshProfileStats(user);
                     refreshProfileWorkouts(user);
                     refreshAchievements(user);
                 } catch(e) {
                     console.warn('Failed to save workout:', e.message);
+                    // Still cache locally even if DB save failed
+                    if (!user.workouts) user.workouts = [];
+                    const now2 = new Date().toISOString();
+                    user.workouts.unshift({ ...workoutRecord, created_at: now2, date: now2 });
+                    setCurrentUser(user);
+                    refreshProfileStats(user);
+                    refreshProfileWorkouts(user);
+                    refreshAchievements(user);
                 }
             }
 
@@ -3374,7 +3385,7 @@
                                     <div style="font-family:'Bebas Neue',cursive; font-size:18px; letter-spacing:1px;">${w.name.toUpperCase()}</div>
                                     <div style="font-size:12px; color:#999; margin-top:3px;">${w.exercises?.length || 0} exercises Â· ${w.duration || 0} min</div>
                                 </div>
-                                <div style="font-size:12px; color:#666; font-family:'Roboto Mono',monospace;">${new Date(w.date).toLocaleDateString()}</div>
+                                <div style="font-size:12px; color:#666; font-family:'Roboto Mono',monospace;">${new Date(w.created_at || w.date || Date.now()).toLocaleDateString()}</div>
                             </div>`).join('')}`;
                 }
             }
@@ -3538,8 +3549,11 @@
 
         // â”€â”€ PROFILE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function loadProfileForUser(user) {
+            // Normalize field names from Supabase (full_name) vs legacy (fullName)
+            user.fullName = user.full_name || user.fullName || user.username || '';
+            user.initials = user.initials || user.fullName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '??';
             const el = id => document.getElementById(id);
-            if (el('profileName'))     el('profileName').textContent    = user.full_name || user.fullName || '';
+            if (el('profileName'))     el('profileName').textContent    = user.fullName;
             if (el('profileUsername')) el('profileUsername').textContent = '@' + user.username;
             if (el('profileBio'))      el('profileBio').textContent      = user.bio || 'No bio yet.';
             if (el('profileInitials')) el('profileInitials').textContent = user.initials || '';
@@ -3611,12 +3625,12 @@
                         <span class="exercise-details">${ex.sets||'?'} Ã— ${ex.reps||'?'}${ex.weight ? ' @ '+ex.weight+' lbs' : ''}</span>
                     </div>`).join('') || '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
                 const captionHTML = w.caption ? `<p class="workout-caption">"${w.caption}"</p>` : '';
-                const dateStr = new Date(w.date).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+                const dateStr = new Date(w.created_at || w.date || Date.now()).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
                 return `<div class="activity-card">
                     <div class="activity-header">
-                        <div class="user-avatar">${user.initials}</div>
+                        <div class="user-avatar">${user.initials || (user.full_name||'').slice(0,2).toUpperCase()}</div>
                         <div class="activity-user-info">
-                            <h3>${user.fullName}</h3>
+                            <h3>${user.full_name || user.fullName || user.username}</h3>
                             <span class="activity-time">${dateStr}</span>
                         </div>
                     </div>
@@ -3709,7 +3723,7 @@
         function hasWorkoutsInWeek(workouts, n) {
             const weeks = {};
             workouts.forEach(w => {
-                const d = new Date(w.date);
+                const d = new Date(w.created_at || w.date || Date.now());
                 const key = `${d.getFullYear()}-W${Math.floor((d - new Date(d.getFullYear(),0,1)) / 604800000)}`;
                 weeks[key] = (weeks[key] || 0) + 1;
             });
@@ -3719,7 +3733,7 @@
         function hasWeeklyStreak(workouts, weeks) {
             if (workouts.length === 0) return false;
             const weekNums = [...new Set(workouts.map(w => {
-                const d = new Date(w.date);
+                const d = new Date(w.created_at || w.date || Date.now());
                 return `${d.getFullYear()}-W${Math.floor((d - new Date(d.getFullYear(),0,1)) / 604800000)}`;
             }))].sort();
             let streak = 1, best = 1;
@@ -3767,7 +3781,7 @@
                 if (token) saveSession({ access_token: token, user: { id: userId }, expires_at: authData.expires_at || (Date.now()/1000 + 3600) });
 
                 const initials = fullName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-                const profile = { id: userId, username, full_name: fullName, initials, bio: '', followers: 0, following: 0 };
+                const profile = { id: userId, username, full_name: fullName, fullName, initials, bio: '', followers: 0, following: 0 };
                 await sb('profiles', { method:'POST', body: profile });
 
                 profile.workouts = [];
