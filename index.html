@@ -2010,6 +2010,335 @@
             margin-bottom: 10px;
         }
 
+
+        /* ── POST TYPE SELECTOR ── */
+        .post-type-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 2500;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .post-type-overlay.active { display: flex; }
+        .post-type-sheet {
+            background: var(--iron);
+            border-top: 2px solid var(--primary);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px 30px calc(30px + env(safe-area-inset-bottom));
+            animation: slideUpSheet 0.3s ease-out;
+        }
+        @keyframes slideUpSheet {
+            from { transform: translateY(100%); }
+            to   { transform: translateY(0); }
+        }
+        .post-type-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 24px;
+            letter-spacing: 2px;
+            color: #999;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .post-type-btn {
+            width: 100%;
+            background: var(--steel);
+            border: 2px solid #333;
+            color: var(--white);
+            padding: 22px 25px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        .post-type-btn:hover { border-color: var(--primary); background: rgba(255,107,53,0.1); }
+        .post-type-btn .pt-icon { font-size: 28px; }
+        .post-type-btn .pt-text { flex: 1; }
+        .post-type-btn .pt-label { display: block; font-size: 18px; }
+        .post-type-btn .pt-sub { display: block; font-size: 12px; color: #999; font-weight: 400; margin-top: 2px; text-transform: none; letter-spacing: 0; }
+        .post-type-cancel {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #666;
+            padding: 15px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        /* ── MULTI-STEP MODAL ── */
+        .modal-step { display: none; }
+        .modal-step.active { display: block; }
+        .modal-step-indicator {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .step-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #333;
+            transition: all 0.3s;
+        }
+        .step-dot.active { background: var(--primary); width: 24px; border-radius: 4px; }
+        .modal-step-nav {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        .btn-back {
+            background: transparent;
+            border: 2px solid #333;
+            color: #999;
+            padding: 14px 25px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-back:hover { border-color: #666; color: var(--white); }
+        .btn-next {
+            flex: 1;
+            background: var(--primary);
+            border: none;
+            color: var(--white);
+            padding: 14px 25px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-next:hover { background: var(--primary-dark); }
+
+        /* ── POST CARD REDESIGN ── */
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0 12px;
+            color: #666;
+            font-size: 12px;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .post-meta-dot { color: #444; }
+        .post-exercises-preview {
+            padding: 0 30px 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .post-ex-chip {
+            background: rgba(255,107,53,0.08);
+            border: 1px solid rgba(255,107,53,0.2);
+            color: #ccc;
+            padding: 4px 10px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            border-radius: 2px;
+        }
+        .view-workout-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-family: 'Oswald', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            padding: 0 30px 20px;
+            display: block;
+        }
+        .view-workout-btn:hover { color: var(--primary-light); }
+
+        /* ── FULL WORKOUT DRAWER ── */
+        .workout-drawer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2500;
+            background: rgba(0,0,0,0.9);
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .workout-drawer.active { display: flex; }
+        .workout-drawer-sheet {
+            background: var(--steel);
+            border-top: 2px solid var(--primary);
+            width: 100%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 30px 30px calc(30px + env(safe-area-inset-bottom));
+            animation: slideUpSheet 0.3s ease-out;
+        }
+        .drawer-close {
+            float: right;
+            background: transparent;
+            border: none;
+            color: #999;
+            font-size: 28px;
+            cursor: pointer;
+            line-height: 1;
+            margin-top: -5px;
+        }
+        .drawer-close:hover { color: var(--white); }
+        .drawer-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 28px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            padding-right: 40px;
+        }
+
+        /* ── LIKES ── */
+        .action-btn.liked { color: var(--primary); }
+        .action-btn.liked .like-icon { transform: scale(1.2); display: inline-block; }
+
+        /* ── COMMENTS ── */
+        .comments-section {
+            border-top: 1px solid #222;
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+        }
+        .comments-section.open {
+            max-height: 600px;
+            padding: 15px 0 0;
+        }
+        .comment-list { padding: 0 30px; margin-bottom: 12px; }
+        .comment-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+        .comment-avatar {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .comment-avatar img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .comment-bubble {
+            background: var(--iron);
+            padding: 8px 12px;
+            flex: 1;
+        }
+        .comment-author {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 3px;
+        }
+        .comment-text {
+            font-size: 14px;
+            color: #ccc;
+            font-family: 'Roboto Mono', monospace;
+            line-height: 1.4;
+        }
+        .comment-input-row {
+            display: flex;
+            gap: 10px;
+            padding: 12px 30px 20px;
+            border-top: 1px solid #222;
+            align-items: center;
+        }
+        .comment-input-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 13px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .comment-input-avatar img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .comment-input {
+            flex: 1;
+            background: var(--iron);
+            border: 1px solid #333;
+            color: var(--white);
+            padding: 10px 14px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .comment-input:focus { border-color: var(--primary); }
+        .comment-send {
+            background: var(--primary);
+            border: none;
+            color: var(--white);
+            padding: 10px 16px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .comment-send:hover { background: var(--primary-dark); }
+
+        /* ── PROFILE PHOTO ── */
+        .user-avatar, .profile-avatar-large {
+            overflow: hidden;
+            position: relative;
+        }
+        .user-avatar img, .profile-avatar-large img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            position: absolute;
+            inset: 0;
+        }
+        .profile-photo-upload {
+            position: absolute;
+            bottom: 0; right: 0;
+            width: 36px; height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 3px solid var(--steel);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 2;
+        }
+
     </style>
 </head>
 <body>
@@ -2525,20 +2854,51 @@
         </a>
     </nav>
 
-    <!-- Log Workout Modal -->
+    <!-- Post Type Selector Sheet -->
+    <div class="post-type-overlay" id="postTypeOverlay" onclick="if(event.target===this)closePostType()">
+        <div class="post-type-sheet">
+            <div class="post-type-title">What are you posting?</div>
+            <button class="post-type-btn" onclick="openWorkoutModal('personal')">
+                <span class="pt-icon">&#127947;</span>
+                <span class="pt-text">
+                    <span class="pt-label">Personal Workout</span>
+                    <span class="pt-sub">Log a workout to your profile and the public feed</span>
+                </span>
+                <span>&#8250;</span>
+            </button>
+            <button class="post-type-btn" onclick="openWorkoutModal('group')">
+                <span class="pt-icon">&#128101;</span>
+                <span class="pt-text">
+                    <span class="pt-label">Post to Group</span>
+                    <span class="pt-sub">Share a workout challenge with your group</span>
+                </span>
+                <span>&#8250;</span>
+            </button>
+            <button class="post-type-cancel" onclick="closePostType()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Log Workout Modal (2-step) -->
     <div class="modal" id="workoutModal">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal()">x</button>
-            <h2>Log New Workout</h2>
-            <form id="workoutForm">
+            <button class="modal-close" onclick="closeModal()">&#215;</button>
+            <h2 id="modalTitle">Log Workout</h2>
+
+            <!-- Step indicators -->
+            <div class="modal-step-indicator">
+                <div class="step-dot active" id="dot1"></div>
+                <div class="step-dot" id="dot2"></div>
+            </div>
+
+            <!-- STEP 1: Workout info -->
+            <div class="modal-step active" id="modalStep1">
                 <div class="form-group">
                     <label>Workout Name</label>
-                    <input id="workoutName" type="text" placeholder="e.g., PUSH DAY - CHEST & TRICEPS" required>
+                    <input id="workoutName" type="text" placeholder="e.g., PUSH DAY - CHEST &amp; TRICEPS">
                 </div>
-                
                 <div class="form-group">
                     <label>Workout Type</label>
-                    <select id="workoutType" required>
+                    <select id="workoutType">
                         <option value="">Select type</option>
                         <option value="push">Push (Chest, Shoulders, Triceps)</option>
                         <option value="pull">Pull (Back, Biceps)</option>
@@ -2548,48 +2908,74 @@
                         <option value="full">Full Body</option>
                     </select>
                 </div>
-
-                <div class="form-group">
-                    <label>Add Photo (Optional)</label>
-                    <div class="photo-upload-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
-                        <div class="upload-icon"></div>
-                        <div class="upload-text">Click to upload workout photo</div>
-                        <img id="previewImage" class="preview-image" alt="Workout preview">
-                        <button type="button" class="remove-photo" id="removePhoto">x</button>
-                    </div>
-                    <input type="file" id="photoInput" accept="image/*">
-                </div>
-
-                <div class="form-group">
-                    <label>Caption (Optional)</label>
-                    <textarea id="captionInput" rows="2" placeholder="Feeling strong today! "></textarea>
-                </div>
-
                 <div class="form-group">
                     <label>Duration (minutes)</label>
-                    <input id="workoutDuration" type="number" placeholder="60" required>
+                    <input id="workoutDuration" type="number" placeholder="60">
                 </div>
-
                 <div class="form-group">
                     <label>Exercises</label>
                     <div id="exerciseContainer">
                         <div class="exercise-inputs">
-                            <input type="text" placeholder="Exercise name" required>
-                            <input type="number" placeholder="Sets" required>
-                            <input type="number" placeholder="Reps" required>
-                            <input type="number" placeholder="Weight (lbs)" required>
+                            <input type="text" placeholder="Exercise name">
+                            <input type="number" placeholder="Sets">
+                            <input type="number" placeholder="Reps">
+                            <input type="number" placeholder="Weight (lbs)">
                         </div>
                     </div>
                     <button type="button" class="add-exercise-btn" onclick="addExercise()">+ Add Exercise</button>
                 </div>
-
-                <div class="form-group">
-                    <label>Notes (optional)</label>
-                    <textarea rows="3" placeholder="How did you feel? Any PRs?"></textarea>
+                <div class="modal-step-nav">
+                    <button class="btn-next" onclick="goToStep2()">Next &rarr;</button>
                 </div>
+            </div>
 
-                <button type="button" class="submit-btn" onclick="handleLogWorkout()">Log Workout</button>
-            </form>
+            <!-- STEP 2: Photo & caption -->
+            <div class="modal-step" id="modalStep2">
+                <div class="form-group">
+                    <label>Add Photo (Optional)</label>
+                    <div class="photo-upload-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
+                        <div class="upload-icon">&#128247;</div>
+                        <div class="upload-text">Tap to upload workout photo</div>
+                        <img id="previewImage" class="preview-image" alt="Workout preview">
+                        <button type="button" class="remove-photo" id="removePhoto" onclick="event.stopPropagation();removeWorkoutPhoto()">&#215;</button>
+                    </div>
+                    <input type="file" id="photoInput" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>Caption (Optional)</label>
+                    <textarea id="captionInput" rows="3" placeholder="Feeling strong today!"></textarea>
+                </div>
+                <div id="groupSelectWrap" style="display:none">
+                    <div class="form-group">
+                        <label>Select Group</label>
+                        <select id="groupSelect">
+                            <option value="">Choose a group...</option>
+                            <option value="morning-grind">Morning Grind Crew</option>
+                            <option value="powerlifting">Powerlifting Gang</option>
+                            <option value="summer-shred">Summer Shred</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-step-nav">
+                    <button class="btn-back" onclick="goToStep1()">&larr; Back</button>
+                    <button class="btn-next" onclick="handleLogWorkout()">Post Workout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workout Full Detail Drawer -->
+    <div class="workout-drawer" id="workoutDrawer" onclick="if(event.target===this)closeDrawer()">
+        <div class="workout-drawer-sheet">
+            <button class="drawer-close" onclick="closeDrawer()">&#215;</button>
+            <div class="drawer-title" id="drawerTitle">Workout Details</div>
+            <div id="drawerContent"></div>
+            <div class="comment-list" id="drawerComments"></div>
+            <div class="comment-input-row">
+                <div class="comment-input-avatar" id="drawerCommentAvatar">?</div>
+                <input class="comment-input" id="drawerCommentInput" placeholder="Add a comment..." onkeydown="if(event.key==='Enter')submitComment()">
+                <button class="comment-send" onclick="submitComment()">Post</button>
+            </div>
         </div>
     </div>
 
@@ -2658,9 +3044,9 @@
     </div>
 
 
-    <script>
 
-        // ── SUPABASE CONFIG ───────────────────────────────────────────────
+    <script>
+        // ── CONFIG ────────────────────────────────────────────────────────
         const SUPABASE_URL = 'https://nygqoszurqvvdtndpufo.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55Z3Fvc3p1cnF2dmR0bmRwdWZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3NzU5NDksImV4cCI6MjA4NjM1MTk0OX0.KSd3SPRK2RULFCikjS7WpAlf8YvBiZnwsyA3OT6dzPY';
 
@@ -2668,10 +3054,13 @@
         window._sbToken       = null;
         window._sbUserId      = null;
         window._following     = new Set(JSON.parse(localStorage.getItem('ss_following') || '[]'));
+        window._likedPosts    = new Set(JSON.parse(localStorage.getItem('ss_likes') || '[]'));
         window._exerciseMap   = {};
         window.progressChart  = null;
+        window._activeDrawerWorkout = null;
+        window._postType      = 'personal';
 
-        // ── REST HELPERS ──────────────────────────────────────────────────
+        // ── REST ──────────────────────────────────────────────────────────
         async function sb(path, opts) {
             opts = opts || {};
             const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
@@ -2685,7 +3074,7 @@
                 body: opts.body ? JSON.stringify(opts.body) : undefined
             });
             if (!res.ok) {
-                const e = await res.json().catch(function() { return {}; });
+                const e = await res.json().catch(() => ({}));
                 throw new Error(e.message || e.error_description || res.statusText);
             }
             return res.status === 204 ? null : res.json();
@@ -2695,7 +3084,7 @@
             const res = await fetch(SUPABASE_URL + '/auth/v1/' + endpoint, {
                 method: 'POST',
                 headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, password: password })
+                body: JSON.stringify({ email, password })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error_description || data.msg || 'Auth failed');
@@ -2704,47 +3093,34 @@
 
         function getCurrentUser()  { return window._ssCurrentUser; }
         function setCurrentUser(u) { window._ssCurrentUser = u; }
-
         function saveSession(data) {
-            try {
-                localStorage.setItem('sb_session', JSON.stringify({
-                    access_token: data.access_token,
-                    user_id: data.user.id,
-                    expires_at: data.expires_at || (Date.now() / 1000 + 3600)
-                }));
-            } catch(e) {}
+            try { localStorage.setItem('sb_session', JSON.stringify({ access_token: data.access_token, user_id: data.user.id, expires_at: data.expires_at || (Date.now()/1000+3600) })); } catch(e) {}
         }
-
-        function saveFollowing() {
-            try { localStorage.setItem('ss_following', JSON.stringify([...window._following])); } catch(e) {}
-        }
+        function saveLikes()     { try { localStorage.setItem('ss_likes',     JSON.stringify([...window._likedPosts])); } catch(e) {} }
+        function saveFollowing() { try { localStorage.setItem('ss_following', JSON.stringify([...window._following]));  } catch(e) {} }
 
         // ── NAVIGATION ────────────────────────────────────────────────────
         function showPage(page) {
-            var pages = ['feed', 'progress', 'groups', 'profile', 'search'];
-            pages.forEach(function(p) {
-                var el = document.getElementById(p + '-page') || document.querySelector('.' + p + '-page');
+            ['feed','progress','groups','profile'].forEach(p => {
+                const el = document.querySelector('.' + p + '-page');
                 if (el) el.classList.remove('active');
             });
-            // Also hide search page by id
-            var sp = document.getElementById('searchPage');
+            const sp = document.getElementById('searchPage');
             if (sp) sp.classList.remove('active');
-
-            document.querySelectorAll('.nav-link').forEach(function(l) { l.classList.remove('active'); });
-            var link = document.querySelector('.nav-link[data-page="' + page + '"]');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            const link = document.querySelector('.nav-link[data-page="' + page + '"]');
             if (link) link.classList.add('active');
-
             if (page === 'feed') {
-                var fp = document.querySelector('.feed-page');
+                const fp = document.querySelector('.feed-page');
                 if (fp) fp.classList.add('active');
             } else if (page === 'progress') {
-                var pp = document.querySelector('.progress-page');
+                const pp = document.querySelector('.progress-page');
                 if (pp) { pp.classList.add('active'); setTimeout(renderProgressPage, 100); }
             } else if (page === 'groups') {
-                var gp = document.querySelector('.groups-page');
+                const gp = document.querySelector('.groups-page');
                 if (gp) { gp.classList.add('active'); closeGroup(); }
             } else if (page === 'profile') {
-                var prp = document.querySelector('.profile-page');
+                const prp = document.querySelector('.profile-page');
                 if (prp) prp.classList.add('active');
             } else if (page === 'search') {
                 if (sp) { sp.classList.add('active'); loadPeopleFeed(); }
@@ -2754,40 +3130,394 @@
         function navigateToPage(page) { showPage(page); }
 
         function navigateToFeed() {
-            var sp = document.getElementById('signupPage');
-            var lp = document.getElementById('loginPage');
-            if (sp) { sp.classList.remove('active'); sp.style.display = 'none'; }
-            if (lp) { lp.classList.remove('active'); lp.style.display = 'none'; }
+            ['signupPage','loginPage'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+            });
             showPage('feed');
             loadFeedFromSupabase();
         }
 
-        document.querySelectorAll('.nav-link').forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                showPage(this.dataset.page);
-            });
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', e => { e.preventDefault(); showPage(link.dataset.page); });
         });
+
+        // ── POST TYPE / MODAL ─────────────────────────────────────────────
+        function openModal() {
+            document.getElementById('postTypeOverlay').classList.add('active');
+        }
+        function closePostType() {
+            document.getElementById('postTypeOverlay').classList.remove('active');
+        }
+        function openWorkoutModal(type) {
+            window._postType = type;
+            closePostType();
+            document.getElementById('modalTitle').textContent = type === 'group' ? 'Post to Group' : 'Log Workout';
+            document.getElementById('groupSelectWrap').style.display = type === 'group' ? 'block' : 'none';
+            goToStep1();
+            document.getElementById('workoutModal').classList.add('active');
+        }
+        function closeModal() {
+            document.getElementById('workoutModal').classList.remove('active');
+        }
+        document.getElementById('workoutModal').addEventListener('click', e => { if (e.target === document.getElementById('workoutModal')) closeModal(); });
+
+        function goToStep1() {
+            document.getElementById('modalStep1').classList.add('active');
+            document.getElementById('modalStep2').classList.remove('active');
+            document.getElementById('dot1').classList.add('active');
+            document.getElementById('dot2').classList.remove('active');
+        }
+        function goToStep2() {
+            const name = document.getElementById('workoutName').value.trim();
+            if (!name) { alert('Please enter a workout name.'); return; }
+            document.getElementById('modalStep1').classList.remove('active');
+            document.getElementById('modalStep2').classList.add('active');
+            document.getElementById('dot1').classList.remove('active');
+            document.getElementById('dot2').classList.add('active');
+        }
+
+        function addExercise() {
+            const container = document.getElementById('exerciseContainer');
+            const div = document.createElement('div');
+            div.className = 'exercise-inputs';
+            div.innerHTML = '<input type="text" placeholder="Exercise name"><input type="number" placeholder="Sets"><input type="number" placeholder="Reps"><input type="number" placeholder="Weight (lbs)">';
+            container.appendChild(div);
+        }
+
+        // ── PHOTO UPLOAD ──────────────────────────────────────────────────
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('previewImage');
+                const zone = document.getElementById('photoZone');
+                img.src = e.target.result;
+                img.classList.add('active');
+                zone.classList.add('has-image');
+                document.getElementById('removePhoto').classList.add('active');
+                zone.querySelector('.upload-icon').style.display = 'none';
+                zone.querySelector('.upload-text').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function removeWorkoutPhoto() {
+            document.getElementById('photoInput').value = '';
+            const img  = document.getElementById('previewImage');
+            const zone = document.getElementById('photoZone');
+            img.classList.remove('active');
+            zone.classList.remove('has-image');
+            document.getElementById('removePhoto').classList.remove('active');
+            zone.querySelector('.upload-icon').style.display = 'block';
+            zone.querySelector('.upload-text').style.display = 'block';
+        }
+
+        function resetWorkoutForm() {
+            document.getElementById('workoutName').value = '';
+            document.getElementById('workoutDuration').value = '';
+            document.getElementById('captionInput').value = '';
+            document.getElementById('workoutType').value = '';
+            removeWorkoutPhoto();
+            document.getElementById('exerciseContainer').innerHTML =
+                '<div class="exercise-inputs"><input type="text" placeholder="Exercise name"><input type="number" placeholder="Sets"><input type="number" placeholder="Reps"><input type="number" placeholder="Weight (lbs)"></div>';
+        }
+
+        // ── LOG WORKOUT ───────────────────────────────────────────────────
+        async function handleLogWorkout() {
+            const workoutName = document.getElementById('workoutName').value.trim();
+            const duration    = parseInt(document.getElementById('workoutDuration').value) || 0;
+            const caption     = document.getElementById('captionInput').value.trim();
+            const previewImg  = document.getElementById('previewImage');
+            const photoSrc    = previewImg.classList.contains('active') ? previewImg.src : null;
+
+            if (!workoutName) { alert('Please enter a workout name.'); goToStep1(); return; }
+
+            const exercises = [];
+            document.querySelectorAll('#exerciseContainer .exercise-inputs').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const name = inputs[0] ? inputs[0].value.trim() : '';
+                if (name) exercises.push({ name, sets: inputs[1].value, reps: inputs[2].value, weight: inputs[3].value });
+            });
+
+            const user        = getCurrentUser();
+            const displayName = user ? (user.full_name || user.fullName || user.username || 'You') : 'You';
+            const initials    = user ? (user.initials || displayName.split(' ').map(x => x[0]||'').join('').toUpperCase().slice(0,2)) : '??';
+            const avatarUrl   = user ? user.avatar_url : null;
+            const now         = new Date().toISOString();
+
+            if (user) {
+                const record = { user_id: window._sbUserId, name: workoutName, duration, caption: caption||null, exercises, photo_url: photoSrc||null, created_at: now };
+                try {
+                    const saved = await sb('workouts', { method: 'POST', body: record });
+                    if (!user.workouts) user.workouts = [];
+                    user.workouts.unshift({ ...record, id: saved?.[0]?.id });
+                    setCurrentUser(user);
+                    refreshProfileStats(user); refreshProfileWorkouts(user); refreshAchievements(user);
+                } catch(e) { console.warn('Save failed:', e.message); }
+            }
+
+            // Build card and insert
+            const card = buildWorkoutCardEl({ name: workoutName, duration, caption, exercises, photo_url: photoSrc, created_at: now, id: Date.now() }, { full_name: displayName, initials, avatar_url: avatarUrl });
+            const feed = document.getElementById('mainFeed');
+            if (feed) feed.insertBefore(card, feed.firstChild);
+
+            resetWorkoutForm();
+            closeModal();
+            navigateToFeed();
+        }
+
+        // ── HELPERS ───────────────────────────────────────────────────────
+        function avatarHTML(initials, avatarUrl, size) {
+            size = size || 50;
+            if (avatarUrl) {
+                return '<img src="' + avatarUrl + '" alt="" style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;object-fit:cover;">';
+            }
+            return '<span style="font-family:\'Bebas Neue\',cursive;font-size:' + Math.round(size*0.44) + 'px">' + (initials||'??') + '</span>';
+        }
+
+        function timeAgo(dateStr) {
+            if (!dateStr) return 'Recently';
+            const d    = new Date(dateStr);
+            if (isNaN(d)) return 'Recently';
+            const diff = Date.now() - d.getTime();
+            const mins = Math.floor(diff/60000);
+            if (mins < 1)   return 'Just now';
+            if (mins < 60)  return mins + 'm ago';
+            const hrs = Math.floor(mins/60);
+            if (hrs < 24)   return hrs + 'h ago';
+            const days = Math.floor(hrs/24);
+            if (days < 7)   return days + 'd ago';
+            return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+        }
+
+        // ── BUILD POST CARD ───────────────────────────────────────────────
+        function buildWorkoutCardEl(w, profile) {
+            const name      = profile ? (profile.full_name || profile.username || 'Unknown') : 'Unknown';
+            const initials  = profile ? (profile.initials || name.split(' ').map(x=>x[0]||'').join('').toUpperCase().slice(0,2)) : '??';
+            const avatarUrl = profile ? profile.avatar_url : null;
+            const exercises = Array.isArray(w.exercises) ? w.exercises : [];
+            const wid       = w.id || ('w_' + Date.now() + Math.random());
+            const liked     = window._likedPosts.has(String(wid));
+            const timeStr   = timeAgo(w.created_at || w.date);
+
+            // Only show first 3 exercise chips
+            const chips = exercises.slice(0,3).map(ex =>
+                '<span class="post-ex-chip">' + ex.name + '</span>'
+            ).join('') + (exercises.length > 3 ? '<span class="post-ex-chip">+' + (exercises.length-3) + ' more</span>' : '');
+
+            const card = document.createElement('div');
+            card.className = 'activity-card';
+            card.dataset.workoutId = wid;
+            card.innerHTML =
+                '<div class="activity-header">' +
+                    '<div class="user-avatar">' + avatarHTML(initials, avatarUrl, 50) + '</div>' +
+                    '<div class="activity-user-info">' +
+                        '<h3>' + name + '</h3>' +
+                        '<div class="post-meta">' +
+                            '<span>' + timeStr + '</span>' +
+                            (exercises.length ? '<span class="post-meta-dot">·</span><span>' + exercises.length + ' exercise' + (exercises.length>1?'s':'') + '</span>' : '') +
+                            (w.duration ? '<span class="post-meta-dot">·</span><span>' + w.duration + ' min</span>' : '') +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<h2 class="workout-title">' + (w.name||'Untitled').toUpperCase() + '</h2>' +
+                (w.photo_url ? '<img src="' + w.photo_url + '" class="workout-photo" alt="">' : '') +
+                (w.caption   ? '<p class="workout-caption">&ldquo;' + w.caption + '&rdquo;</p>' : '') +
+                (chips ? '<div class="post-exercises-preview">' + chips + '</div>' : '') +
+                '<button class="view-workout-btn" onclick="openWorkoutDrawer(' + JSON.stringify(wid) + ')">View Full Workout &rarr;</button>' +
+                '<div class="activity-actions">' +
+                    '<button class="action-btn like-btn' + (liked?' liked':'') + '" data-wid="' + wid + '" onclick="handleLike(this)">' +
+                        '<span class="like-icon">&#10084;</span> <span class="like-count">0 Likes</span>' +
+                    '</button>' +
+                    '<button class="action-btn" onclick="openWorkoutDrawer(' + JSON.stringify(wid) + ')">' +
+                        '&#128172; <span class="comment-count">0 Comments</span>' +
+                    '</button>' +
+                '</div>' +
+                '<div class="comments-section" id="comments_' + wid + '"></div>';
+
+            // Store workout data on element for drawer
+            card._workoutData = w;
+            card._profileData = profile;
+            return card;
+        }
+
+        // ── LIKES ─────────────────────────────────────────────────────────
+        function handleLike(btn) {
+            const wid = btn.dataset.wid;
+            if (window._likedPosts.has(String(wid))) return; // already liked
+            window._likedPosts.add(String(wid));
+            saveLikes();
+            btn.classList.add('liked');
+            const countEl = btn.querySelector('.like-count');
+            const cur = parseInt(countEl.textContent) || 0;
+            countEl.textContent = (cur + 1) + ' Like' + (cur+1===1?'':'s');
+        }
+
+        // ── WORKOUT DRAWER ────────────────────────────────────────────────
+        window._drawerWorkouts = {};
+
+        function openWorkoutDrawer(wid) {
+            const card    = document.querySelector('[data-workout-id="' + wid + '"]');
+            const drawer  = document.getElementById('workoutDrawer');
+            const content = document.getElementById('drawerContent');
+            const title   = document.getElementById('drawerTitle');
+
+            let w       = card ? card._workoutData : null;
+            let profile = card ? card._profileData : null;
+            if (!w) return;
+
+            window._activeDrawerWorkout = wid;
+            title.textContent = (w.name || 'Untitled').toUpperCase();
+
+            const exercises = Array.isArray(w.exercises) ? w.exercises : [];
+            const exRows = exercises.map(ex =>
+                '<div class="exercise-item"><span class="exercise-name">' + ex.name + '</span>' +
+                '<span class="exercise-details">' + (ex.sets||'?') + ' x ' + (ex.reps||'?') + (ex.weight ? ' @ '+ex.weight+' lbs':'') + '</span></div>'
+            ).join('') || '<div class="exercise-item"><span>No exercises recorded</span></div>';
+
+            content.innerHTML =
+                '<div class="workout-stats" style="margin-bottom:20px;">' +
+                    '<div class="workout-stat"><div class="workout-stat-value">' + exercises.length + '</div><div class="workout-stat-label">Exercises</div></div>' +
+                    '<div class="workout-stat"><div class="workout-stat-value">' + (w.duration||'&mdash;') + '</div><div class="workout-stat-label">Minutes</div></div>' +
+                '</div>' +
+                '<div class="exercise-list">' + exRows + '</div>';
+
+            // Load comments
+            const stored = JSON.parse(localStorage.getItem('comments_' + wid) || '[]');
+            renderDrawerComments(stored);
+
+            // Set commenter avatar
+            const user = getCurrentUser();
+            const avatarEl = document.getElementById('drawerCommentAvatar');
+            if (user && user.avatar_url) {
+                avatarEl.innerHTML = '<img src="' + user.avatar_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+            } else {
+                avatarEl.textContent = user ? (user.initials || '?') : '?';
+            }
+
+            drawer.classList.add('active');
+        }
+
+        function closeDrawer() {
+            document.getElementById('workoutDrawer').classList.remove('active');
+            window._activeDrawerWorkout = null;
+        }
+
+        function commentHTML(c) {
+            const av = c.avatar_url
+                ? '<img src="' + c.avatar_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'
+                : (c.initials || '?');
+            return '<div class="comment-item">' +
+                '<div class="comment-avatar">' + av + '</div>' +
+                '<div class="comment-bubble">' +
+                    '<div class="comment-author">' + (c.name || 'Anonymous') + '</div>' +
+                    '<div class="comment-text">' + c.text + '</div>' +
+                '</div></div>';
+        }
+
+        function renderDrawerComments(comments) {
+            const list = document.getElementById('drawerComments');
+            if (!comments.length) {
+                list.innerHTML = '<p style="color:#555;font-size:13px;padding:10px 0 5px;">No comments yet. Be the first!</p>';
+                return;
+            }
+            list.innerHTML = comments.map(commentHTML).join('');
+        }
+
+        function renderCardCommentPreview(wid) {
+            const section = document.getElementById('comments_' + wid);
+            if (!section) return;
+            const all = JSON.parse(localStorage.getItem('comments_' + wid) || '[]');
+            if (!all.length) { section.innerHTML = ''; return; }
+            const preview = all.slice(-2); // show last 2
+            const moreCount = all.length - 2;
+            section.innerHTML =
+                '<div style="padding:10px 30px 5px;border-top:1px solid #222;">' +
+                    preview.map(commentHTML).join('') +
+                    (moreCount > 0
+                        ? '<button onclick="openWorkoutDrawer('' + wid + '')" style="background:none;border:none;color:var(--primary);font-family:Oswald,sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;padding:5px 0 10px;">View all ' + all.length + ' comments</button>'
+                        : '<button onclick="openWorkoutDrawer('' + wid + '')" style="background:none;border:none;color:#666;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;padding:5px 0 10px;text-transform:uppercase;letter-spacing:1px;">Add a comment...</button>') +
+                '</div>';
+        }
+
+        function submitComment() {
+            const wid   = window._activeDrawerWorkout;
+            const input = document.getElementById('drawerCommentInput');
+            const text  = input.value.trim();
+            if (!text || !wid) return;
+            const user    = getCurrentUser();
+            const comment = {
+                name:       user ? (user.full_name || user.fullName || user.username || 'Anonymous') : 'Anonymous',
+                initials:   user ? (user.initials || '?') : '?',
+                avatar_url: user ? user.avatar_url : null,
+                text,
+                ts: Date.now()
+            };
+            const key      = 'comments_' + wid;
+            const existing = JSON.parse(localStorage.getItem(key) || '[]');
+            existing.push(comment);
+            localStorage.setItem(key, JSON.stringify(existing));
+            renderDrawerComments(existing);
+            renderCardCommentPreview(wid);
+            input.value = '';
+            const countEl = document.querySelector('[data-workout-id="' + wid + '"] .comment-count');
+            if (countEl) countEl.textContent = existing.length + ' Comment' + (existing.length===1?'':'s');
+        }
+
+        // ── FEED ──────────────────────────────────────────────────────────
+        async function loadFeedFromSupabase() {
+            const feed = document.getElementById('mainFeed');
+            if (!feed) return;
+            try {
+                const workouts = await sb('workouts?order=created_at.desc&limit=50&select=*,profiles(full_name,initials,username,avatar_url)');
+                if (!workouts || !workouts.length) {
+                    feed.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#555;">' +
+                        '<div style="font-size:64px;margin-bottom:20px;opacity:0.3">&#127947;</div>' +
+                        '<h3 style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:#444;letter-spacing:3px;margin-bottom:10px;">No Workouts Yet</h3>' +
+                        '<p style="color:#555;font-size:14px;letter-spacing:1px;">Be the first to log a workout!</p></div>';
+                    return;
+                }
+                feed.innerHTML = '';
+                workouts.forEach(w => {
+                    if (!w || !w.name) return;
+                    const card = buildWorkoutCardEl(w, w.profiles);
+                    feed.appendChild(card);
+                    // Restore like counts
+                    const wid     = w.id || w.created_at;
+                    const comments = JSON.parse(localStorage.getItem('comments_' + wid) || '[]');
+                    const countEl  = card.querySelector('.comment-count');
+                    if (countEl && comments.length) countEl.textContent = comments.length + ' Comment' + (comments.length===1?'':'s');
+                    if (comments.length) renderCardCommentPreview(wid);
+                    if (window._likedPosts.has(String(wid))) {
+                        const likeBtn = card.querySelector('.like-btn');
+                        if (likeBtn) likeBtn.classList.add('liked');
+                    }
+                });
+            } catch(e) {
+                console.warn('Feed error:', e.message);
+                feed.innerHTML = '<div style="text-align:center;padding:40px;color:#555;">Could not load feed.</div>';
+            }
+        }
 
         // ── GROUPS ────────────────────────────────────────────────────────
         function openGroup(groupId) {
-            var groupsGrid   = document.querySelector('.groups-grid');
-            var groupsHeader = document.querySelector('.groups-header');
-            var groupDetail  = document.getElementById('groupDetail');
+            const groupsGrid   = document.querySelector('.groups-grid');
+            const groupsHeader = document.querySelector('.groups-header');
+            const groupDetail  = document.getElementById('groupDetail');
             if (groupsGrid)   groupsGrid.style.display   = 'none';
             if (groupsHeader) groupsHeader.style.display = 'none';
             if (groupDetail)  groupDetail.classList.add('active');
         }
-
         function closeGroup() {
-            var groupsGrid   = document.querySelector('.groups-grid');
-            var groupsHeader = document.querySelector('.groups-header');
-            var groupDetail  = document.getElementById('groupDetail');
+            const groupsGrid   = document.querySelector('.groups-grid');
+            const groupsHeader = document.querySelector('.groups-header');
+            const groupDetail  = document.getElementById('groupDetail');
             if (groupsGrid)   groupsGrid.style.display   = 'grid';
             if (groupsHeader) groupsHeader.style.display = 'flex';
             if (groupDetail)  groupDetail.classList.remove('active');
         }
-
         function completeWorkout(button) {
             if (button.classList.contains('completed')) {
                 button.classList.remove('completed');
@@ -2795,344 +3525,70 @@
             } else {
                 button.classList.add('completed');
                 button.textContent = 'Completed!';
-                setTimeout(function() { alert('Great work! Completion posted to the group!'); }, 300);
+                setTimeout(() => alert('Great work! Completion posted!'), 300);
             }
         }
-
-        function openCreateGroupModal() {
-            alert('Create Group - coming soon!');
-        }
-
-        function openPostWorkoutModal() {
-            alert('Post Workout Challenge - coming soon!');
-        }
-
-        // ── MODAL ─────────────────────────────────────────────────────────
-        function openModal() {
-            document.getElementById('workoutModal').classList.add('active');
-        }
-        function closeModal() {
-            document.getElementById('workoutModal').classList.remove('active');
-        }
-
-        document.getElementById('workoutModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
-        });
-
-        function addExercise() {
-            var container = document.getElementById('exerciseContainer');
-            var div = document.createElement('div');
-            div.className = 'exercise-inputs';
-            div.innerHTML = '<input type="text" placeholder="Exercise name">' +
-                '<input type="number" placeholder="Sets">' +
-                '<input type="number" placeholder="Reps">' +
-                '<input type="number" placeholder="Weight (lbs)">';
-            container.appendChild(div);
-        }
-
-        // ── PHOTO UPLOAD ──────────────────────────────────────────────────
-        var photoInput  = document.getElementById('photoInput');
-        var photoZone   = document.getElementById('photoZone');
-        var previewImage = document.getElementById('previewImage');
-        var removePhoto  = document.getElementById('removePhoto');
-
-        if (photoInput) {
-            photoInput.addEventListener('change', function(e) {
-                var file = e.target.files[0];
-                if (!file) return;
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImage.src = e.target.result;
-                    previewImage.classList.add('active');
-                    photoZone.classList.add('has-image');
-                    removePhoto.classList.add('active');
-                    var icon = photoZone.querySelector('.upload-icon');
-                    var text = photoZone.querySelector('.upload-text');
-                    if (icon) icon.style.display = 'none';
-                    if (text) text.style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        if (removePhoto) {
-            removePhoto.addEventListener('click', function(e) {
-                e.stopPropagation();
-                photoInput.value = '';
-                previewImage.classList.remove('active');
-                photoZone.classList.remove('has-image');
-                removePhoto.classList.remove('active');
-                var icon = photoZone.querySelector('.upload-icon');
-                var text = photoZone.querySelector('.upload-text');
-                if (icon) icon.style.display = 'block';
-                if (text) text.style.display = 'block';
-            });
-        }
-
-        // ── LOG WORKOUT ───────────────────────────────────────────────────
-        function resetWorkoutForm() {
-            document.getElementById('workoutForm').reset();
-            if (previewImage)  previewImage.classList.remove('active');
-            if (photoZone)     photoZone.classList.remove('has-image');
-            if (removePhoto)   removePhoto.classList.remove('active');
-            var icon = photoZone ? photoZone.querySelector('.upload-icon') : null;
-            var text = photoZone ? photoZone.querySelector('.upload-text') : null;
-            if (icon) icon.style.display = 'block';
-            if (text) text.style.display = 'block';
-            var container = document.getElementById('exerciseContainer');
-            if (container) {
-                container.innerHTML = '<div class="exercise-inputs">' +
-                    '<input type="text" placeholder="Exercise name">' +
-                    '<input type="number" placeholder="Sets">' +
-                    '<input type="number" placeholder="Reps">' +
-                    '<input type="number" placeholder="Weight (lbs)">' +
-                    '</div>';
-            }
-        }
-
-        async function handleLogWorkout() {
-            var workoutName = document.getElementById('workoutName').value.trim();
-            var duration    = parseInt(document.getElementById('workoutDuration').value) || 0;
-            var caption     = document.getElementById('captionInput').value.trim();
-            var photoSrc    = previewImage && previewImage.classList.contains('active') ? previewImage.src : null;
-
-            if (!workoutName) { alert('Please enter a workout name.'); return; }
-
-            var exercises = [];
-            document.querySelectorAll('#exerciseContainer .exercise-inputs').forEach(function(row) {
-                var inputs = row.querySelectorAll('input');
-                var name   = inputs[0] ? inputs[0].value.trim() : '';
-                if (name) exercises.push({ name: name, sets: inputs[1].value, reps: inputs[2].value, weight: inputs[3].value });
-            });
-
-            var user        = getCurrentUser();
-            var displayName = user ? (user.full_name || user.fullName || user.username || 'You') : 'You';
-            var initials    = user ? (user.initials || displayName.split(' ').map(function(x){return x[0]||'';}).join('').toUpperCase().slice(0,2)) : '??';
-            var now         = new Date().toISOString();
-
-            // Save to Supabase
-            if (user) {
-                var record = {
-                    user_id: window._sbUserId,
-                    name: workoutName,
-                    duration: duration,
-                    caption: caption || null,
-                    exercises: exercises,
-                    photo_url: photoSrc || null,
-                    created_at: now
-                };
-                try {
-                    var saved = await sb('workouts', { method: 'POST', body: record });
-                    if (!user.workouts) user.workouts = [];
-                    user.workouts.unshift(Object.assign({}, record, { id: saved && saved[0] ? saved[0].id : null }));
-                    setCurrentUser(user);
-                    refreshProfileStats(user);
-                    refreshProfileWorkouts(user);
-                    refreshAchievements(user);
-                } catch(e) {
-                    console.warn('Save failed:', e.message);
-                    if (!user.workouts) user.workouts = [];
-                    user.workouts.unshift({ name: workoutName, duration: duration, caption: caption, exercises: exercises, created_at: now });
-                    setCurrentUser(user);
-                }
-            }
-
-            // Build and insert card into feed
-            var exHTML = exercises.length
-                ? exercises.map(function(ex) {
-                    return '<div class="exercise-item"><span class="exercise-name">' + ex.name + '</span>' +
-                        '<span class="exercise-details">' + (ex.sets||'?') + ' x ' + (ex.reps||'?') + (ex.weight ? ' @ '+ex.weight+' lbs' : '') + '</span></div>';
-                  }).join('')
-                : '<div class="exercise-item"><span class="exercise-name">No exercises logged</span></div>';
-
-            var card = document.createElement('div');
-            card.className = 'activity-card';
-            card.innerHTML =
-                '<div class="activity-header">' +
-                    '<div class="user-avatar">' + initials + '</div>' +
-                    '<div class="activity-user-info"><h3>' + displayName + '</h3><span class="activity-time">Just now</span></div>' +
-                '</div>' +
-                '<h2 class="workout-title">' + workoutName.toUpperCase() + '</h2>' +
-                (photoSrc ? '<img src="' + photoSrc + '" class="workout-photo" alt="">' : '') +
-                (caption  ? '<p class="workout-caption">&ldquo;' + caption + '&rdquo;</p>' : '') +
-                '<div class="workout-details">' +
-                    '<button class="details-toggle" onclick="toggleDetails(this)">' +
-                        '<span>View Workout Details</span>' +
-                        '<span class="details-toggle-icon" style="display:inline-block;transition:transform 0.3s">&#9660;</span>' +
-                    '</button>' +
-                    '<div class="workout-details-content">' +
-                        '<div class="workout-stats">' +
-                            '<div class="workout-stat"><div class="workout-stat-value">' + exercises.length + '</div><div class="workout-stat-label">Exercises</div></div>' +
-                            '<div class="workout-stat"><div class="workout-stat-value">' + (duration||'?') + '</div><div class="workout-stat-label">Minutes</div></div>' +
-                        '</div>' +
-                        '<div class="exercise-list">' + exHTML + '</div>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="activity-actions">' +
-                    '<button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">&#128074;</span> <span>0 Respect</span></button>' +
-                    '<button class="action-btn"><span class="action-icon">&#128172;</span> <span>0 Comments</span></button>' +
-                '</div>';
-
-            var feed = document.getElementById('mainFeed');
-            if (feed) { feed.insertBefore(card, feed.firstChild); }
-
-            resetWorkoutForm();
-            closeModal();
-            navigateToFeed();
-        }
-
-        // ── FEED ──────────────────────────────────────────────────────────
-        function buildWorkoutCard(w, profile) {
-            var name     = profile ? (profile.full_name || profile.username || 'Unknown') : 'Unknown';
-            var initials = profile ? (profile.initials || name.split(' ').map(function(x){return x[0]||'';}).join('').toUpperCase().slice(0,2)) : '??';
-            var exercises = Array.isArray(w.exercises) ? w.exercises : [];
-            var exHTML = exercises.filter(function(ex){ return ex && ex.name; }).map(function(ex) {
-                return '<div class="exercise-item"><span class="exercise-name">' + ex.name + '</span>' +
-                    '<span class="exercise-details">' + (ex.sets||'?') + ' x ' + (ex.reps||'?') + (ex.weight ? ' @ '+ex.weight+' lbs' : '') + '</span></div>';
-            }).join('') || '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
-            var rawDate = w.created_at || w.date || null;
-            var d = rawDate ? new Date(rawDate) : null;
-            var dateStr = (d && !isNaN(d)) ? d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : 'Recently';
-            var wName = (w.name || 'Untitled').toUpperCase();
-            var card = document.createElement('div');
-            card.className = 'activity-card';
-            card.innerHTML =
-                '<div class="activity-header">' +
-                    '<div class="user-avatar">' + initials + '</div>' +
-                    '<div class="activity-user-info"><h3>' + name + '</h3><span class="activity-time">' + dateStr + '</span></div>' +
-                '</div>' +
-                '<h2 class="workout-title">' + wName + '</h2>' +
-                (w.photo_url ? '<img src="' + w.photo_url + '" class="workout-photo" alt="">' : '') +
-                (w.caption   ? '<p class="workout-caption">&ldquo;' + w.caption + '&rdquo;</p>' : '') +
-                '<div class="workout-details">' +
-                    '<button class="details-toggle" onclick="toggleDetails(this)">' +
-                        '<span>View Workout Details</span>' +
-                        '<span class="details-toggle-icon" style="display:inline-block;transition:transform 0.3s">&#9660;</span>' +
-                    '</button>' +
-                    '<div class="workout-details-content">' +
-                        '<div class="workout-stats">' +
-                            '<div class="workout-stat"><div class="workout-stat-value">' + exercises.length + '</div><div class="workout-stat-label">Exercises</div></div>' +
-                            '<div class="workout-stat"><div class="workout-stat-value">' + (w.duration||'&mdash;') + '</div><div class="workout-stat-label">Minutes</div></div>' +
-                        '</div>' +
-                        '<div class="exercise-list">' + exHTML + '</div>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="activity-actions">' +
-                    '<button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">&#128074;</span> <span>0 Respect</span></button>' +
-                    '<button class="action-btn"><span class="action-icon">&#128172;</span> <span>0 Comments</span></button>' +
-                '</div>';
-            return card;
-        }
-
-        async function loadFeedFromSupabase() {
-            var feed = document.getElementById('mainFeed');
-            if (!feed) return;
-            try {
-                var workouts = await sb('workouts?order=created_at.desc&limit=50&select=*,profiles(full_name,initials,username)');
-                if (!workouts || !workouts.length) {
-                    feed.innerHTML =
-                        '<div style="text-align:center;padding:60px 20px;color:#555;">' +
-                        '<div style="font-size:64px;margin-bottom:20px;opacity:0.3">&#127947;</div>' +
-                        '<h3 style="font-family:\'Bebas Neue\',cursive;font-size:32px;color:#444;letter-spacing:3px;margin-bottom:10px;">No Workouts Yet</h3>' +
-                        '<p style="color:#555;font-size:14px;letter-spacing:1px;">Be the first to log a workout!</p></div>';
-                    return;
-                }
-                feed.innerHTML = '';
-                workouts.forEach(function(w) {
-                    if (!w || !w.name) return;
-                    var card = buildWorkoutCard(w, w.profiles);
-                    feed.appendChild(card);
-                });
-            } catch(e) {
-                console.warn('Feed load error:', e.message);
-                feed.innerHTML = '<div style="text-align:center;padding:40px;color:#555;">Could not load feed.</div>';
-            }
-        }
-
-        // ── WORKOUT DETAILS TOGGLE ────────────────────────────────────────
-        function toggleDetails(button) {
-            button.classList.toggle('active');
-            var icon    = button.querySelector('.details-toggle-icon');
-            var content = button.nextElementSibling;
-            if (icon)    icon.style.transform = button.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
-            if (content) content.classList.toggle('active');
-        }
-
-        // ── RESPECT ───────────────────────────────────────────────────────
-        function handleRespect(btn) {
-            var span  = btn.querySelector('span:last-child');
-            var count = parseInt(span.textContent) + 1;
-            span.textContent = count + ' Respect';
-            btn.style.color = 'var(--primary)';
-        }
-
-        // Filter tabs
-        document.querySelectorAll('.filter-tab').forEach(function(tab) {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
-                this.classList.add('active');
-            });
-        });
+        function openCreateGroupModal()  { alert('Create Group - coming soon!'); }
+        function openPostWorkoutModal()  { alert('Post Workout Challenge - coming soon!'); }
 
         // ── AUTH UI ───────────────────────────────────────────────────────
         function showSignup() {
-            var sp = document.getElementById('signupPage');
-            var lp = document.getElementById('loginPage');
+            const sp = document.getElementById('signupPage');
+            const lp = document.getElementById('loginPage');
             if (sp) { sp.style.display = 'flex'; sp.classList.add('active'); }
             if (lp) { lp.style.display = 'none';  lp.classList.remove('active'); }
             clearAuthErrors();
         }
-
         function showLogin() {
-            var lp = document.getElementById('loginPage');
-            var sp = document.getElementById('signupPage');
+            const lp = document.getElementById('loginPage');
+            const sp = document.getElementById('signupPage');
             if (lp) { lp.style.display = 'flex'; lp.classList.add('active'); }
             if (sp) { sp.style.display = 'none';  sp.classList.remove('active'); }
             clearAuthErrors();
         }
-
         function logout() {
-            window._ssCurrentUser = null;
-            window._sbToken = null;
-            window._sbUserId = null;
+            window._ssCurrentUser = null; window._sbToken = null; window._sbUserId = null;
             try { localStorage.removeItem('sb_session'); } catch(e) {}
-            showPage('feed');
-            showSignup();
+            showPage('feed'); showSignup();
         }
-
         function showAuthError(formId, msg) {
-            var el = document.getElementById(formId + 'Error');
+            const el = document.getElementById(formId + 'Error');
             if (el) { el.textContent = msg; el.style.display = 'block'; }
         }
-
         function clearAuthErrors() {
-            document.querySelectorAll('.auth-error').forEach(function(el) { el.textContent = ''; el.style.display = 'none'; });
+            document.querySelectorAll('.auth-error').forEach(el => { el.textContent=''; el.style.display='none'; });
         }
 
         // ── PROFILE ───────────────────────────────────────────────────────
         function loadProfileForUser(user) {
             user.fullName = user.full_name || user.fullName || user.username || '';
-            user.initials = user.initials || user.fullName.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2) || '??';
-            var el = function(id) { return document.getElementById(id); };
-            if (el('profileName'))     el('profileName').textContent     = user.fullName;
-            if (el('profileUsername')) el('profileUsername').textContent  = '@' + user.username;
-            if (el('profileBio'))      el('profileBio').textContent       = user.bio || 'No bio yet.';
-            if (el('profileInitials')) el('profileInitials').textContent  = user.initials;
+            user.initials = user.initials || user.fullName.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2) || '??';
+            const el = id => document.getElementById(id);
+            if (el('profileName'))     el('profileName').textContent    = user.fullName;
+            if (el('profileUsername')) el('profileUsername').textContent = '@' + user.username;
+            if (el('profileBio'))      el('profileBio').textContent      = user.bio || 'No bio yet.';
             if (el('profileFollowers')) el('profileFollowers').textContent = user.followers || 0;
             if (el('profileFollowing')) el('profileFollowing').textContent = user.following || 0;
-            refreshProfileStats(user);
-            refreshProfileWorkouts(user);
-            refreshAchievements(user);
+            // Profile avatar
+            const avatarEl = document.getElementById('profileInitials');
+            if (avatarEl) {
+                if (user.avatar_url) {
+                    avatarEl.innerHTML = '<img src="' + user.avatar_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+                } else {
+                    avatarEl.textContent = user.initials;
+                }
+            }
+            refreshProfileStats(user); refreshProfileWorkouts(user); refreshAchievements(user);
         }
 
         function switchProfileTab(tabName) {
-            document.querySelectorAll('.profile-tab').forEach(function(t) {
-                t.classList.toggle('active', t.getAttribute('onclick') && t.getAttribute('onclick').includes(tabName));
+            document.querySelectorAll('.profile-tab').forEach(t => {
+                t.classList.toggle('active', t.getAttribute('onclick')?.includes(tabName));
             });
-            document.querySelectorAll('.profile-tab-content').forEach(function(c) { c.classList.remove('active'); });
-            var tc = document.getElementById(tabName + '-tab');
+            document.querySelectorAll('.profile-tab-content').forEach(c => c.classList.remove('active'));
+            const tc = document.getElementById(tabName + '-tab');
             if (tc) tc.classList.add('active');
-            var u = getCurrentUser();
+            const u = getCurrentUser();
             if (!u) return;
             if (tabName === 'stats')        refreshProfileStats(u);
             if (tabName === 'workouts')     refreshProfileWorkouts(u);
@@ -3140,446 +3596,273 @@
         }
 
         function refreshProfileStats(user) {
-            var workouts       = user.workouts || [];
-            var totalWorkouts  = workouts.length;
-            var totalExercises = workouts.reduce(function(s,w){ return s + (w.exercises ? w.exercises.length : 0); }, 0);
-            var totalMinutes   = workouts.reduce(function(s,w){ return s + (w.duration||0); }, 0);
-            var set = function(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
-            set('statTotalWorkouts', totalWorkouts);
-            set('statTotalExercises', totalExercises);
-            set('statTotalMinutes', totalMinutes);
-            set('profileWorkoutCount', totalWorkouts);
-
-            var list = document.getElementById('recentWorkoutsList');
+            const workouts      = user.workouts || [];
+            const totalWorkouts = workouts.length;
+            const totalEx       = workouts.reduce((s,w) => s + (w.exercises?.length||0), 0);
+            const totalMins     = workouts.reduce((s,w) => s + (w.duration||0), 0);
+            const set = (id,v) => { const el = document.getElementById(id); if(el) el.textContent=v; };
+            set('statTotalWorkouts', totalWorkouts); set('statTotalExercises', totalEx);
+            set('statTotalMinutes', totalMins); set('profileWorkoutCount', totalWorkouts);
+            const list = document.getElementById('recentWorkoutsList');
             if (!list) return;
-            if (workouts.length === 0) {
-                list.innerHTML = '<p style="color:#999;text-align:center;padding:30px;">No workouts logged yet.</p>';
-                return;
-            }
-            list.innerHTML = '<h3 style="font-family:\'Bebas Neue\',cursive;font-size:22px;letter-spacing:2px;color:var(--primary);margin-bottom:15px;">Recent Workouts</h3>' +
-                workouts.slice(0,10).map(function(w) {
-                    var rawDate = w.created_at || w.date || null;
-                    var d = rawDate ? new Date(rawDate) : null;
-                    var dateStr = (d && !isNaN(d)) ? d.toLocaleDateString() : 'Recently';
+            list.innerHTML = workouts.length === 0
+                ? '<p style="color:#999;text-align:center;padding:30px;">No workouts logged yet.</p>'
+                : '<h3 style="font-family:\'Bebas Neue\',cursive;font-size:22px;letter-spacing:2px;color:var(--primary);margin-bottom:15px;">Recent Workouts</h3>' +
+                  workouts.slice(0,10).map(w => {
+                    const d = new Date(w.created_at || w.date || Date.now());
                     return '<div style="background:var(--steel);border-left:3px solid var(--primary);padding:15px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">' +
                         '<div><div style="font-family:\'Bebas Neue\',cursive;font-size:18px;letter-spacing:1px;">' + (w.name||'Untitled').toUpperCase() + '</div>' +
-                        '<div style="font-size:12px;color:#999;margin-top:3px;">' + (w.exercises?w.exercises.length:0) + ' exercises &middot; ' + (w.duration||0) + ' min</div></div>' +
-                        '<div style="font-size:12px;color:#666;font-family:\'Roboto Mono\',monospace;">' + dateStr + '</div></div>';
-                }).join('');
+                        '<div style="font-size:12px;color:#999;margin-top:3px;">' + (w.exercises?.length||0) + ' exercises &middot; ' + (w.duration||0) + ' min</div></div>' +
+                        '<div style="font-size:12px;color:#666;font-family:\'Roboto Mono\',monospace;">' + (isNaN(d)?'Recently':d.toLocaleDateString()) + '</div></div>';
+                  }).join('');
         }
 
         function refreshProfileWorkouts(user) {
-            var feed = document.getElementById('profileWorkoutFeed');
+            const feed = document.getElementById('profileWorkoutFeed');
             if (!feed) return;
-            var workouts    = (user.workouts || []).filter(function(w) { return w && w.name; });
-            var displayName = user.full_name || user.fullName || user.username || 'You';
-            var initials    = user.initials || displayName.split(' ').map(function(x){return x[0]||'';}).join('').toUpperCase().slice(0,2) || '??';
-
+            const workouts = (user.workouts||[]).filter(w => w && w.name);
             if (workouts.length === 0) {
                 feed.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#999;">' +
                     '<h3 style="font-family:\'Bebas Neue\',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">No Workouts Yet</h3>' +
                     '<p>Hit the + button to log your first workout!</p></div>';
                 return;
             }
-
-            feed.innerHTML = workouts.map(function(w) {
-                var exs = Array.isArray(w.exercises) ? w.exercises.filter(function(e){return e&&e.name;}) : [];
-                var exHTML = exs.map(function(ex) {
-                    return '<div class="exercise-item"><span class="exercise-name">' + ex.name + '</span>' +
-                        '<span class="exercise-details">' + (ex.sets||'?') + ' x ' + (ex.reps||'?') + (ex.weight?' @ '+ex.weight+' lbs':'') + '</span></div>';
-                }).join('') || '<div class="exercise-item"><span class="exercise-name">No exercises recorded</span></div>';
-                var rawDate = w.created_at || w.date || null;
-                var d = rawDate ? new Date(rawDate) : null;
-                var dateStr = (d && !isNaN(d)) ? d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'Recently';
-                return '<div class="activity-card">' +
-                    '<div class="activity-header">' +
-                        '<div class="user-avatar">' + initials + '</div>' +
-                        '<div class="activity-user-info"><h3>' + displayName + '</h3><span class="activity-time">' + dateStr + '</span></div>' +
-                    '</div>' +
-                    '<h2 class="workout-title">' + w.name.toUpperCase() + '</h2>' +
-                    (w.caption ? '<p class="workout-caption">&ldquo;' + w.caption + '&rdquo;</p>' : '') +
-                    '<div class="workout-details">' +
-                        '<button class="details-toggle" onclick="toggleDetails(this)">' +
-                            '<span>View Workout Details</span>' +
-                            '<span class="details-toggle-icon" style="display:inline-block;transition:transform 0.3s">&#9660;</span>' +
-                        '</button>' +
-                        '<div class="workout-details-content">' +
-                            '<div class="workout-stats">' +
-                                '<div class="workout-stat"><div class="workout-stat-value">' + exs.length + '</div><div class="workout-stat-label">Exercises</div></div>' +
-                                '<div class="workout-stat"><div class="workout-stat-value">' + (w.duration||'&mdash;') + '</div><div class="workout-stat-label">Minutes</div></div>' +
-                            '</div>' +
-                            '<div class="exercise-list">' + exHTML + '</div>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="activity-actions">' +
-                        '<button class="action-btn" onclick="handleRespect(this)"><span class="action-icon">&#128074;</span> <span>0 Respect</span></button>' +
-                        '<button class="action-btn"><span class="action-icon">&#128172;</span> <span>0 Comments</span></button>' +
-                    '</div></div>';
-            }).join('');
+            feed.innerHTML = '';
+            workouts.forEach(w => {
+                const card = buildWorkoutCardEl(w, user);
+                feed.appendChild(card);
+            });
         }
 
         function refreshAchievements(user) {
-            var grid = document.getElementById('achievementsGrid');
+            const grid = document.getElementById('achievementsGrid');
             if (!grid) return;
-            var workouts     = (user.workouts || []).filter(function(w){return w;});
-            var count        = workouts.length;
-            var totalMinutes = workouts.reduce(function(s,w){return s+(w.duration||0);}, 0);
-            var allExNames   = new Set();
-            workouts.forEach(function(w) {
-                (w.exercises||[]).forEach(function(e){ if(e&&e.name) allExNames.add(e.name.toLowerCase()); });
-            });
-            var all = [
-                { icon:'&#127949;', title:'First Rep',        desc:'Log your first workout',        earned: count >= 1 },
-                { icon:'&#128287;', title:'10 Workout Club',  desc:'Log 10 workouts',               earned: count >= 10 },
-                { icon:'&#127942;', title:'25 Workout Club',  desc:'Log 25 workouts',               earned: count >= 25 },
-                { icon:'&#9203;',   title:'Hour Grinder',     desc:'Log 60+ min in one workout',    earned: workouts.some(function(w){return w.duration>=60;}) },
-                { icon:'&#128336;', title:'Time Warrior',     desc:'Log 1,000 total minutes',       earned: totalMinutes>=1000 },
-                { icon:'&#128170;', title:'Variety Pack',     desc:'Log 5 different exercises',     earned: allExNames.size>=5 },
-                { icon:'&#128293;', title:'On Fire',          desc:'Log 3 workouts in one week',    earned: hasWorkoutsInWeek(workouts,3) },
-                { icon:'&#9889;',   title:'Consistent',       desc:'Log workouts 2 weeks in a row', earned: hasWeeklyStreak(workouts,2) },
+            const workouts = (user.workouts||[]).filter(w=>w);
+            const count = workouts.length;
+            const totalMins = workouts.reduce((s,w)=>s+(w.duration||0),0);
+            const exNames = new Set();
+            workouts.forEach(w => (w.exercises||[]).forEach(e => { if(e?.name) exNames.add(e.name.toLowerCase()); }));
+            const all = [
+                { icon:'&#127949;', title:'First Rep',       desc:'Log your first workout',         earned: count>=1 },
+                { icon:'&#128287;', title:'10 Workout Club', desc:'Log 10 workouts',                earned: count>=10 },
+                { icon:'&#127942;', title:'25 Workout Club', desc:'Log 25 workouts',                earned: count>=25 },
+                { icon:'&#9203;',   title:'Hour Grinder',    desc:'Log 60+ min in one workout',     earned: workouts.some(w=>w.duration>=60) },
+                { icon:'&#128336;', title:'Time Warrior',    desc:'Log 1,000 total minutes',        earned: totalMins>=1000 },
+                { icon:'&#128170;', title:'Variety Pack',    desc:'Log 5 different exercises',      earned: exNames.size>=5 },
+                { icon:'&#128293;', title:'On Fire',         desc:'Log 3 workouts in one week',     earned: hasWorkoutsInWeek(workouts,3) },
+                { icon:'&#9889;',   title:'Consistent',      desc:'Log workouts 2 weeks in a row',  earned: hasWeeklyStreak(workouts,2) },
             ];
-            var earned = all.filter(function(a){return a.earned;});
-            var locked = all.filter(function(a){return !a.earned;});
-            var html = '';
-            if (earned.length === 0) {
-                html += '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">' +
-                    '<h3 style="font-family:\'Bebas Neue\',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">No Achievements Yet</h3>' +
-                    '<p>Log workouts to start earning!</p></div>';
-            } else {
-                html += '<div style="grid-column:1/-1;font-family:\'Bebas Neue\',cursive;font-size:18px;letter-spacing:2px;color:var(--primary);padding:10px 0 5px;">EARNED (' + earned.length + ')</div>';
-                earned.forEach(function(a) {
-                    html += '<div class="achievement-card" style="border-color:var(--primary);">' +
-                        '<div class="achievement-icon">' + a.icon + '</div>' +
-                        '<div class="achievement-title">' + a.title + '</div>' +
-                        '<div class="achievement-description">' + a.desc + '</div></div>';
-                });
-            }
-            if (locked.length > 0) {
-                html += '<div style="grid-column:1/-1;font-family:\'Bebas Neue\',cursive;font-size:18px;letter-spacing:2px;color:#555;padding:20px 0 5px;">LOCKED (' + locked.length + ')</div>';
-                locked.forEach(function(a) {
-                    html += '<div class="achievement-card" style="opacity:0.35;filter:grayscale(1);">' +
-                        '<div class="achievement-icon">&#128274;</div>' +
-                        '<div class="achievement-title" style="color:#666;">' + a.title + '</div>' +
-                        '<div class="achievement-description">' + a.desc + '</div></div>';
-                });
-            }
+            const earned = all.filter(a=>a.earned), locked = all.filter(a=>!a.earned);
+            let html = '';
+            if (!earned.length) html += '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;"><h3 style="font-family:\'Bebas Neue\',cursive;font-size:28px;color:var(--primary);margin-bottom:10px;">No Achievements Yet</h3><p>Log workouts to start earning!</p></div>';
+            else { html += '<div style="grid-column:1/-1;font-family:\'Bebas Neue\',cursive;font-size:18px;letter-spacing:2px;color:var(--primary);padding:10px 0 5px;">EARNED (' + earned.length + ')</div>'; earned.forEach(a => { html += '<div class="achievement-card" style="border-color:var(--primary);"><div class="achievement-icon">' + a.icon + '</div><div class="achievement-title">' + a.title + '</div><div class="achievement-description">' + a.desc + '</div></div>'; }); }
+            if (locked.length) { html += '<div style="grid-column:1/-1;font-family:\'Bebas Neue\',cursive;font-size:18px;letter-spacing:2px;color:#555;padding:20px 0 5px;">LOCKED (' + locked.length + ')</div>'; locked.forEach(a => { html += '<div class="achievement-card" style="opacity:0.35;filter:grayscale(1);"><div class="achievement-icon">&#128274;</div><div class="achievement-title" style="color:#666;">' + a.title + '</div><div class="achievement-description">' + a.desc + '</div></div>'; }); }
             grid.innerHTML = html;
         }
 
         function hasWorkoutsInWeek(workouts, n) {
-            var weeks = {};
-            workouts.forEach(function(w) {
-                var d   = new Date(w.created_at || w.date || Date.now());
-                var key = d.getFullYear() + '-W' + Math.floor((d - new Date(d.getFullYear(),0,1)) / 604800000);
-                weeks[key] = (weeks[key]||0) + 1;
-            });
-            return Object.values(weeks).some(function(v){return v>=n;});
+            const weeks = {};
+            workouts.forEach(w => { const d=new Date(w.created_at||w.date||Date.now()); const k=d.getFullYear()+'-W'+Math.floor((d-new Date(d.getFullYear(),0,1))/604800000); weeks[k]=(weeks[k]||0)+1; });
+            return Object.values(weeks).some(v=>v>=n);
         }
-
         function hasWeeklyStreak(workouts, weeks) {
             if (!workouts.length) return false;
-            var weekNums = [...new Set(workouts.map(function(w) {
-                var d = new Date(w.created_at || w.date || Date.now());
-                return d.getFullYear() + '-W' + Math.floor((d - new Date(d.getFullYear(),0,1)) / 604800000);
-            }))].sort();
-            var streak = 1, best = 1;
-            for (var i = 1; i < weekNums.length; i++) {
-                var prev = weekNums[i-1].split('-W'), cur = weekNums[i].split('-W');
-                var diff = (parseInt(cur[1])-parseInt(prev[1])) + (parseInt(cur[0])-parseInt(prev[0]))*52;
-                streak = diff === 1 ? streak+1 : 1;
-                best = Math.max(best, streak);
-            }
-            return best >= weeks;
+            const wks = [...new Set(workouts.map(w=>{ const d=new Date(w.created_at||w.date||Date.now()); return d.getFullYear()+'-W'+Math.floor((d-new Date(d.getFullYear(),0,1))/604800000); }))].sort();
+            let streak=1,best=1;
+            for (let i=1;i<wks.length;i++) { const p=wks[i-1].split('-W'),c=wks[i].split('-W'); const diff=(+c[1]-+p[1])+(+c[0]-+p[0])*52; streak=diff===1?streak+1:1; best=Math.max(best,streak); }
+            return best>=weeks;
         }
 
-        // ── SIGNUP ────────────────────────────────────────────────────────
+        // ── SIGNUP / LOGIN ────────────────────────────────────────────────
         async function handleSignup() {
-            var fullName = document.getElementById('signupName').value.trim();
-            var username = document.getElementById('signupUsername').value.trim().toLowerCase();
-            var email    = document.getElementById('signupEmail').value.trim().toLowerCase();
-            var password = document.getElementById('signupPassword').value;
-
+            const fullName = document.getElementById('signupName').value.trim();
+            const username = document.getElementById('signupUsername').value.trim().toLowerCase();
+            const email    = document.getElementById('signupEmail').value.trim().toLowerCase();
+            const password = document.getElementById('signupPassword').value;
             if (!fullName||!username||!email||!password) { showAuthError('signup','Please fill in all fields.'); return; }
             if (username.length < 3) { showAuthError('signup','Username must be at least 3 characters.'); return; }
             if (password.length < 6) { showAuthError('signup','Password must be at least 6 characters.'); return; }
-
-            var btn = document.querySelector('#signupForm .auth-submit-btn');
+            const btn = document.querySelector('#signupForm .auth-submit-btn');
             btn.textContent = 'Creating...'; btn.disabled = true;
-
             try {
-                var taken = await sb('profiles?username=eq.' + username + '&select=id');
-                if (taken && taken.length > 0) { showAuthError('signup','Username already taken.'); btn.textContent='Create Account'; btn.disabled=false; return; }
-
-                var authData = await sbAuth('signup', email, password);
-                var userId   = authData.user && authData.user.id;
-                var token    = authData.access_token || (authData.session && authData.session.access_token);
-
-                if (!userId) {
-                    showAuthError('signup', 'Check your email to confirm your account, then log in.');
-                    btn.textContent = 'Create Account'; btn.disabled = false; return;
-                }
-
-                window._sbToken  = token;
-                window._sbUserId = userId;
-                if (token) saveSession({ access_token: token, user: { id: userId }, expires_at: authData.expires_at || (Date.now()/1000+3600) });
-
-                var initials = fullName.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2);
-                var profile  = { id: userId, username: username, full_name: fullName, fullName: fullName, initials: initials, bio: '', followers: 0, following: 0, workouts: [] };
-                await sb('profiles', { method:'POST', body: { id: userId, username: username, full_name: fullName, initials: initials, bio: '', followers: 0, following: 0 } });
-
-                setCurrentUser(profile);
-                loadProfileForUser(profile);
-                await loadFeedFromSupabase();
-                navigateToFeed();
-            } catch(err) {
-                showAuthError('signup', err.message);
-                btn.textContent = 'Create Account'; btn.disabled = false;
-            }
+                const taken = await sb('profiles?username=eq.'+username+'&select=id');
+                if (taken?.length) { showAuthError('signup','Username already taken.'); btn.textContent='Create Account'; btn.disabled=false; return; }
+                const authData = await sbAuth('signup', email, password);
+                const userId = authData.user?.id;
+                const token  = authData.access_token || authData.session?.access_token;
+                if (!userId) { showAuthError('signup','Check your email to confirm your account, then log in.'); btn.textContent='Create Account'; btn.disabled=false; return; }
+                window._sbToken = token; window._sbUserId = userId;
+                if (token) saveSession({ access_token: token, user: { id: userId }, expires_at: authData.expires_at||(Date.now()/1000+3600) });
+                const initials = fullName.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+                await sb('profiles', { method:'POST', body:{ id:userId, username, full_name:fullName, initials, bio:'', followers:0, following:0 } });
+                const profile = { id:userId, username, full_name:fullName, fullName, initials, bio:'', followers:0, following:0, workouts:[] };
+                setCurrentUser(profile); loadProfileForUser(profile);
+                await loadFeedFromSupabase(); navigateToFeed();
+            } catch(err) { showAuthError('signup', err.message); btn.textContent='Create Account'; btn.disabled=false; }
         }
 
-        // ── LOGIN ─────────────────────────────────────────────────────────
         async function handleLogin() {
-            var email    = document.getElementById('loginIdentifier').value.trim().toLowerCase();
-            var password = document.getElementById('loginPassword').value;
-
+            const email    = document.getElementById('loginIdentifier').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
             if (!email||!password) { showAuthError('login','Please fill in all fields.'); return; }
-
-            var btn = document.querySelector('#loginForm .auth-submit-btn');
+            const btn = document.querySelector('#loginForm .auth-submit-btn');
             btn.textContent = 'Logging in...'; btn.disabled = true;
-
             try {
-                var authData = await sbAuth('token?grant_type=password', email, password);
-                window._sbToken  = authData.access_token;
-                window._sbUserId = authData.user.id;
+                const authData = await sbAuth('token?grant_type=password', email, password);
+                window._sbToken = authData.access_token; window._sbUserId = authData.user.id;
                 saveSession(authData);
-
-                var profiles = await sb('profiles?id=eq.' + authData.user.id + '&select=*');
-                var profile  = profiles && profiles[0];
+                let profiles = await sb('profiles?id=eq.'+authData.user.id+'&select=*');
+                let profile  = profiles?.[0];
                 if (!profile) {
-                    profile = { id: authData.user.id, username: email.split('@')[0], full_name: email.split('@')[0], initials: email.slice(0,2).toUpperCase(), bio:'', followers:0, following:0 };
-                    await sb('profiles', { method:'POST', body: profile });
+                    profile = { id:authData.user.id, username:email.split('@')[0], full_name:email.split('@')[0], initials:email.slice(0,2).toUpperCase(), bio:'', followers:0, following:0 };
+                    await sb('profiles', { method:'POST', body:profile });
                 }
-                var workouts = await sb('workouts?user_id=eq.' + authData.user.id + '&order=created_at.desc&select=*');
+                const workouts = await sb('workouts?user_id=eq.'+authData.user.id+'&order=created_at.desc&select=*');
                 profile.workouts = workouts || [];
-
-                setCurrentUser(profile);
-                loadProfileForUser(profile);
-                await loadFeedFromSupabase();
-                navigateToFeed();
-            } catch(err) {
-                showAuthError('login', err.message.includes('Invalid') ? 'Incorrect email or password.' : err.message);
-                btn.textContent = 'Log In'; btn.disabled = false;
-            }
+                setCurrentUser(profile); loadProfileForUser(profile);
+                await loadFeedFromSupabase(); navigateToFeed();
+            } catch(err) { showAuthError('login', err.message.includes('Invalid')?'Incorrect email or password.':err.message); btn.textContent='Log In'; btn.disabled=false; }
         }
 
         // ── FOLLOW SYSTEM ─────────────────────────────────────────────────
-        function isFollowing(userId) { return window._following.has(String(userId)); }
-
-        async function toggleFollow(userId, btn) {
-            var uid = String(userId);
+        function isFollowing(uid) { return window._following.has(String(uid)); }
+        async function toggleFollow(uid, btn) {
             if (!getCurrentUser()) { alert('Please log in to follow people.'); return; }
+            uid = String(uid);
             if (isFollowing(uid)) {
-                window._following.delete(uid);
-                btn.textContent = 'Follow';
-                btn.classList.remove('following');
-                try { await sb('follows?follower_id=eq.' + window._sbUserId + '&following_id=eq.' + uid, { method:'DELETE', prefer:'' }); } catch(e) {}
+                window._following.delete(uid); btn.textContent='Follow'; btn.classList.remove('following');
+                try { await sb('follows?follower_id=eq.'+window._sbUserId+'&following_id=eq.'+uid, {method:'DELETE',prefer:''}); } catch(e) {}
             } else {
-                window._following.add(uid);
-                btn.textContent = 'Following';
-                btn.classList.add('following');
-                try { await sb('follows', { method:'POST', body:{ follower_id: window._sbUserId, following_id: uid } }); } catch(e) {}
+                window._following.add(uid); btn.textContent='Following'; btn.classList.add('following');
+                try { await sb('follows', {method:'POST', body:{follower_id:window._sbUserId, following_id:uid}}); } catch(e) {}
             }
             saveFollowing();
         }
 
-        // ── SEARCH / PEOPLE ───────────────────────────────────────────────
-        var _allProfiles = [];
-
+        // ── SEARCH ────────────────────────────────────────────────────────
+        let _allProfiles = [];
         async function loadPeopleFeed() {
             try {
-                var profiles = await sb('profiles?select=id,username,full_name,initials,bio,followers,following&limit=50');
-                var me = getCurrentUser();
-                _allProfiles = (profiles||[]).filter(function(p){ return !me || p.id !== me.id; });
+                const profiles = await sb('profiles?select=id,username,full_name,initials,bio,followers,following,avatar_url&limit=50');
+                const me = getCurrentUser();
+                _allProfiles = (profiles||[]).filter(p => !me || p.id !== me.id);
                 renderPeopleResults(_allProfiles, '');
-            } catch(e) {
-                console.warn('Load people error:', e.message);
-                renderPeopleResults([], '');
-            }
+            } catch(e) { renderPeopleResults([], ''); }
         }
-
-        function handlePeopleSearch(query) {
-            var q = query.trim().toLowerCase();
-            if (!q) { renderPeopleResults(_allProfiles, ''); return; }
-            renderPeopleResults(_allProfiles.filter(function(p) {
-                return (p.full_name||'').toLowerCase().includes(q) ||
-                       (p.username||'').toLowerCase().includes(q) ||
-                       (p.bio||'').toLowerCase().includes(q);
-            }), q);
+        function handlePeopleSearch(q) {
+            q = q.trim().toLowerCase();
+            renderPeopleResults(!q ? _allProfiles : _allProfiles.filter(p =>
+                (p.full_name||'').toLowerCase().includes(q) || (p.username||'').toLowerCase().includes(q)), q);
         }
-
         function renderPeopleResults(people, query) {
-            var grid  = document.getElementById('peopleGrid');
-            var title = document.getElementById('searchResultsTitle');
-            var empty = document.getElementById('searchEmpty');
+            const grid  = document.getElementById('peopleGrid');
+            const title = document.getElementById('searchResultsTitle');
+            const empty = document.getElementById('searchEmpty');
             if (!grid) return;
-            if (title) { title.textContent = query ? 'Results for "' + query + '"' : 'All Athletes'; title.style.display = 'block'; }
-            if (!people.length) { grid.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
-            if (empty) empty.style.display = 'none';
-            grid.innerHTML = people.map(function(p) {
-                var name     = p.full_name || p.username || 'Unknown';
-                var initials = p.initials  || name.split(' ').map(function(x){return x[0]||'';}).join('').toUpperCase().slice(0,2);
-                var following = isFollowing(p.id);
-                return '<div class="person-card" data-user-id="' + p.id + '">' +
-                    '<div class="person-avatar">' + initials + '</div>' +
-                    '<div class="person-info">' +
-                        '<div class="person-name">' + name + '</div>' +
-                        '<div class="person-username">@' + (p.username||'unknown') + '</div>' +
-                        '<div class="person-bio">' + (p.bio||'No bio yet') + '</div>' +
-                    '</div>' +
-                    '<div class="person-stats">' +
-                        '<div class="person-stat"><div class="person-stat-num">' + (p.followers||0) + '</div><div class="person-stat-lbl">Followers</div></div>' +
-                        '<div class="person-stat"><div class="person-stat-num">' + (p.following||0) + '</div><div class="person-stat-lbl">Following</div></div>' +
-                    '</div>' +
-                    '<button class="follow-btn ' + (following?'following':'') + '" onclick="event.stopPropagation();toggleFollow(\'' + p.id + '\',this)">' + (following?'Following':'Follow') + '</button>' +
-                    '</div>';
+            if (title) title.textContent = query ? 'Results for "'+query+'"' : 'All Athletes';
+            if (!people.length) { grid.innerHTML=''; if(empty) empty.style.display='block'; return; }
+            if (empty) empty.style.display='none';
+            grid.innerHTML = people.map(p => {
+                const name = p.full_name||p.username||'Unknown';
+                const init = p.initials||name.split(' ').map(x=>x[0]||'').join('').toUpperCase().slice(0,2);
+                const following = isFollowing(p.id);
+                const av = p.avatar_url ? '<img src="'+p.avatar_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">' : init;
+                return '<div class="person-card"><div class="person-avatar">'+av+'</div>' +
+                    '<div class="person-info"><div class="person-name">'+name+'</div><div class="person-username">@'+(p.username||'?')+'</div><div class="person-bio">'+(p.bio||'No bio yet')+'</div></div>' +
+                    '<div class="person-stats"><div class="person-stat"><div class="person-stat-num">'+(p.followers||0)+'</div><div class="person-stat-lbl">Followers</div></div>' +
+                    '<div class="person-stat"><div class="person-stat-num">'+(p.following||0)+'</div><div class="person-stat-lbl">Following</div></div></div>' +
+                    '<button class="follow-btn '+(following?'following':'')+'" onclick="event.stopPropagation();toggleFollow(\''+p.id+'\',this)">'+(following?'Following':'Follow')+'</button></div>';
             }).join('');
         }
 
         // ── PROGRESS ──────────────────────────────────────────────────────
         function renderProgressPage() {
-            var user     = getCurrentUser();
-            var workouts = user ? (user.workouts||[]) : [];
-            var exMap    = {};
-            workouts.forEach(function(w) {
-                var date = w.created_at || w.date || new Date().toISOString();
-                (w.exercises||[]).forEach(function(ex) {
-                    if (!ex||!ex.name||!ex.weight) return;
-                    var key = ex.name.trim().toLowerCase();
+            const user = getCurrentUser();
+            const workouts = user ? (user.workouts||[]) : [];
+            const exMap = {};
+            workouts.forEach(w => {
+                const date = w.created_at||w.date||new Date().toISOString();
+                (w.exercises||[]).forEach(ex => {
+                    if (!ex?.name||!ex.weight) return;
+                    const key = ex.name.trim().toLowerCase();
                     if (!exMap[key]) exMap[key] = { displayName: ex.name.trim(), entries: [] };
-                    exMap[key].entries.push({ date: date, weight: parseFloat(ex.weight) });
+                    exMap[key].entries.push({ date, weight: parseFloat(ex.weight) });
                 });
             });
-            Object.values(exMap).forEach(function(e) {
-                e.entries.sort(function(a,b){ return new Date(a.date)-new Date(b.date); });
-            });
-
+            Object.values(exMap).forEach(e => e.entries.sort((a,b)=>new Date(a.date)-new Date(b.date)));
             window._exerciseMap = exMap;
-            var keys = Object.keys(exMap);
-            var selector = document.querySelector('.exercise-selector');
+            const keys = Object.keys(exMap);
+            const selector = document.querySelector('.exercise-selector');
             if (selector) {
                 selector.innerHTML = keys.length === 0
                     ? '<div style="color:#555;font-size:14px;padding:20px;text-align:center;grid-column:1/-1;">Log workouts with weights to see progress here.</div>'
-                    : keys.map(function(key,i) {
-                        return '<button class="exercise-btn ' + (i===0?'active':'') + '" onclick="selectProgressExercise(\'' + key + '\',this)">' + exMap[key].displayName + '</button>';
-                      }).join('');
+                    : keys.map((key,i) => '<button class="exercise-btn'+(i===0?' active':'')+'" onclick="selectProgressExercise(\''+key+'\',this)">'+exMap[key].displayName+'</button>').join('');
             }
-
-            if (keys.length > 0) {
-                renderProgressExercise(keys[0], exMap[keys[0]]);
-            } else {
-                var titleEl = document.getElementById('chartTitle');
-                if (titleEl) titleEl.textContent = 'Your Progress';
-                ['currentPR','totalIncrease','avgGain'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent='&mdash;'; });
-            }
+            if (keys.length > 0) renderProgressExercise(keys[0], exMap[keys[0]]);
             renderHistoryTable(workouts);
         }
 
         function selectProgressExercise(key, btn) {
-            document.querySelectorAll('.exercise-btn').forEach(function(b){ b.classList.remove('active'); });
+            document.querySelectorAll('.exercise-btn').forEach(b=>b.classList.remove('active'));
             btn.classList.add('active');
-            if (window._exerciseMap && window._exerciseMap[key]) renderProgressExercise(key, window._exerciseMap[key]);
+            if (window._exerciseMap?.[key]) renderProgressExercise(key, window._exerciseMap[key]);
         }
 
         function renderProgressExercise(key, exData) {
-            var entries = exData.entries;
-            var weights = entries.map(function(e){return e.weight;});
-            var pr      = Math.max.apply(null, weights);
-            var increase = pr - (weights[0]||0);
-            var titleEl  = document.getElementById('chartTitle');
-            if (titleEl) titleEl.innerHTML = exData.displayName + ' Progress <span class="pr-badge">PR: ' + pr + ' LBS</span>';
-            var set = function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
-            set('currentPR', pr + ' lbs');
-            set('totalIncrease', (increase>=0?'+':'') + increase + ' lbs');
-            set('avgGain', entries.length + ' sessions');
-            var labels = entries.map(function(e){ var d=new Date(e.date); return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); });
-            if (window.progressChart) {
-                window.progressChart.data.labels = labels;
-                window.progressChart.data.datasets[0].data = weights;
-                window.progressChart.update();
-            } else {
-                var canvas = document.getElementById('progressChart');
-                if (canvas) {
-                    window.progressChart = new Chart(canvas.getContext('2d'), {
-                        type: 'line',
-                        data: { labels: labels, datasets: [{ label:'Weight (lbs)', data:weights, borderColor:'#ff6b35', backgroundColor:'rgba(255,107,53,0.2)', borderWidth:4, fill:true, tension:0.4, pointRadius:7, pointBackgroundColor:'#ff6b35', pointBorderColor:'#fff', pointBorderWidth:3 }] },
-                        options: { responsive:true, maintainAspectRatio:false,
-                            plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#2a2a2a', titleColor:'#ff6b35', bodyColor:'#fff', borderColor:'#ff6b35', borderWidth:2, padding:15, displayColors:false, callbacks:{ label:function(c){return c.parsed.y+' lbs';} } } },
-                            scales:{ y:{ beginAtZero:false, grid:{color:'rgba(255,255,255,0.08)'}, ticks:{color:'#999',font:{family:'Roboto Mono',size:13},callback:function(v){return v+' lbs';}} }, x:{ grid:{color:'rgba(255,255,255,0.08)'}, ticks:{color:'#999',font:{family:'Roboto Mono',size:13}} } }
-                        }
-                    });
-                }
+            const entries = exData.entries, weights = entries.map(e=>e.weight);
+            const pr = Math.max(...weights), increase = pr-(weights[0]||0);
+            const titleEl = document.getElementById('chartTitle');
+            if (titleEl) titleEl.innerHTML = exData.displayName+' Progress <span class="pr-badge">PR: '+pr+' LBS</span>';
+            const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+            set('currentPR', pr+' lbs'); set('totalIncrease', (increase>=0?'+':'')+increase+' lbs'); set('avgGain', entries.length+' sessions');
+            const labels = entries.map(e=>{ const d=new Date(e.date); return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}); });
+            if (window.progressChart) { window.progressChart.data.labels=labels; window.progressChart.data.datasets[0].data=weights; window.progressChart.update(); }
+            else {
+                const canvas = document.getElementById('progressChart');
+                if (canvas) window.progressChart = new Chart(canvas.getContext('2d'),{type:'line',data:{labels,datasets:[{label:'Weight (lbs)',data:weights,borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,0.2)',borderWidth:4,fill:true,tension:0.4,pointRadius:7,pointBackgroundColor:'#ff6b35',pointBorderColor:'#fff',pointBorderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#2a2a2a',titleColor:'#ff6b35',bodyColor:'#fff',borderColor:'#ff6b35',borderWidth:2,padding:15,displayColors:false,callbacks:{label:c=>c.parsed.y+' lbs'}}},scales:{y:{beginAtZero:false,grid:{color:'rgba(255,255,255,0.08)'},ticks:{color:'#999',font:{family:'Roboto Mono',size:13},callback:v=>v+' lbs'}},x:{grid:{color:'rgba(255,255,255,0.08)'},ticks:{color:'#999',font:{family:'Roboto Mono',size:13}}}}}});
             }
         }
 
         function renderHistoryTable(workouts) {
-            var tbody = document.getElementById('historyTableBody');
+            const tbody = document.getElementById('historyTableBody');
             if (!tbody) return;
-            var rows = [];
-            workouts.forEach(function(w) {
-                var date = w.created_at || w.date;
-                (w.exercises||[]).forEach(function(ex) {
-                    if (!ex||!ex.name) return;
-                    rows.push({ date: new Date(date||Date.now()), name: ex.name, weight: ex.weight?parseFloat(ex.weight):null, sets:ex.sets, reps:ex.reps });
-                });
+            const rows = [];
+            workouts.forEach(w => {
+                const date = w.created_at||w.date;
+                (w.exercises||[]).forEach(ex => { if(ex?.name) rows.push({date:new Date(date||Date.now()),name:ex.name,weight:ex.weight?parseFloat(ex.weight):null,sets:ex.sets,reps:ex.reps}); });
             });
-            rows.sort(function(a,b){return b.date-a.date;});
-            if (rows.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#555;padding:30px;">No history yet.</td></tr>';
-                return;
-            }
-            var lastWeight = {};
-            tbody.innerHTML = rows.slice(0,20).map(function(row) {
-                var key  = row.name.toLowerCase();
-                var prev = lastWeight[key];
-                var trend = '&mdash;';
-                if (row.weight && prev !== undefined) {
-                    var diff = row.weight - prev;
-                    trend = diff > 0 ? '<span class="trend-up">+' + diff + ' lbs</span>' : diff < 0 ? '<span class="trend-down">' + diff + ' lbs</span>' : '<span class="trend-neutral">&mdash;</span>';
-                }
-                lastWeight[key] = row.weight;
-                var vol = (row.sets&&row.reps&&row.weight) ? (parseInt(row.sets)*parseInt(row.reps)*row.weight).toLocaleString()+' lbs' : '&mdash;';
-                return '<tr><td>' + row.date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + '</td>' +
-                    '<td>' + row.name + '</td><td>' + (row.weight?row.weight+' lbs':'&mdash;') + '</td>' +
-                    '<td>' + (row.sets||'&mdash;') + ' x ' + (row.reps||'&mdash;') + '</td><td>' + vol + '</td><td>' + trend + '</td></tr>';
+            rows.sort((a,b)=>b.date-a.date);
+            if (!rows.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#555;padding:30px;">No history yet.</td></tr>'; return; }
+            const lastWeight = {};
+            tbody.innerHTML = rows.slice(0,20).map(row => {
+                const key=row.name.toLowerCase(), prev=lastWeight[key];
+                let trend='&mdash;';
+                if (row.weight&&prev!==undefined) { const diff=row.weight-prev; trend=diff>0?'<span class="trend-up">+'+diff+' lbs</span>':diff<0?'<span class="trend-down">'+diff+' lbs</span>':'<span class="trend-neutral">&mdash;</span>'; }
+                lastWeight[key]=row.weight;
+                const vol=(row.sets&&row.reps&&row.weight)?(+row.sets * +row.reps * row.weight).toLocaleString()+' lbs':'&mdash;';
+                return '<tr><td>'+row.date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'</td><td>'+row.name+'</td><td>'+(row.weight?row.weight+' lbs':'&mdash;')+'</td><td>'+(row.sets||'&mdash;')+' x '+(row.reps||'&mdash;')+'</td><td>'+vol+'</td><td>'+trend+'</td></tr>';
             }).join('');
         }
 
-        // ── SESSION RESTORE ON LOAD ───────────────────────────────────────
+        // ── INIT ──────────────────────────────────────────────────────────
         (async function init() {
-            // Always load feed immediately so visitors see content
             loadFeedFromSupabase();
-
             try {
-                var stored = localStorage.getItem('sb_session');
+                const stored = localStorage.getItem('sb_session');
                 if (stored) {
-                    var sess = JSON.parse(stored);
-                    if (sess.expires_at > Date.now() / 1000) {
-                        window._sbToken  = sess.access_token;
-                        window._sbUserId = sess.user_id;
-                        var profiles = await sb('profiles?id=eq.' + sess.user_id + '&select=*');
-                        if (profiles && profiles[0]) {
-                            var workouts = await sb('workouts?user_id=eq.' + sess.user_id + '&order=created_at.desc&select=*');
-                            profiles[0].workouts = workouts || [];
-                            setCurrentUser(profiles[0]);
-                            loadProfileForUser(profiles[0]);
-                            navigateToFeed();
-                            return;
+                    const sess = JSON.parse(stored);
+                    if (sess.expires_at > Date.now()/1000) {
+                        window._sbToken = sess.access_token; window._sbUserId = sess.user_id;
+                        const profiles = await sb('profiles?id=eq.'+sess.user_id+'&select=*');
+                        if (profiles?.[0]) {
+                            const workouts = await sb('workouts?user_id=eq.'+sess.user_id+'&order=created_at.desc&select=*');
+                            profiles[0].workouts = workouts||[];
+                            setCurrentUser(profiles[0]); loadProfileForUser(profiles[0]);
+                            navigateToFeed(); return;
                         }
                     }
                 }
             } catch(e) { console.warn('Session restore failed:', e.message); }
-
-            // Not logged in - show signup but keep feed visible underneath
             showSignup();
         })();
 
