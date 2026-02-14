@@ -131,7 +131,7 @@
             justify-content: space-around;
             align-items: center;
             padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
-            z-index: 1000;
+            z-index: 3000;
             box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
         }
 
@@ -1451,11 +1451,12 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: calc(100% - 80px);
             background: var(--black);
             z-index: 2000;
             align-items: center;
             justify-content: center;
+            overflow-y: auto;
         }
 
         .auth-page.active {
@@ -3393,6 +3394,8 @@
                     }
                 }
             } catch(e) { console.warn('Session restore failed:', e.message); }
+            // Still load the feed so visitors can see workouts even before logging in
+            loadFeedFromSupabase().catch(function(){});
             showSignup();
         })();
 
@@ -3672,13 +3675,12 @@
             try {
                 var workouts = await sb('workouts?order=created_at.desc&limit=50&select=*,profiles(full_name,initials,username)');
                 var feed = document.getElementById('mainFeed') || document.querySelector('.activity-feed');
-                if (!feed || !workouts || !workouts.length) {
-                    if (feed && !workouts.length) {
-                        feed.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#555;">' +
-                            '<div style="font-size:48px;margin-bottom:15px;">&#127947;</div>' +
-                            '<h3 style="font-family:Bebas Neue,cursive;font-size:28px;color:#444;letter-spacing:2px;">No Workouts Yet</h3>' +
-                            '<p style="margin-top:10px;">Be the first to log a workout! Hit the + button.</p></div>';
-                    }
+                if (!feed) return;
+                if (!workouts || !workouts.length) {
+                    feed.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#555;">' +
+                        '<div style="font-size:64px;margin-bottom:20px;opacity:0.4">&#127947;</div>' +
+                        '<h3 style="font-family:Bebas Neue,cursive;font-size:32px;color:#444;letter-spacing:3px;margin-bottom:10px;">No Workouts Yet</h3>' +
+                        '<p style="color:#555;font-size:14px;letter-spacing:1px;">Log in and hit the + to post your first workout.</p></div>';
                     return;
                 }
                 // Clear existing DB cards
@@ -3754,6 +3756,7 @@
             document.querySelectorAll('.nav-link').forEach(function(l) { l.classList.remove('active'); });
             var feedLink = document.querySelector('.nav-link[data-page="feed"]');
             if (feedLink) feedLink.classList.add('active');
+            loadFeedFromSupabase().catch(function(){});
         }
 
         // ── FOLLOW SYSTEM ──────────────────────────────────────────────
