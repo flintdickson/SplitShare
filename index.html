@@ -3096,8 +3096,8 @@
         function saveSession(data) {
             try { localStorage.setItem('sb_session', JSON.stringify({ access_token: data.access_token, user_id: data.user.id, expires_at: data.expires_at || (Date.now()/1000+3600) })); } catch(e) {}
         }
-        function saveLikes()     { try { localStorage.setItem('ss_likes',     JSON.stringify([...window._likedPosts])); } catch(e) {} }
-        function saveFollowing() { try { localStorage.setItem('ss_following', JSON.stringify([...window._following]));  } catch(e) {} }
+        function saveLikes()     { try { localStorage.setItem('ss_likes',     JSON.stringify(Array.from(window._likedPosts))); } catch(e) {} }
+        function saveFollowing() { try { localStorage.setItem('ss_following', JSON.stringify(Array.from(window._following)));  } catch(e) {} }
 
         // ── NAVIGATION ────────────────────────────────────────────────────
         function showPage(page) {
@@ -3252,7 +3252,7 @@
                 try {
                     const saved = await sb('workouts', { method: 'POST', body: record });
                     if (!user.workouts) user.workouts = [];
-                    user.workouts.unshift({ ...record, id: saved?.[0]?.id });
+                    user.workouts.unshift(Object.assign({}, record, { id: (saved && saved[0] ? saved[0].id : null) }));
                     setCurrentUser(user);
                     refreshProfileStats(user); refreshProfileWorkouts(user); refreshAchievements(user);
                 } catch(e) { console.warn('Save failed:', e.message); }
@@ -3583,7 +3583,7 @@
 
         function switchProfileTab(tabName) {
             document.querySelectorAll('.profile-tab').forEach(t => {
-                t.classList.toggle('active', t.getAttribute('onclick')?.includes(tabName));
+                t.classList.toggle('active', (t.getAttribute('onclick') && t.getAttribute('onclick').includes(tabName)));
             });
             document.querySelectorAll('.profile-tab-content').forEach(c => c.classList.remove('active'));
             const tc = document.getElementById(tabName + '-tab');
@@ -3598,7 +3598,7 @@
         function refreshProfileStats(user) {
             const workouts      = user.workouts || [];
             const totalWorkouts = workouts.length;
-            const totalEx       = workouts.reduce((s,w) => s + (w.exercises?.length||0), 0);
+            const totalEx       = workouts.reduce((s,w) => s + ((w.exercises ? w.exercises.length : 0)||0), 0);
             const totalMins     = workouts.reduce((s,w) => s + (w.duration||0), 0);
             const set = (id,v) => { const el = document.getElementById(id); if(el) el.textContent=v; };
             set('statTotalWorkouts', totalWorkouts); set('statTotalExercises', totalEx);
@@ -3612,7 +3612,7 @@
                     const d = new Date(w.created_at || w.date || Date.now());
                     return '<div style="background:var(--steel);border-left:3px solid var(--primary);padding:15px 20px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">' +
                         '<div><div style="font-family:\'Bebas Neue\',cursive;font-size:18px;letter-spacing:1px;">' + (w.name||'Untitled').toUpperCase() + '</div>' +
-                        '<div style="font-size:12px;color:#999;margin-top:3px;">' + (w.exercises?.length||0) + ' exercises &middot; ' + (w.duration||0) + ' min</div></div>' +
+                        '<div style="font-size:12px;color:#999;margin-top:3px;">' + ((w.exercises ? w.exercises.length : 0)||0) + ' exercises &middot; ' + (w.duration||0) + ' min</div></div>' +
                         '<div style="font-size:12px;color:#666;font-family:\'Roboto Mono\',monospace;">' + (isNaN(d)?'Recently':d.toLocaleDateString()) + '</div></div>';
                   }).join('');
         }
@@ -3641,7 +3641,7 @@
             const count = workouts.length;
             const totalMins = workouts.reduce((s,w)=>s+(w.duration||0),0);
             const exNames = new Set();
-            workouts.forEach(w => (w.exercises||[]).forEach(e => { if(e?.name) exNames.add(e.name.toLowerCase()); }));
+            workouts.forEach(w => (w.exercises||[]).forEach(e => { if(e && e.name) exNames.add(e.name.toLowerCase()); }));
             const all = [
                 { icon:'&#127949;', title:'First Rep',       desc:'Log your first workout',         earned: count>=1 },
                 { icon:'&#128287;', title:'10 Workout Club', desc:'Log 10 workouts',                earned: count>=10 },
@@ -3667,7 +3667,7 @@
         }
         function hasWeeklyStreak(workouts, weeks) {
             if (!workouts.length) return false;
-            const wks = [...new Set(workouts.map(w=>{ const d=new Date(w.created_at||w.date||Date.now()); return d.getFullYear()+'-W'+Math.floor((d-new Date(d.getFullYear(),0,1))/604800000); }))].sort();
+            const wks = Array.from(new Set(workouts.map(function(w){ var d=new Date(w.created_at||w.date||Date.now()); return d.getFullYear()+'-W'+Math.floor((d-new Date(d.getFullYear(),0,1))/604800000); }))).sort();
             let streak=1,best=1;
             for (let i=1;i<wks.length;i++) { const p=wks[i-1].split('-W'),c=wks[i].split('-W'); const diff=(+c[1]-+p[1])+(+c[0]-+p[0])*52; streak=diff===1?streak+1:1; best=Math.max(best,streak); }
             return best>=weeks;
@@ -3686,10 +3686,10 @@
             btn.textContent = 'Creating...'; btn.disabled = true;
             try {
                 const taken = await sb('profiles?username=eq.'+username+'&select=id');
-                if (taken?.length) { showAuthError('signup','Username already taken.'); btn.textContent='Create Account'; btn.disabled=false; return; }
+                if (taken && taken.length) { showAuthError('signup','Username already taken.'); btn.textContent='Create Account'; btn.disabled=false; return; }
                 const authData = await sbAuth('signup', email, password);
-                const userId = authData.user?.id;
-                const token  = authData.access_token || authData.session?.access_token;
+                const userId = authData.user && authData.user.id;
+                const token  = authData.access_token || authData.session && authData.session.access_token;
                 if (!userId) { showAuthError('signup','Check your email to confirm your account, then log in.'); btn.textContent='Create Account'; btn.disabled=false; return; }
                 window._sbToken = token; window._sbUserId = userId;
                 if (token) saveSession({ access_token: token, user: { id: userId }, expires_at: authData.expires_at||(Date.now()/1000+3600) });
@@ -3712,7 +3712,7 @@
                 window._sbToken = authData.access_token; window._sbUserId = authData.user.id;
                 saveSession(authData);
                 let profiles = await sb('profiles?id=eq.'+authData.user.id+'&select=*');
-                let profile  = profiles?.[0];
+                let profile  = (profiles && profiles[0]);
                 if (!profile) {
                     profile = { id:authData.user.id, username:email.split('@')[0], full_name:email.split('@')[0], initials:email.slice(0,2).toUpperCase(), bio:'', followers:0, following:0 };
                     await sb('profiles', { method:'POST', body:profile });
@@ -3783,7 +3783,7 @@
             workouts.forEach(w => {
                 const date = w.created_at||w.date||new Date().toISOString();
                 (w.exercises||[]).forEach(ex => {
-                    if (!ex?.name||!ex.weight) return;
+                    if (!(ex && ex.name)||!ex.weight) return;
                     const key = ex.name.trim().toLowerCase();
                     if (!exMap[key]) exMap[key] = { displayName: ex.name.trim(), entries: [] };
                     exMap[key].entries.push({ date, weight: parseFloat(ex.weight) });
@@ -3805,12 +3805,12 @@
         function selectProgressExercise(key, btn) {
             document.querySelectorAll('.exercise-btn').forEach(b=>b.classList.remove('active'));
             btn.classList.add('active');
-            if (window._exerciseMap?.[key]) renderProgressExercise(key, window._exerciseMap[key]);
+            if (window._exerciseMap && window._exerciseMap[key]) renderProgressExercise(key, window._exerciseMap[key]);
         }
 
         function renderProgressExercise(key, exData) {
             const entries = exData.entries, weights = entries.map(e=>e.weight);
-            const pr = Math.max(...weights), increase = pr-(weights[0]||0);
+            const pr = Math.max.apply(null, weights), increase = pr-(weights[0]||0);
             const titleEl = document.getElementById('chartTitle');
             if (titleEl) titleEl.innerHTML = exData.displayName+' Progress <span class="pr-badge">PR: '+pr+' LBS</span>';
             const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
@@ -3829,7 +3829,7 @@
             const rows = [];
             workouts.forEach(w => {
                 const date = w.created_at||w.date;
-                (w.exercises||[]).forEach(ex => { if(ex?.name) rows.push({date:new Date(date||Date.now()),name:ex.name,weight:ex.weight?parseFloat(ex.weight):null,sets:ex.sets,reps:ex.reps}); });
+                (w.exercises||[]).forEach(ex => { if((ex && ex.name)) rows.push({date:new Date(date||Date.now()),name:ex.name,weight:ex.weight?parseFloat(ex.weight):null,sets:ex.sets,reps:ex.reps}); });
             });
             rows.sort((a,b)=>b.date-a.date);
             if (!rows.length) { tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#555;padding:30px;">No history yet.</td></tr>'; return; }
@@ -3854,7 +3854,7 @@
                     if (sess.expires_at > Date.now()/1000) {
                         window._sbToken = sess.access_token; window._sbUserId = sess.user_id;
                         const profiles = await sb('profiles?id=eq.'+sess.user_id+'&select=*');
-                        if (profiles?.[0]) {
+                        if ((profiles && profiles[0])) {
                             const workouts = await sb('workouts?user_id=eq.'+sess.user_id+'&order=created_at.desc&select=*');
                             profiles[0].workouts = workouts||[];
                             setCurrentUser(profiles[0]); loadProfileForUser(profiles[0]);
