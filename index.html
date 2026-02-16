@@ -3046,6 +3046,8 @@
 
 
     <script>
+        console.log('=== SPLITSHARE v2.5 LOADED ===');
+        
         // ── CONFIG ────────────────────────────────────────────────────────
         const SUPABASE_URL = 'https://nygqoszurqvvdtndpufo.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55Z3Fvc3p1cnF2dmR0bmRwdWZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3NzU5NDksImV4cCI6MjA4NjM1MTk0OX0.KSd3SPRK2RULFCikjS7WpAlf8YvBiZnwsyA3OT6dzPY';
@@ -3138,12 +3140,16 @@
             loadFeedFromSupabase();
         }
 
+        console.log('Attaching nav listeners...');
         document.querySelectorAll('.nav-link').forEach(link => {
+            console.log('  - Attached to:', link.dataset.page);
             link.addEventListener('click', e => { e.preventDefault(); showPage(link.dataset.page); });
         });
+        console.log('Nav listeners attached!');
 
         // ── POST TYPE / MODAL ─────────────────────────────────────────────
         function openModal() {
+            console.log('openModal called');
             document.getElementById('postTypeOverlay').classList.add('active');
         }
         function closePostType() {
