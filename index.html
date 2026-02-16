@@ -3046,7 +3046,7 @@
 
 
     <script>
-        console.log('=== SPLITSHARE v2.6 SCRIPT LOADED ===');
+        console.log('=== SPLITSHARE v2.7 LOADED - SYNTAX FIXED ===');
         
         document.addEventListener('DOMContentLoaded', function() {
             console.log('=== DOM READY, INITIALIZING ===');
@@ -3455,8 +3455,8 @@
                 '<div style="padding:10px 30px 5px;border-top:1px solid #222;">' +
                     preview.map(commentHTML).join('') +
                     (moreCount > 0
-                        ? '<button onclick="openWorkoutDrawer('' + wid + '')" style="background:none;border:none;color:var(--primary);font-family:Oswald,sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;padding:5px 0 10px;">View all ' + all.length + ' comments</button>'
-                        : '<button onclick="openWorkoutDrawer('' + wid + '')" style="background:none;border:none;color:#666;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;padding:5px 0 10px;text-transform:uppercase;letter-spacing:1px;">Add a comment...</button>') +
+                        ? '<button onclick="openWorkoutDrawer(\'' + wid + '\')" style="background:none;border:none;color:var(--primary);font-family:Oswald,sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;padding:5px 0 10px;">View all ' + all.length + ' comments</button>'
+                        : '<button onclick="openWorkoutDrawer(\'' + wid + '\')" style="background:none;border:none;color:#666;font-family:Oswald,sans-serif;font-size:12px;cursor:pointer;padding:5px 0 10px;text-transform:uppercase;letter-spacing:1px;">Add a comment...</button>') +
                 '</div>';
         }
 
