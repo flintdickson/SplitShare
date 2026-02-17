@@ -3046,7 +3046,7 @@
 
 
     <script>
-        console.log('=== SPLITSHARE v2.9 LOADED - AUTH FIXED ===');
+        console.log('=== SPLITSHARE v3.0 - FOLLOW SYSTEM SYNCED ===');
         
         // ── CONFIG ────────────────────────────────────────────────────────
         const SUPABASE_URL = 'https://nygqoszurqvvdtndpufo.supabase.co';
@@ -3734,6 +3734,11 @@
                 }
                 const workouts = await sb('workouts?user_id=eq.'+authData.user.id+'&order=created_at.desc&select=*');
                 profile.workouts = workouts || [];
+                
+                // Load follows from Supabase
+                const follows = await sb('follows?follower_id=eq.'+authData.user.id+'&select=following_id');
+                window._following = new Set((follows || []).map(f => String(f.following_id)));
+                
                 setCurrentUser(profile); loadProfileForUser(profile);
                 await loadFeedFromSupabase(); navigateToFeed();
             } catch(err) { showAuthError('login', err.message.includes('Invalid')?'Incorrect email or password.':err.message); btn.textContent='Log In'; btn.disabled=false; }
@@ -3746,10 +3751,20 @@
             uid = String(uid);
             if (isFollowing(uid)) {
                 window._following.delete(uid); btn.textContent='Follow'; btn.classList.remove('following');
-                try { await sb('follows?follower_id=eq.'+window._sbUserId+'&following_id=eq.'+uid, {method:'DELETE',prefer:''}); } catch(e) {}
+                try { 
+                    await sb('follows?follower_id=eq.'+window._sbUserId+'&following_id=eq.'+uid, {method:'DELETE',prefer:''}); 
+                    // Update local count
+                    const user = getCurrentUser();
+                    if (user) { user.following = Math.max(0, (user.following || 0) - 1); setCurrentUser(user); refreshProfileStats(user); }
+                } catch(e) { console.warn('Unfollow failed:', e); }
             } else {
                 window._following.add(uid); btn.textContent='Following'; btn.classList.add('following');
-                try { await sb('follows', {method:'POST', body:{follower_id:window._sbUserId, following_id:uid}}); } catch(e) {}
+                try { 
+                    await sb('follows', {method:'POST', body:{follower_id:window._sbUserId, following_id:uid}}); 
+                    // Update local count
+                    const user = getCurrentUser();
+                    if (user) { user.following = (user.following || 0) + 1; setCurrentUser(user); refreshProfileStats(user); }
+                } catch(e) { console.warn('Follow failed:', e); }
             }
             saveFollowing();
         }
@@ -3872,6 +3887,11 @@
                         if ((profiles && profiles[0])) {
                             const workouts = await sb('workouts?user_id=eq.'+sess.user_id+'&order=created_at.desc&select=*');
                             profiles[0].workouts = workouts||[];
+                            
+                            // Load follows from Supabase
+                            const follows = await sb('follows?follower_id=eq.'+sess.user_id+'&select=following_id');
+                            window._following = new Set((follows || []).map(f => String(f.following_id)));
+                            
                             setCurrentUser(profiles[0]); loadProfileForUser(profiles[0]);
                             navigateToFeed(); return;
                         }
