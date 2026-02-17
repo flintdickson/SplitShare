@@ -3046,10 +3046,7 @@
 
 
     <script>
-        console.log('=== SPLITSHARE v2.7 LOADED - SYNTAX FIXED ===');
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== DOM READY, INITIALIZING ===');
+        console.log('=== SPLITSHARE v2.9 LOADED - AUTH FIXED ===');
         
         // ── CONFIG ────────────────────────────────────────────────────────
         const SUPABASE_URL = 'https://nygqoszurqvvdtndpufo.supabase.co';
@@ -3884,8 +3881,6 @@
             showSignup();
         })();
 
-        }); // End DOMContentLoaded
-
         // ── EXPOSE FUNCTIONS GLOBALLY FOR INLINE ONCLICK ─────────────────
         window.openModal = function() { document.getElementById('postTypeOverlay').classList.add('active'); };
         window.closePostType = function() { document.getElementById('postTypeOverlay').classList.remove('active'); };
@@ -3929,7 +3924,7 @@
             zone.querySelector('.upload-icon').style.display = 'block';
             zone.querySelector('.upload-text').style.display = 'block';
         };
-        window.handleLogWorkout = function() { /* will be set in DOMContentLoaded */ };
+        window.handleLogWorkout = handleLogWorkout;
         window.toggleDetails = function(button) {
             button.classList.toggle('active');
             const icon = button.querySelector('.details-toggle-icon');
@@ -3947,12 +3942,12 @@
             const cur = parseInt(countEl.textContent) || 0;
             countEl.textContent = (cur + 1) + ' Like' + (cur + 1 === 1 ? '' : 's');
         };
-        window.openWorkoutDrawer = function(wid) { /* will be set */ };
+        window.openWorkoutDrawer = openWorkoutDrawer;
         window.closeDrawer = function() {
             document.getElementById('workoutDrawer').classList.remove('active');
             window._activeDrawerWorkout = null;
         };
-        window.submitComment = function() { /* will be set */ };
+        window.submitComment = submitComment;
         window.openGroup = function(groupId) {
             const groupsGrid = document.querySelector('.groups-grid');
             const groupsHeader = document.querySelector('.groups-header');
@@ -3996,11 +3991,11 @@
             const tc = document.getElementById(tabName + '-tab');
             if (tc) tc.classList.add('active');
         };
-        window.navigateToPage = function(page) { /* will be set */ };
-        window.selectProgressExercise = function(key, btn) { /* will be set */ };
-        window.toggleFollow = function(uid, btn) { /* will be set */ };
-        window.handleSignup = function() { /* will be set */ };
-        window.handleLogin = function() { /* will be set */ };
+        window.navigateToPage = navigateToPage;
+        window.selectProgressExercise = selectProgressExercise;
+        window.toggleFollow = toggleFollow;
+        window.handleSignup = handleSignup;
+        window.handleLogin = handleLogin;
         window.showSignup = function() {
             const sp = document.getElementById('signupPage');
             const lp = document.getElementById('loginPage');
