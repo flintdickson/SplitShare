@@ -917,11 +917,36 @@
         }
 
         .exercise-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
             margin-bottom: 40px;
             animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .exercise-dropdown {
+            width: 100%;
+            max-width: 400px;
+            background: var(--steel);
+            border: 2px solid #333;
+            color: var(--white);
+            padding: 15px 20px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .exercise-dropdown:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 107, 53, 0.1);
+        }
+
+        .exercise-dropdown option {
+            background: var(--steel);
+            color: var(--white);
+            padding: 10px;
         }
 
         .exercise-btn {
@@ -2383,10 +2408,13 @@
             </div>
 
             <div class="exercise-selector">
-                <button class="exercise-btn active" data-exercise="bench">Bench Press</button>
-                <button class="exercise-btn" data-exercise="squat">Squat</button>
-                <button class="exercise-btn" data-exercise="deadlift">Deadlift</button>
-                <button class="exercise-btn" data-exercise="ohp">Overhead Press</button>
+                <select class="exercise-dropdown" id="exerciseSelect" onchange="selectProgressExercise(this.value, this)">
+                    <option value="">Select an exercise...</option>
+                    <option value="bench">Bench Press</option>
+                    <option value="squat">Squat</option>
+                    <option value="deadlift">Deadlift</option>
+                    <option value="ohp">Overhead Press</option>
+                </select>
             </div>
 
             <div class="chart-container">
@@ -2422,7 +2450,6 @@
                             <th>Weight</th>
                             <th>Sets x Reps</th>
                             <th>Volume</th>
-                            <th>Trend</th>
                         </tr>
                     </thead>
                     <tbody id="historyTableBody"></tbody>
@@ -2442,71 +2469,7 @@
             </div>
 
             <div class="groups-grid">
-                <!-- Group Card 1 -->
-                <div class="group-card" onclick="openGroup('morning-grind')">
-                    <div class="group-header-banner">
-                        <h3 class="group-name">Morning Grind Crew</h3>
-                        <div class="group-members-count"> 12 members</div>
-                    </div>
-                    <div class="group-body">
-                        <p class="group-description">Early morning lifters crushing it before work. 5 AM squad! </p>
-                        <div class="group-stats">
-                            <div class="group-stat">
-                                <div class="group-stat-value">24</div>
-                                <div class="group-stat-label">Workouts</div>
-                            </div>
-                            <div class="group-stat">
-                                <div class="group-stat-value">89%</div>
-                                <div class="group-stat-label">Completion</div>
-                            </div>
-                        </div>
-                        <button class="view-group-btn">View Group</button>
-                    </div>
-                </div>
-
-                <!-- Group Card 2 -->
-                <div class="group-card" onclick="openGroup('powerlifting')">
-                    <div class="group-header-banner">
-                        <h3 class="group-name">Powerlifting Gang</h3>
-                        <div class="group-members-count"> 8 members</div>
-                    </div>
-                    <div class="group-body">
-                        <p class="group-description">Focused on the big three: squat, bench, deadlift. Let's get strong! </p>
-                        <div class="group-stats">
-                            <div class="group-stat">
-                                <div class="group-stat-value">18</div>
-                                <div class="group-stat-label">Workouts</div>
-                            </div>
-                            <div class="group-stat">
-                                <div class="group-stat-value">92%</div>
-                                <div class="group-stat-label">Completion</div>
-                            </div>
-                        </div>
-                        <button class="view-group-btn">View Group</button>
-                    </div>
-                </div>
-
-                <!-- Group Card 3 -->
-                <div class="group-card" onclick="openGroup('summer-shred')">
-                    <div class="group-header-banner">
-                        <h3 class="group-name">Summer Shred</h3>
-                        <div class="group-members-count"> 25 members</div>
-                    </div>
-                    <div class="group-body">
-                        <p class="group-description">12-week program to get beach ready. High intensity, high accountability! </p>
-                        <div class="group-stats">
-                            <div class="group-stat">
-                                <div class="group-stat-value">36</div>
-                                <div class="group-stat-label">Workouts</div>
-                            </div>
-                            <div class="group-stat">
-                                <div class="group-stat-value">76%</div>
-                                <div class="group-stat-label">Completion</div>
-                            </div>
-                        </div>
-                        <button class="view-group-btn">View Group</button>
-                    </div>
-                </div>
+                <!-- Groups load here from database -->
             </div>
 
             <!-- Group Detail View -->
@@ -2523,189 +2486,7 @@
                 </div>
 
                 <div class="group-workout-feed">
-                    <!-- Workout Challenge 1 -->
-                    <div class="group-workout-card">
-                        <div class="workout-posted-by">
-                            <div class="posted-by-label">Posted by Group Leader</div>
-                            <div class="posted-by-name">Marcus King</div>
-                        </div>
-                        <h3 class="workout-challenge-title">Monday Push Day Challenge</h3>
-                        <p class="workout-challenge-description">Let's crush this push day together! Focus on progressive overload - add 5 lbs from last week if you can. Post your completion photo or just check in when done! </p>
-                        <div class="workout-challenge-exercises">
-                            <div class="exercise-list">
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Barbell Bench Press</span>
-                                    <span class="exercise-details">4 x 8</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Incline Dumbbell Press</span>
-                                    <span class="exercise-details">3 x 10</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Cable Flyes</span>
-                                    <span class="exercise-details">3 x 12</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Overhead Press</span>
-                                    <span class="exercise-details">3 x 8</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Tricep Pushdowns</span>
-                                    <span class="exercise-details">3 x 15</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="completions-section">
-                            <div class="completions-header">
-                                <div class="completions-title">Completions (8/12)</div>
-                                <button class="complete-workout-btn" onclick="completeWorkout(this)">âœ“ Mark Complete</button>
-                            </div>
-                            <div class="completions-grid">
-                                <div class="completion-item">
-                                    <div class="completion-avatar">JR</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Jessica Rodriguez</div>
-                                        <div class="completion-time">2 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">TC</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Tyler Chen</div>
-                                        <div class="completion-time">3 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">âœ…</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">SD</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Sarah Davis</div>
-                                        <div class="completion-time">4 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">MJ</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Mike Johnson</div>
-                                        <div class="completion-time">5 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">âœ…</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">AL</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Alex Lee</div>
-                                        <div class="completion-time">6 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">KB</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Kim Brown</div>
-                                        <div class="completion-time">7 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">âœ…</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">RP</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Ryan Park</div>
-                                        <div class="completion-time">8 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">âœ…</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">EN</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Emma Nelson</div>
-                                        <div class="completion-time">9 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1550345332-09e3ac987658?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Workout Challenge 2 -->
-                    <div class="group-workout-card">
-                        <div class="workout-posted-by">
-                            <div class="posted-by-label">Posted by Group Leader</div>
-                            <div class="posted-by-name">Marcus King</div>
-                        </div>
-                        <h3 class="workout-challenge-title">Friday Leg Day </h3>
-                        <p class="workout-challenge-description">End the week strong with a brutal leg session. Remember: legs don't grow from comfort!</p>
-                        <div class="workout-challenge-exercises">
-                            <div class="exercise-list">
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Back Squat</span>
-                                    <span class="exercise-details">5 x 5</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Romanian Deadlift</span>
-                                    <span class="exercise-details">4 x 8</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Leg Press</span>
-                                    <span class="exercise-details">3 x 12</span>
-                                </div>
-                                <div class="exercise-item">
-                                    <span class="exercise-name">Walking Lunges</span>
-                                    <span class="exercise-details">3 x 20</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="completions-section">
-                            <div class="completions-header">
-                                <div class="completions-title">Completions (5/12)</div>
-                                <button class="complete-workout-btn" onclick="completeWorkout(this)">âœ“ Mark Complete</button>
-                            </div>
-                            <div class="completions-grid">
-                                <div class="completion-item">
-                                    <div class="completion-avatar">TC</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Tyler Chen</div>
-                                        <div class="completion-time">1 hour ago</div>
-                                    </div>
-                                    <span class="completion-status">âœ…</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">SD</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Sarah Davis</div>
-                                        <div class="completion-time">2 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">âœ…</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">AL</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Alex Lee</div>
-                                        <div class="completion-time">3 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">MJ</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Mike Johnson</div>
-                                        <div class="completion-time">4 hours ago</div>
-                                    </div>
-                                    <span class="completion-status">âœ…</span>
-                                </div>
-                                <div class="completion-item">
-                                    <div class="completion-avatar">JR</div>
-                                    <div class="completion-info">
-                                        <div class="completion-name">Jessica Rodriguez</div>
-                                        <div class="completion-time">5 hours ago</div>
-                                    </div>
-                                    <img src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=100&h=100&fit=crop" class="completion-photo" alt="Workout completion">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Group workouts load here from database -->
                 </div>
             </div>
         </div>
@@ -2717,9 +2498,9 @@
                 <div class="profile-top">
                     <div class="profile-avatar-large" id="profileInitials">MK</div>
                     <div class="profile-info">
-                        <h1 class="profile-name" id="profileName">Marcus King</h1>
-                        <div class="profile-username" id="profileUsername">@marcusking</div>
-                        <p class="profile-bio" id="profileBio">Powerlifter | 5 AM Grind | Chasing 500lb deadlift </p>
+                        <h1 class="profile-name" id="profileName">Your Name</h1>
+                        <div class="profile-username" id="profileUsername">@username</div>
+                        <p class="profile-bio" id="profileBio">Your bio appears here</p>
                         <div class="profile-stats-row">
                             <div class="profile-stat-item">
                                 <div class="profile-stat-number" id="profileWorkoutCount">0</div>
@@ -3046,7 +2827,7 @@
 
 
     <script>
-        console.log('=== SPLITSHARE v3.0 - FOLLOW SYSTEM SYNCED ===');
+        console.log('=== SPLITSHARE v3.2 - SAMPLE DATA REMOVED ===');
         
         // ── CONFIG ────────────────────────────────────────────────────────
         const SUPABASE_URL = 'https://nygqoszurqvvdtndpufo.supabase.co';
@@ -3753,17 +3534,29 @@
                 window._following.delete(uid); btn.textContent='Follow'; btn.classList.remove('following');
                 try { 
                     await sb('follows?follower_id=eq.'+window._sbUserId+'&following_id=eq.'+uid, {method:'DELETE',prefer:''}); 
-                    // Update local count
-                    const user = getCurrentUser();
-                    if (user) { user.following = Math.max(0, (user.following || 0) - 1); setCurrentUser(user); refreshProfileStats(user); }
+                    // Reload profile to get updated counts
+                    const profiles = await sb('profiles?id=eq.'+window._sbUserId+'&select=*');
+                    if (profiles && profiles[0]) {
+                        const user = getCurrentUser();
+                        user.followers = profiles[0].followers || 0;
+                        user.following = profiles[0].following || 0;
+                        setCurrentUser(user);
+                        refreshProfileStats(user);
+                    }
                 } catch(e) { console.warn('Unfollow failed:', e); }
             } else {
                 window._following.add(uid); btn.textContent='Following'; btn.classList.add('following');
                 try { 
                     await sb('follows', {method:'POST', body:{follower_id:window._sbUserId, following_id:uid}}); 
-                    // Update local count
-                    const user = getCurrentUser();
-                    if (user) { user.following = (user.following || 0) + 1; setCurrentUser(user); refreshProfileStats(user); }
+                    // Reload profile to get updated counts
+                    const profiles = await sb('profiles?id=eq.'+window._sbUserId+'&select=*');
+                    if (profiles && profiles[0]) {
+                        const user = getCurrentUser();
+                        user.followers = profiles[0].followers || 0;
+                        user.following = profiles[0].following || 0;
+                        setCurrentUser(user);
+                        refreshProfileStats(user);
+                    }
                 } catch(e) { console.warn('Follow failed:', e); }
             }
             saveFollowing();
