@@ -135,10 +135,6 @@
             box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
         }
 
-        .auth-page.active ~ nav {
-            display: none;
-        }
-
         nav a {
             color: #999;
             text-decoration: none;
@@ -1480,9 +1476,9 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: calc(100% - 80px);
+            height: 100%;
             background: var(--black);
-            z-index: 2000;
+            z-index: 4000;
             align-items: center;
             justify-content: center;
             overflow-y: auto;
@@ -2921,6 +2917,8 @@
                 const el = document.getElementById(id);
                 if (el) { el.classList.remove('active'); el.style.display = 'none'; }
             });
+            const nav = document.querySelector('nav');
+            if (nav) nav.style.display = 'flex';
             showPage('feed');
             loadFeedFromSupabase();
         }
@@ -3335,15 +3333,19 @@
         function showSignup() {
             const sp = document.getElementById('signupPage');
             const lp = document.getElementById('loginPage');
+            const nav = document.querySelector('nav');
             if (sp) { sp.style.display = 'flex'; sp.classList.add('active'); }
             if (lp) { lp.style.display = 'none';  lp.classList.remove('active'); }
+            if (nav) nav.style.display = 'none';
             clearAuthErrors();
         }
         function showLogin() {
             const lp = document.getElementById('loginPage');
             const sp = document.getElementById('signupPage');
+            const nav = document.querySelector('nav');
             if (lp) { lp.style.display = 'flex'; lp.classList.add('active'); }
             if (sp) { sp.style.display = 'none';  sp.classList.remove('active'); }
+            if (nav) nav.style.display = 'none';
             clearAuthErrors();
         }
         function logout() {
@@ -3816,14 +3818,18 @@
         window.showSignup = function() {
             const sp = document.getElementById('signupPage');
             const lp = document.getElementById('loginPage');
+            const nav = document.querySelector('nav');
             if (sp) { sp.style.display = 'flex'; sp.classList.add('active'); }
             if (lp) { lp.style.display = 'none'; lp.classList.remove('active'); }
+            if (nav) nav.style.display = 'none';
         };
         window.showLogin = function() {
             const lp = document.getElementById('loginPage');
             const sp = document.getElementById('signupPage');
+            const nav = document.querySelector('nav');
             if (lp) { lp.style.display = 'flex'; lp.classList.add('active'); }
             if (sp) { sp.style.display = 'none'; sp.classList.remove('active'); }
+            if (nav) nav.style.display = 'none';
         };
 
     </script>
