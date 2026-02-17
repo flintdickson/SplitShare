@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SplitShare">
     <title>SplitShare - Track Your Strength</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Bebas+Neue&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -3124,12 +3127,12 @@
                 (w.photo_url ? '<img src="' + w.photo_url + '" class="workout-photo" alt="">' : '') +
                 (w.caption   ? '<p class="workout-caption">&ldquo;' + w.caption + '&rdquo;</p>' : '') +
                 (chips ? '<div class="post-exercises-preview">' + chips + '</div>' : '') +
-                '<button class="view-workout-btn" onclick="openWorkoutDrawer(' + JSON.stringify(wid) + ')">View Full Workout &rarr;</button>' +
+                '<button class="view-workout-btn" onclick="openWorkoutDrawer(\'' + wid + '\')">View Full Workout &rarr;</button>' +
                 '<div class="activity-actions">' +
                     '<button class="action-btn like-btn' + (liked?' liked':'') + '" data-wid="' + wid + '" onclick="handleLike(this)">' +
                         '<span class="like-icon">&#10084;</span> <span class="like-count">0 Likes</span>' +
                     '</button>' +
-                    '<button class="action-btn" onclick="openWorkoutDrawer(' + JSON.stringify(wid) + ')">' +
+                    '<button class="action-btn" onclick="openWorkoutDrawer(\'' + wid + '\')">' +
                         '&#128172; <span class="comment-count">0 Comments</span>' +
                     '</button>' +
                 '</div>' +
