@@ -7,15 +7,37 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SplitShare">
     <title>SplitShare - Track Your Strength</title>
+    <script>
+        // Chart.js stub - prevents errors if CDN fails
+        // Real Chart.js loaded after page ready
+        window.Chart = window.Chart || function() {
+            return { destroy: function(){}, update: function(){}, data: { labels:[], datasets:[] } };
+        };
+    </script>
+    <script>
+        // Load Chart.js asynchronously after page loads
+        window.addEventListener('load', function() {
+            var s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+            document.head.appendChild(s);
+        });
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Bebas+Neue&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Fallback fonts if Google Fonts fails to load */
+        body { font-family: 'Oswald', 'Arial Narrow', Arial, sans-serif; }
+    </style>
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             max-width: 100vw;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
+        *::-webkit-scrollbar { display: none; }
 
         img, svg, video, canvas {
             max-width: 100%;
@@ -1168,6 +1190,10 @@
             margin-bottom: 24px;
             overflow-x: auto;
             scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-x;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .progress-tabs::-webkit-scrollbar { display: none; }
 
@@ -1764,7 +1790,12 @@
         .groups-subnav {
             display: flex;
             border-bottom: 2px solid #222;
-            margin: 20px 0 0 0;
+            margin: 0;
+            padding-top: calc(env(safe-area-inset-top) + 12px);
+            background: var(--black);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         .groups-subnav-btn {
             flex: 1;
@@ -1899,7 +1930,7 @@
         .groups-grid {
             display: flex;
             flex-direction: column;
-            gap: 0;
+            gap: 32px;
             margin-bottom: 80px;
         }
 
@@ -2013,7 +2044,10 @@
         .group-detail {
             display: none;
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: var(--black);
             z-index: 900;
             overflow-y: auto;
@@ -2428,10 +2462,12 @@
             position: fixed;
             top: 0;
             left: 0;
+            right: 0;
+            bottom: 0;
             width: 100%;
-            height: 100%;
+            min-height: 100%;
             background: var(--black);
-            z-index: 4000;
+            z-index: 99999;
             align-items: center;
             justify-content: center;
             overflow-y: auto;
@@ -3413,7 +3449,7 @@
             border-top: 2px solid var(--primary);
             width: 100%;
             max-width: 600px;
-            padding: 30px 30px calc(30px + env(safe-area-inset-bottom));
+            padding: 30px 30px calc(100px + env(safe-area-inset-bottom));
             animation: slideUpSheet 0.3s ease-out;
         }
         @keyframes slideUpSheet {
@@ -3734,7 +3770,7 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">SPLITSHARE</div>
-                <button class="header-search-btn" onclick="navigateToPage('search')">🔍 Find People</button>
+                <button class="header-search-btn" onclick="navigateToPage('search')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-right:6px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find People</button>
             </div>
         </div>
     </header>
@@ -3755,7 +3791,7 @@
             </div>
 
             <div class="activity-feed" id="mainFeed">
-                <!-- Workouts load here from Supabase -->
+<!-- Workouts load here from Supabase -->
             </div>
         </section>
         </div>
@@ -3769,17 +3805,38 @@
             </div>
 
             <div class="progress-tabs">
-                <button class="progress-tab active" onclick="switchProgressTab('chart', this)">📈 Charts</button>
-                <button class="progress-tab" onclick="switchProgressTab('prs', this)">🏆 PR Board</button>
-                <button class="progress-tab" onclick="switchProgressTab('insights', this)">⚡ Insights</button>
-                <button class="progress-tab" onclick="switchProgressTab('goals', this)">🎯 Goals</button>
-                <button class="progress-tab compete-only" onclick="switchProgressTab('muscles', this)">💪 Muscles</button>
-                <button class="progress-tab compete-only" onclick="switchProgressTab('heatmap', this)">📅 Heatmap</button>
-                <button class="progress-tab compete-only" onclick="switchProgressTab('plateau', this)">⚠️ Plateau</button>
+                <button class="progress-tab active" onclick="switchProgressTab('history', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-right:5px;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>History</button>
+                <button class="progress-tab compete-only" onclick="switchProgressTab('chart', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-right:5px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Charts</button>
+                <button class="progress-tab compete-only" onclick="switchProgressTab('prs', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-right:5px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>PR Board</button>
+                <button class="progress-tab compete-only" onclick="switchProgressTab('insights', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-right:5px;"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>Insights</button>
+                <button class="progress-tab compete-only" onclick="switchProgressTab('goals', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-right:5px;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Goals</button>
+                <button class="progress-tab compete-only" onclick="switchProgressTab('muscles', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-right:5px;"><path d="M6.5 6.5a5 5 0 0 1 7 7l-7 7-7-7a5 5 0 0 1 7-7z"/><path d="M17.5 6.5a5 5 0 0 1 0 7"/></svg>Muscles</button>
+                <button class="progress-tab compete-only" onclick="switchProgressTab('heatmap', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-right:5px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Heatmap</button>
+                <button class="progress-tab compete-only" onclick="switchProgressTab('plateau', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-right:5px;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Plateau</button>
             </div>
 
             <!-- TAB: Charts -->
-            <div class="progress-tab-pane active" id="ptab-chart">
+            <div class="progress-tab-pane active" id="ptab-history">
+                <div class="exercise-selector">
+                    <select class="exercise-dropdown" id="historyExerciseSelect" onchange="selectHistoryExercise(this.value)">
+                        <option value="">Select an exercise...</option>
+                    </select>
+                </div>
+                <div id="historyContent" style="display:none">
+                    <h2 class="chart-title" style="font-size:20px;text-align:left;margin-bottom:16px;">Session History</h2>
+                    <table class="history-table">
+                        <thead><tr><th>Date</th><th>Weight</th><th>Sets×Reps</th><th>Volume</th><th>Est 1RM</th></tr></thead>
+                        <tbody id="historyTabBody"></tbody>
+                    </table>
+                </div>
+                <div id="historyNoExMsg" style="text-align:center;padding:60px 20px;color:#555;">
+                    <div style="margin-bottom:16px;opacity:0.3;"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+                    <h3 style="font-family:'Bebas Neue',cursive;font-size:28px;color:#444;letter-spacing:2px;margin-bottom:8px">Select an Exercise</h3>
+                    <p style="font-size:14px;color:#555;">Choose a lift from the dropdown to see your session history.</p>
+                </div>
+            </div>
+
+            <div class="progress-tab-pane" id="ptab-chart">
                 <div class="exercise-selector">
                     <select class="exercise-dropdown" id="exerciseSelect" onchange="selectProgressExercise(this.value)">
                         <option value="">Select an exercise...</option>
@@ -3799,12 +3856,12 @@
                     <div id="goalProgressSection" style="display:none;margin-top:14px;background:rgba(255,107,53,0.07);border:1px solid rgba(255,107,53,0.2);padding:14px 16px;border-radius:2px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                             <span style="font-size:12px;color:#999;font-family:'Oswald',sans-serif;letter-spacing:1px;text-transform:uppercase;">Progress to Goal</span>
-                            <span id="goalPct" style="font-family:'Bebas Neue',cursive;font-size:18px;color:var(--primary);">0%</span>
+                            <span id="goalPct" style="font-family:Bebas Neue,cursive;font-size:18px;color:var(--primary);">0%</span>
                         </div>
                         <div style="height:8px;background:#222;border-radius:4px;overflow:hidden;">
                             <div id="goalProgressBar" style="height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:4px;transition:width 0.6s ease;width:0%"></div>
                         </div>
-                        <div id="goalETA" style="font-size:12px;color:#888;margin-top:8px;font-family:'Roboto Mono',monospace;"></div>
+                        <div id="goalETA" style="font-size:12px;color:#888;margin-top:8px;font-family:Roboto Mono,monospace;"></div>
                     </div>
                 </div>
                 <div class="workout-history" id="historySection" style="display:none">
@@ -3861,20 +3918,36 @@
         <div class="groups-page">
             <!-- Groups Sub-Nav -->
             <div class="groups-subnav">
-                <button class="groups-subnav-btn active" onclick="switchGroupsTab('my', this)">My Groups</button>
+                <button class="groups-subnav-btn active" onclick="switchGroupsTab('teams', this)">My Teams</button>
+                <button class="groups-subnav-btn" onclick="switchGroupsTab('compete', this)">My Competitions</button>
                 <button class="groups-subnav-btn" onclick="switchGroupsTab('discover', this)">Discover</button>
             </div>
 
-            <!-- My Groups Tab -->
-            <div class="groups-tab-pane active" id="myGroupsTab">
+            <!-- My Teams Tab -->
+            <div class="groups-tab-pane active" id="teamsTab">
                 <div class="groups-header">
                     <div>
-                        <h1 class="progress-title">My Groups</h1>
-                        <p class="progress-subtitle">Train together, achieve together</p>
+                        <h1 class="progress-title">My Teams</h1>
+                        <p class="progress-subtitle">Coach and athlete groups</p>
                     </div>
-                    <button class="create-group-btn" onclick="openCreateGroupModal()">+ Create Group</button>
+                    <button class="create-group-btn" style="background:transparent;border:2px solid var(--primary);color:var(--primary);padding:10px 16px;font-size:13px;white-space:nowrap;" onclick="openCreateGroupModal(false)">+ New</button>
                 </div>
-                <div class="groups-grid" id="myGroupsGrid"></div>
+                <div class="groups-grid" id="teamsGrid"></div>
+            </div>
+
+            <!-- My Competitions Tab -->
+            <div class="groups-tab-pane" id="competeTab">
+                <div class="groups-header">
+                    <div>
+                        <h1 class="progress-title">My Competitions</h1>
+                        <p class="progress-subtitle">Challenge friends, track PRs</p>
+                    </div>
+                    <button class="create-group-btn" style="background:transparent;border:2px solid var(--primary);color:var(--primary);padding:10px 16px;font-size:13px;white-space:nowrap;" onclick="openCreateGroupModal(true)">+ New</button>
+                </div>
+                <div class="groups-grid" id="competeGrid"></div>
+
+            <!-- Legacy myGroupsGrid kept for compat -->
+            <div style="display:none"><div class="groups-grid" id="myGroupsGrid"></div></div>
             </div>
 
             <!-- Discover Tab -->
@@ -3910,10 +3983,12 @@
                 <div class="group-inner-tabs" id="groupInnerTabs">
                     <button class="group-inner-tab active" onclick="switchGroupInnerTab('feed',this)">Feed</button>
                     <button class="group-inner-tab" onclick="switchGroupInnerTab('leaderboard',this)">Leaderboard</button>
+                    <button class="group-inner-tab compete-group-tab" onclick="switchGroupInnerTab('challenges',this)" style="display:none">Challenges</button>
                     <button class="group-inner-tab" onclick="switchGroupInnerTab('members',this)">Members</button>
                     <button class="group-inner-tab admin-only-tab" onclick="switchGroupInnerTab('admin',this)" style="display:none">Dashboard</button>
                 </div>
                 <div class="group-inner-pane active" id="groupFeedPane"><div id="groupWorkoutFeed"></div></div>
+                <div class="group-inner-pane" id="groupChallengesPane"><div id="groupChallengesFeed"></div></div>
                 <div class="group-inner-pane" id="groupLeaderboardPane"><div id="groupLeaderboard"></div></div>
                 <div class="group-inner-pane" id="groupMembersPane"><div id="groupMembersList"></div></div>
                 <div class="group-inner-pane" id="groupAdminPane"><div id="groupAdminDashboard"></div></div>
@@ -3923,6 +3998,9 @@
 
         <!-- Profile Page -->
         <div class="profile-page">
+            <div style="background:var(--black);padding:calc(env(safe-area-inset-top) + 12px) 20px 12px;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:10;">
+                <div style="font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:3px;color:var(--white);">PROFILE</div>
+            </div>
             <div class="profile-header">
                 <div class="profile-top">
                     <div class="profile-avatar-large" id="profileInitials">MK</div>
@@ -4115,19 +4193,16 @@
     <!-- Post Type Selector Sheet -->
     <div class="post-type-overlay" id="postTypeOverlay" onclick="if(event.target===this)closePostType()">
         <div class="post-type-sheet">
-            <div class="post-type-title">What are you posting?</div>
+            <div class="post-type-title">Log Workout</div>
             <button class="post-type-btn" onclick="openWorkoutModal('personal')">
-                <span class="pt-icon">&#127947;</span>
+                <span class="pt-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="18" y2="12"/><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="18" y="10" width="4" height="4" rx="1"/><rect x="4" y="8" width="2" height="8" rx="1"/><rect x="18" y="8" width="2" height="8" rx="1"/></svg></span>
                 <span class="pt-text">
-                    <span class="pt-label">Personal Workout</span>
-                    <span class="pt-sub">Log a workout to your profile and the public feed</span>
+                    <span class="pt-label">Log Workout</span>
+                    <span class="pt-sub">Post to your profile and the public feed</span>
                 </span>
                 <span>&#8250;</span>
             </button>
-            <button class="post-type-btn" onclick="openWorkoutModal('group')">
-                <span class="pt-icon">&#128101;</span>
-                <span class="pt-text">
-                    <span class="pt-label">Post to Group</span>
+            <div style="display:none"><button onclick="openWorkoutModal('group')"><span class="pt-label">Post to Group</span>
                     <span class="pt-sub">Share a workout challenge with your group</span>
                 </span>
                 <span>&#8250;</span>
@@ -4299,7 +4374,8 @@
         <div class="modal-content" style="max-width:500px;">
             <button class="modal-close" onclick="closeUpgradeModal()">&#215;</button>
             <h2 style="margin-bottom:8px;">Upgrade Your Plan</h2>
-            <p style="color:#888;font-size:14px;margin-bottom:30px;">Unlock premium features and take your training to the next level.</p>
+            <p style="color:#888;font-size:14px;margin-bottom:16px;">Unlock premium features and take your training to the next level.</p>
+            <button onclick="recheckSubscription()" style="width:100%;padding:12px;background:transparent;border:1px solid #333;color:#999;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;margin-bottom:20px;transition:all 0.2s;">Already paid? Tap here to unlock</button>
 
             <div style="background:var(--iron);border:2px solid var(--primary);padding:24px;margin-bottom:16px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -4311,15 +4387,16 @@
                     <li>✅ Workout frequency heatmap</li>
                     <li>✅ Plateau detection</li>
                     <li>✅ Full PR history &amp; analytics</li>
-                    <li>✅ Create groups &amp; leaderboards</li>
-                    <li>✅ Compete against friends</li>
+                    <li>✅ Create 1 Compete group with leaderboard</li>
+                    <li>✅ Rank members by workouts, volume &amp; minutes</li>
+                    <li>✅ See everyone's recent workouts</li>
                 </ul>
                 <button class="submit-btn" style="margin-top:0;" onclick="openStripeLink('https://buy.stripe.com/00w14n9DZfroakh61m7wA00')">Get Compete — $5/mo</button>
             </div>
 
             <div style="background:var(--iron);border:1px solid #333;padding:24px;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                    <div style="font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:2px;">Coach</div>
+                    <div style="font-family:'Bebas Neue',cursive;font-size:26px;letter-spacing:2px;">Teams</div>
                     <div style="font-family:'Bebas Neue',cursive;font-size:26px;color:var(--primary);">$20<span style="font-size:14px;color:#888;">/group/mo</span></div>
                 </div>
                 <ul style="color:#ccc;font-size:13px;line-height:2;list-style:none;padding:0;margin:0 0 16px;">
@@ -4330,7 +4407,7 @@
                     <li>✅ Unlimited athletes per group</li>
                     <li>✅ Each $20/mo = one group — buy as many as you need</li>
                 </ul>
-                <button class="submit-btn" style="margin-top:0;" onclick="openStripeLink('https://buy.stripe.com/7sY8wP4jFcfccspfBW7wA01')">Get Coach — $20/mo per group</button>
+                <button class="submit-btn" style="margin-top:0;" onclick="openStripeLink('https://buy.stripe.com/7sY8wP4jFcfccspfBW7wA01')">Get Teams — $20/mo per group</button>
             </div>
         </div>
     </div>
@@ -4458,7 +4535,7 @@
         <div class="modal-content">
             <button class="modal-close" onclick="closePostGroupWorkout()">&#215;</button>
             <h2>Post Workout</h2>
-            <form id="postGroupWorkoutForm">
+            <form id="postGroupWorkoutForm" onsubmit="return false;">
                 <div class="form-group">
                     <label>Workout Name</label>
                     <input id="gwName" type="text" placeholder="e.g., Monday Push Day" required>
@@ -4473,12 +4550,20 @@
                 </div>
                 <div class="form-group">
                     <label>Exercises</label>
+                    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 2fr;gap:6px;margin-bottom:6px;">
+                        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;">Exercise</div>
+                        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;text-align:center;">Sets</div>
+                        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;text-align:center;">Reps</div>
+                        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;text-align:center;">Weight</div>
+                        <div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;">Coaching Cue</div>
+                    </div>
                     <div id="gwExerciseContainer">
-                        <div class="exercise-inputs">
+                        <div class="exercise-inputs" style="grid-template-columns:2fr 1fr 1fr 1fr 2fr;">
                             <input type="text" placeholder="Exercise name" class="gw-ex-name">
                             <input type="number" placeholder="Sets" class="gw-ex-sets">
                             <input type="number" placeholder="Reps" class="gw-ex-reps">
-                            <input type="text" placeholder="Weight / notes" class="gw-ex-weight">
+                            <input type="text" placeholder="Weight" class="gw-ex-weight">
+                            <input type="text" placeholder="e.g. Keep chest up" class="gw-ex-cue">
                         </div>
                     </div>
                     <button type="button" class="add-exercise-btn" onclick="addGWExercise()">+ Add Exercise</button>
@@ -4536,6 +4621,13 @@
     </div>
 
     <script>
+        // Global error trap
+        window.onerror = function(msg, src, line, col, err) {
+            const feed = document.getElementById('mainFeed');
+            if (feed && feed.children.length === 0) {
+                feed.innerHTML = '<div style="padding:20px;color:#f87171;font-size:13px;font-family:monospace;">JS Error: ' + msg + ' (line ' + line + ')</div>';
+            }
+        };
         console.log('=== SPLITSHARE v3.2 - SAMPLE DATA REMOVED ===');
         
         // ── CONFIG ────────────────────────────────────────────────────────
@@ -4555,6 +4647,8 @@
         // ── REST ──────────────────────────────────────────────────────────
         async function sb(path, opts) {
             opts = opts || {};
+            const controller = new AbortController();
+            const timeout = setTimeout(function() { controller.abort(); }, 30000);
             const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
                 method: opts.method || 'GET',
                 headers: {
@@ -4563,8 +4657,10 @@
                     'Content-Type': 'application/json',
                     'Prefer': opts.prefer || 'return=representation'
                 },
-                body: opts.body ? JSON.stringify(opts.body) : undefined
+                body: opts.body ? JSON.stringify(opts.body) : undefined,
+                signal: controller.signal
             });
+            clearTimeout(timeout);
             if (!res.ok) {
                 const e = await res.json().catch(() => ({}));
                 throw new Error(e.message || e.error_description || e.hint || res.statusText);
@@ -4593,6 +4689,9 @@
 
         // ── NAVIGATION ────────────────────────────────────────────────────
         function showPage(page) {
+            // Show header only on feed page
+            const header = document.querySelector('header');
+            if (header) header.style.display = page === 'feed' ? 'block' : 'none';
             ['feed','progress','groups','profile'].forEach(p => {
                 const el = document.querySelector('.' + p + '-page');
                 if (el) el.classList.remove('active');
@@ -4608,12 +4707,14 @@
             } else if (page === 'progress') {
                 const pp = document.querySelector('.progress-page');
                 if (pp) { pp.classList.add('active'); setTimeout(renderProgressPage, 100); }
+                // Recheck subscription so compete tabs unlock if paid
+                loadSubscription();
             } else if (page === 'groups') {
                 const gp = document.querySelector('.groups-page');
                 // Restore nav in case we're coming from inside a group detail
                 const nav = document.querySelector('nav');
                 if (nav) nav.style.display = 'flex';
-                if (gp) { gp.classList.add('active'); closeGroupDetail(); loadUserGroups(); }
+                if (gp) { gp.classList.add('active'); closeGroupDetail(); loadUserGroups('teams'); }
             } else if (page === 'profile') {
                 const prp = document.querySelector('.profile-page');
                 if (prp) prp.classList.add('active');
@@ -4872,6 +4973,8 @@
 
             resetWorkoutForm();
             closeModal();
+            // Check for new PRs and prompt to share
+            checkForNewPRs(exercises);
             if (postType === 'personal') {
                 navigateToFeed();
             } else {
@@ -5368,7 +5471,15 @@
                 } else {
                     window._allFeedWorkouts = [];
                 }
+                console.log('Total workouts loaded:', (window._allFeedWorkouts||[]).length);
                 renderFeed(window._activeFeedFilter);
+                // Show debug count on feed if empty after 3s
+                setTimeout(function() {
+                    const feed = document.getElementById('mainFeed');
+                    if (feed && feed.children.length === 0) {
+                        feed.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#555;"><div style="font-size:14px;">No posts yet. Be the first to log a workout!</div></div>';
+                    }
+                }, 3000);
             } catch(e) {
                 console.error('Feed load error:', e.message, e);
                 feed.innerHTML = '<div style="text-align:center;padding:40px;color:#f87171;">Feed error: ' + e.message + '</div>';
@@ -5408,11 +5519,10 @@
                     return vis === 'public';
                 });
             } else {
-                // Everyone tab — only public posts from anyone
-                // My own followers/private posts do NOT appear here
+                // Everyone tab — show all posts (null visibility treated as public)
                 filtered = allWorkouts.filter(function(w) {
                     const vis = w.visibility || 'public';
-                    return vis === 'public';
+                    return vis === 'public' || vis === 'followers';
                 });
             }
 
@@ -5501,7 +5611,11 @@
             document.querySelectorAll('.groups-subnav-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.groups-tab-pane').forEach(p => p.classList.remove('active'));
             btn.classList.add('active');
-            document.getElementById(tab === 'my' ? 'myGroupsTab' : 'discoverTab').classList.add('active');
+            const paneMap = { teams: 'teamsTab', compete: 'competeTab', discover: 'discoverTab', my: 'teamsTab' };
+            const pane = document.getElementById(paneMap[tab] || 'teamsTab');
+            if (pane) pane.classList.add('active');
+            if (tab === 'teams') loadUserGroups('teams');
+            if (tab === 'compete') loadUserGroups('compete');
             if (tab === 'discover') loadDiscoverGroups();
         }
 
@@ -5513,23 +5627,23 @@
             if (tab === 'members')     loadGroupMembers(window._currentGroupId);
             if (tab === 'admin')       loadAdminDashboard(window._currentGroupId);
             if (tab === 'leaderboard') loadGroupLeaderboard(window._currentGroupId);
+            if (tab === 'challenges') loadGroupChallenges(window._currentGroupId);
         }
 
         // ── Create Group ──────────────────────────────────────────
-        async function openCreateGroupModal() {
+        async function openCreateGroupModal(isCompete) {
             // Reload subscription fresh in case it was just purchased
             await loadSubscription();
             const sub = window._userSubscription;
-            const isCoach = sub && (sub.tier === 'coach' || sub.tier === 'team');
-            if (!isCoach) {
-                // Show upgrade modal with coach pricing info
-                openUpgradeModal();
-                return;
-            }
+            const isCoach = sub && ((sub.tier === 'teams' || sub.tier === 'coach') || (sub.tier === 'team'));
+            const hasCompeteForGroup = sub && (sub.tier === 'compete' || sub.tier === 'team' || sub.tier === 'coach' || sub.tier === 'teams');
+            if (isCompete && !hasCompeteForGroup) { openUpgradeModal(); return; }
+            if (!isCompete && !isCoach) { openUpgradeModal(); return; }
+            window._creatingCompeteGroup = !!isCompete;
             // Check group slots: each $20/mo purchase = 1 group slot
             try {
-                const coachSubs = await sb('subscriptions?user_id=eq.' + window._sbUserId + '&tier=eq.coach&status=eq.active&select=id');
-                const slots = coachSubs ? coachSubs.length : 0;
+                const teamsSubs = await sb('subscriptions?user_id=eq.' + window._sbUserId + '&tier=in.(teams,coach)&select=id');
+                const slots = teamsSubs ? teamsSubs.length : 0;
                 const created = await sb('groups?creator_id=eq.' + window._sbUserId + '&select=id');
                 const used = created ? created.length : 0;
                 if (used >= slots) {
@@ -5540,7 +5654,7 @@
                     const modal = document.createElement('div');
                     modal.id = 'deleteConfirmModal';
                     modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
-                    modal.innerHTML = '<div style="background:#1e1e1e;border:2px solid #ff6b35;padding:32px;max-width:360px;width:100%;text-align:center;"><div style="font-family:Bebas Neue,cursive;font-size:26px;letter-spacing:2px;color:#ff6b35;margin-bottom:10px;">Add Another Group</div><p style="color:#999;font-size:14px;margin-bottom:24px;line-height:1.6;">All group slots used. Buy another Coach subscription to add a new group.</p><div style="display:flex;gap:12px;"><button id="slotCancelBtn" style="flex:1;padding:14px;background:transparent;border:2px solid #444;color:#999;font-family:Oswald,sans-serif;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;">Cancel</button><button id="slotBuyBtn" style="flex:1;padding:14px;background:#ff6b35;border:none;color:#fff;font-family:Oswald,sans-serif;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;">$20/mo — Add Group</button></div></div>';
+                    modal.innerHTML = '<div style="background:#1e1e1e;border:2px solid #ff6b35;padding:32px;max-width:360px;width:100%;text-align:center;"><div style="font-family:Bebas Neue,cursive;font-size:26px;letter-spacing:2px;color:#ff6b35;margin-bottom:10px;">Add Another Group</div><p style="color:#999;font-size:14px;margin-bottom:24px;line-height:1.6;">All group slots used. Buy another Teams subscription to add a new group.</p><div style="display:flex;gap:12px;"><button id="slotCancelBtn" style="flex:1;padding:14px;background:transparent;border:2px solid #444;color:#999;font-family:Oswald,sans-serif;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;">Cancel</button><button id="slotBuyBtn" style="flex:1;padding:14px;background:#ff6b35;border:none;color:#fff;font-family:Oswald,sans-serif;font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;">$20/mo — Add Group</button></div></div>';
                     document.body.appendChild(modal);
                     document.getElementById('slotCancelBtn').onclick = function() { modal.remove(); };
                     document.getElementById('slotBuyBtn').onclick = function() { modal.remove(); openStripeLink('https://buy.stripe.com/7sY8wP4jFcfccspfBW7wA01'); };
@@ -5609,7 +5723,7 @@
             // Check coach subscription — reload fresh to be sure
             await loadSubscription();
             const sub = window._userSubscription;
-            const isCoach = sub && (sub.tier === 'coach' || sub.tier === 'team');
+            const isCoach = sub && ((sub.tier === 'teams' || sub.tier === 'coach') || (sub.tier === 'team'));
             if (!isCoach) { openUpgradeModal(); return; }
 
             // Count purchased slots (one row per $20/mo payment) vs groups already created
@@ -5618,7 +5732,7 @@
             const existingAdminGroups = await sb('group_members?user_id=eq.' + user.id + '&role=eq.admin&select=group_id').catch(() => []);
             const adminCount = existingAdminGroups ? existingAdminGroups.length : 0;
             if (adminCount >= purchasedSlots) {
-                showToast('You need another Coach subscription to create an additional group ($20/mo).');
+                showToast('You need another Teams subscription to create an additional group ($20/mo).');
                 openStripeLink('https://buy.stripe.com/7sY8wP4jFcfccspfBW7wA01');
                 return;
             }
@@ -5645,6 +5759,7 @@
                     name, description: desc || '', image_url: imageUrl,
                     creator_id: user.id, is_public: visibility === 'public',
                     password: visibility === 'private' ? password : null,
+                    group_type: window._creatingCompeteGroup ? 'compete' : 'teams',
                     created_at: new Date().toISOString()
                 }});
                 if (created && created[0]) {
@@ -5653,8 +5768,9 @@
                         role: 'admin', joined_at: new Date().toISOString()
                     }});
                     closeCreateGroup();
-                    await loadUserGroups();
+                    await loadUserGroups('teams');
                     openGroupDetail(created[0].id);
+                    const gType = window._creatingCompeteGroup ? 'Competition' : 'Team';
                 }
             } catch(err) {
                 alert('Error: ' + err.message);
@@ -5664,23 +5780,34 @@
         }
 
         // ── Load My Groups ────────────────────────────────────────
-        async function loadUserGroups() {
+        async function loadUserGroups(filterType) {
             const user = getCurrentUser();
             if (!user) return;
-            const grid = document.getElementById('myGroupsGrid');
+            const gridId = filterType === 'compete' ? 'competeGrid' : (filterType === 'teams' ? 'teamsGrid' : 'teamsGrid');
+            const grid = document.getElementById(gridId);
             if (!grid) return;
+            const emptyMsg = filterType === 'compete'
+                ? emptyGroupsMsg('No competitions yet.', 'Create a compete group to challenge your friends!')
+                : emptyGroupsMsg('No teams yet.', 'Create a team or join one from Discover!');
             grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#555;">Loading...</div>';
             try {
                 const memberships = await sb('group_members?user_id=eq.' + user.id + '&select=group_id,role');
                 if (!memberships || memberships.length === 0) {
-                    grid.innerHTML = emptyGroupsMsg('You haven\'t joined any groups yet.', 'Create one or search Discover!');
+                    grid.innerHTML = emptyMsg;
                     return;
                 }
                 const ids = memberships.map(m => m.group_id);
                 const roleMap = {};
                 memberships.forEach(m => roleMap[m.group_id] = m.role);
-                const groups = await sb('groups?id=in.(' + ids.join(',') + ')&select=*');
-                if (!groups || groups.length === 0) { grid.innerHTML = emptyGroupsMsg('No groups found.', ''); return; }
+                const allGroups = await sb('groups?id=in.(' + ids.join(',') + ')&select=*');
+                if (!allGroups || allGroups.length === 0) { grid.innerHTML = emptyMsg; return; }
+                // Filter by type
+                const targetType = filterType === 'compete' ? 'compete' : 'teams';
+                const groups = allGroups.filter(function(g) {
+                    if (filterType === 'compete') return g.group_type === 'compete';
+                    return g.group_type !== 'compete'; // teams = anything not compete
+                });
+                if (groups.length === 0) { grid.innerHTML = emptyMsg; return; }
                 grid.innerHTML = groups.map(g => groupCard(g, roleMap[g.id], true)).join('');
             } catch(e) {
                 grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#f87171;">Error loading groups: ' + e.message + '</div>';
@@ -5802,7 +5929,7 @@
                 group_id: groupId, user_id: user.id,
                 role: 'member', joined_at: new Date().toISOString()
             }});
-            await loadUserGroups();
+            await loadUserGroups('teams');
             openGroupDetail(groupId);
         }
 
@@ -5861,7 +5988,7 @@
                     userRole = mem && mem[0] ? mem[0].role : null;
                     console.log('group_members query result:', mem, 'userRole:', userRole);
                     // Fallback: if role query returned nothing but user created the group, treat as admin
-                    if (!userRole && group.created_by && group.created_by === user.id) {
+                    if (!userRole && group.creator_id && group.creator_id === user.id) {
                         userRole = 'admin';
                         console.log('Fallback: user is group creator, granting admin role');
                     }
@@ -5892,7 +6019,8 @@
 
                 // Action buttons
                 let actions = '';
-                if (userRole === 'admin') {
+                const isCompeteGroup = group.group_type === 'compete';
+                if (userRole === 'admin' && !isCompeteGroup) {
                     actions += '<button class="post-workout-btn" onclick="openPostGroupWorkout()"><svg width="14" height="14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px;"><rect x="16" y="8" width="32" height="48" rx="3" stroke="currentColor" stroke-width="4" fill="none"/><rect x="24" y="4" width="16" height="10" rx="2" stroke="currentColor" stroke-width="3" fill="none"/><line x1="24" y1="26" x2="40" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="24" y1="34" x2="40" y2="34" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><line x1="24" y1="42" x2="34" y2="42" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>Post Workout</button>';
                     document.querySelector('.admin-only-tab').style.display = 'block';
                 } else {
@@ -5901,10 +6029,49 @@
                         actions += '<button class="post-workout-btn" onclick="handleJoinGroup(\'' + groupId + '\',event)">Join Group</button>';
                     }
                 }
+                actionsEl.style.cssText = 'display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px;';
                 actionsEl.innerHTML = actions;
+                if (userRole === 'admin') {
+                    const dotsBtn = document.createElement('div');
+                    dotsBtn.style.cssText = 'position:relative;display:inline-block;';
+                    dotsBtn.innerHTML = '<button id="groupDotsBtn" onclick="toggleGroupMenu()" style="background:transparent;border:2px solid var(--primary);color:var(--primary);padding:10px 18px;font-family:Oswald,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;text-transform:uppercase;font-weight:600;">⋮ OPTIONS</button>' +
+                        '<div id="groupDotsMenu" style="display:none;position:absolute;bottom:48px;left:0;background:#1a1a1a;border:2px solid var(--primary);min-width:200px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.7);">' +
+                        '<button onclick="shareGroup();toggleGroupMenu()" style="display:block;width:100%;padding:16px 20px;background:transparent;border:none;border-bottom:1px solid #2a2a2a;color:#fff;font-family:Oswald,sans-serif;font-size:14px;letter-spacing:1px;text-align:left;cursor:pointer;text-transform:uppercase;font-weight:600;">Share Group</button>' +
+                        '<button onclick="openEditGroup();toggleGroupMenu()" style="display:block;width:100%;padding:16px 20px;background:transparent;border:none;border-bottom:1px solid #2a2a2a;color:#fff;font-family:Oswald,sans-serif;font-size:14px;letter-spacing:1px;text-align:left;cursor:pointer;text-transform:uppercase;font-weight:600;">Edit Group</button>' +
+                        '<button onclick="confirmDeleteGroup();toggleGroupMenu()" style="display:block;width:100%;padding:16px 20px;background:transparent;border:none;color:#f87171;font-family:Oswald,sans-serif;font-size:14px;letter-spacing:1px;text-align:left;cursor:pointer;text-transform:uppercase;font-weight:600;">Delete Group</button>' +
+                        '</div>';
+                    actionsEl.appendChild(dotsBtn);
+                }
 
-                // Load feed
-                await loadGroupFeed(groupId, userRole);
+                // Load feed or leaderboard depending on group type
+                if (group.group_type === 'compete') {
+                    // Show challenges tab for compete groups
+                    // Hide leaderboard tab, show challenges tab for compete groups
+                    document.querySelectorAll('.group-inner-tab').forEach(function(t) {
+                        const onclick = t.getAttribute('onclick') || '';
+                        if (onclick.includes('leaderboard')) t.style.display = 'none';
+                        if (onclick.includes('admin')) t.style.display = 'none';
+                        if (onclick.includes("'feed'")) t.style.display = 'none';
+                        t.classList.remove('active');
+                    });
+                    document.querySelectorAll('.compete-group-tab').forEach(function(t) { t.style.display = 'block'; });
+                    document.querySelectorAll('.group-inner-pane').forEach(function(p) { p.classList.remove('active'); });
+                    const cTab = document.querySelector('.compete-group-tab');
+                    if (cTab) cTab.classList.add('active');
+                    const cPane = document.getElementById('groupChallengesPane');
+                    if (cPane) cPane.classList.add('active');
+                    window._currentUserRole = userRole;
+                    await loadGroupChallenges(groupId);
+                } else {
+                    // Restore standard tabs for teams groups (hide leaderboard)
+                    document.querySelectorAll('.group-inner-tab').forEach(function(t) {
+                        const onclick = t.getAttribute('onclick') || '';
+                        t.style.display = onclick.includes('leaderboard') ? 'none' : '';
+                    });
+                    document.querySelectorAll('.compete-group-tab').forEach(function(t) { t.style.display = 'none'; });
+                    window._currentUserRole = userRole;
+                    await loadGroupFeed(groupId, userRole);
+                }
 
             } catch(e) {
                 document.getElementById('groupWorkoutFeed').innerHTML = '<div style="padding:40px;text-align:center;color:#f87171;">Error: ' + e.message + '</div>';
@@ -5964,17 +6131,25 @@
         function renderGroupWorkoutCard(w, alreadyDone, completionCount, userRole) {
             const exercises = Array.isArray(w.exercises) ? w.exercises : [];
             const exHTML = exercises.map(ex =>
-                '<div class="exercise-item"><span class="exercise-name">' + ex.name + '</span>' +
+                '<div class="exercise-item" style="flex-direction:column;align-items:flex-start;gap:4px;">' +
+                '<div style="display:flex;justify-content:space-between;width:100%;align-items:center;">' +
+                '<span class="exercise-name">' + ex.name + '</span>' +
                 '<span class="exercise-details">' + (ex.sets||'?') + ' × ' + (ex.reps||'?') +
-                (ex.weight ? ' · ' + ex.weight : '') + '</span></div>'
+                (ex.weight ? ' · ' + ex.weight : '') + '</span></div>' +
+                (ex.cue ? '<div style="font-size:12px;color:#ff9966;font-style:italic;padding-left:2px;">💡 ' + ex.cue + '</div>' : '') +
+                '</div>'
             ).join('');
             const dueHTML = w.due_date ? '<span class="gw-due-badge">Due ' + new Date(w.due_date).toLocaleDateString('en-US',{month:'short',day:'numeric'}) + '</span>' : '';
             const logBtnHTML = alreadyDone
-                ? '<button class="gw-log-btn" disabled>✅ Done</button>'
+                ? '<button class="gw-log-btn" disabled style="background:#4ade80;">✅ Done</button>'
                 : '<button class="gw-log-btn" onclick="openLogCompletion(&#39;' + w.id + '&#39;)">Log Completion</button>';
             return '<div class="gw-card">' +
                 '<div class="gw-card-header"><div><div class="gw-card-title">' + w.name.toUpperCase() + '</div>' +
-                (w.notes ? '<div style="font-size:12px;color:#888;margin-top:4px;">' + w.notes + '</div>' : '') + '</div>' + dueHTML + '</div>' +
+                (w.notes ? '<div style="font-size:12px;color:#888;margin-top:4px;">' + w.notes + '</div>' : '') + '</div>' +
+                '<div style="display:flex;align-items:center;gap:6px;">' + dueHTML +
+                (userRole === 'admin' ? '<button onclick="openEditGroupWorkout(\'' + w.id + '\')" style="background:transparent;border:1px solid #444;color:#999;padding:5px 10px;font-family:Oswald,sans-serif;font-size:11px;letter-spacing:1px;cursor:pointer;text-transform:uppercase;">Edit</button>' : '') +
+                (userRole === 'admin' ? '<button onclick="deleteGroupWorkout(\'' + w.id + '\')" style="background:transparent;border:1px solid #444;color:#f87171;padding:5px 10px;font-family:Oswald,sans-serif;font-size:11px;letter-spacing:1px;cursor:pointer;text-transform:uppercase;">Delete</button>' : '') +
+                '</div></div>' +
                 (exercises.length ? '<div class="gw-exercises"><div class="exercise-list" style="margin:0;">' + exHTML + '</div></div>' : '') +
                 '<div class="gw-completion-bar">' +
                 '<span class="gw-completion-count">✓ ' + completionCount + ' completed</span>' +
@@ -5985,9 +6160,14 @@
         // ── Post Group Workout (admin) ────────────────────────────
         function openPostGroupWorkout() {
             const sub = window._userSubscription;
-            const isCoach = sub && (sub.tier === 'coach' || sub.tier === 'team');
+            const isCoach = sub && ((sub.tier === 'teams' || sub.tier === 'coach') || (sub.tier === 'team'));
             if (!isCoach) {
                 openUpgradeModal();
+                return;
+            }
+            // Ensure _currentGroupId is set
+            if (!window._currentGroupId) {
+                alert('Debug: no group ID set. Please close and re-open the group.');
                 return;
             }
             document.getElementById('postGroupWorkoutModal').classList.add('active');
@@ -6007,16 +6187,19 @@
             const container = document.getElementById('gwExerciseContainer');
             const div = document.createElement('div');
             div.className = 'exercise-inputs';
+            div.style.cssText = 'grid-template-columns:2fr 1fr 1fr 1fr 2fr;';
             div.innerHTML = '<input type="text" placeholder="Exercise name" class="gw-ex-name">' +
                 '<input type="number" placeholder="Sets" class="gw-ex-sets">' +
                 '<input type="number" placeholder="Reps" class="gw-ex-reps">' +
-                '<input type="text" placeholder="Weight / notes" class="gw-ex-weight">';
+                '<input type="text" placeholder="Weight" class="gw-ex-weight">' +
+                '<input type="text" placeholder="Coaching cue" class="gw-ex-cue" style="color:#ff9966;">';
             container.appendChild(div);
         }
         async function saveGroupWorkout() {
             const user    = getCurrentUser();
             const groupId = window._currentGroupId;
-            if (!user || !groupId) return;
+            if (!user) { alert('You must be logged in to post.'); return; }
+            if (!groupId) { alert('Error: no group selected. Please go back and re-open the group.'); return; }
             const name    = document.getElementById('gwName').value.trim();
             const notes   = document.getElementById('gwNotes').value.trim();
             const dueDate = document.getElementById('gwDueDate').value;
@@ -6028,25 +6211,27 @@
                     name: n,
                     sets: row.querySelector('.gw-ex-sets').value || '',
                     reps: row.querySelector('.gw-ex-reps').value || '',
-                    weight: row.querySelector('.gw-ex-weight').value || ''
+                    weight: row.querySelector('.gw-ex-weight').value || '',
+                    cue: row.querySelector('.gw-ex-cue') ? row.querySelector('.gw-ex-cue').value.trim() : ''
                 });
             });
             const btn = document.querySelector('#postGroupWorkoutModal .submit-btn');
-            btn.textContent = 'Posting...'; btn.disabled = true;
+            if (btn) { btn.textContent = 'Posting...'; btn.disabled = true; }
             try {
-                console.log('Posting to group:', groupId, 'as user:', user.id);
-                await sb('group_workouts', { method: 'POST', body: {
-                    group_id: groupId, posted_by: user.id, name,
+                alert('Debug: posting workout "' + name + '" to group ' + groupId);
+                const result = await sb('group_workouts', { method: 'POST', body: {
+                    group_id: groupId, user_id: user.id, name,
                     notes: notes || null, exercises,
-                    due_date: dueDate || null, created_at: new Date().toISOString()
+                    due_date: dueDate || null,
+                    created_at: new Date().toISOString()
                 }});
+                alert('Debug: post succeeded! Result: ' + JSON.stringify(result));
                 closePostGroupWorkout();
                 await loadGroupFeed(groupId, 'admin');
             } catch(e) {
-                console.error('Post group workout error:', e);
-                alert('Could not post workout.\n\n' + e.message + '\n\nMake sure the RLS policy allows admins to insert into group_workouts.');
+                alert('Post failed: ' + e.message);
             } finally {
-                btn.textContent = 'Post Workout'; btn.disabled = false;
+                if (btn) { btn.textContent = 'Post Workout'; btn.disabled = false; }
             }
         }
 
@@ -6057,6 +6242,12 @@
         async function openLogCompletion(workoutId) {
             window._currentWorkoutId = workoutId;
             try {
+                // Check if already completed
+                const existing = await sb('group_completions?workout_id=eq.' + workoutId + '&user_id=eq.' + window._sbUserId + '&select=id');
+                if (existing && existing.length > 0) {
+                    alert('You have already completed this workout!');
+                    return;
+                }
                 const rows = await sb('group_workouts?id=eq.' + workoutId + '&select=*');
                 const w    = rows && rows[0];
                 if (!w) return;
@@ -6066,7 +6257,8 @@
                 const container = document.getElementById('logCompletionExercises');
                 container.innerHTML = window._currentWorkoutExercises.map((ex, i) =>
                     '<div style="margin-bottom:12px;">' +
-                    '<div style="font-size:13px;font-weight:600;letter-spacing:1px;margin-bottom:6px;color:#ccc;">' + ex.name.toUpperCase() + '</div>' +
+                    '<div style="font-size:13px;font-weight:600;letter-spacing:1px;margin-bottom:4px;color:#ccc;">' + ex.name.toUpperCase() + '</div>' +
+                    (ex.cue ? '<div style="font-size:12px;color:#ff9966;margin-bottom:6px;font-style:italic;">💡 ' + ex.cue + '</div>' : '') +
                     '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">' +
                     '<input type="number" id="comp_sets_' + i + '" placeholder="Sets" value="' + (ex.sets||'') + '" style="padding:10px;background:var(--iron);border:1px solid #333;color:white;font-family:Oswald,sans-serif;font-size:14px;">' +
                     '<input type="number" id="comp_reps_' + i + '" placeholder="Reps" value="' + (ex.reps||'') + '" style="padding:10px;background:var(--iron);border:1px solid #333;color:white;font-family:Oswald,sans-serif;font-size:14px;">' +
@@ -6152,7 +6344,8 @@
                 await sb('group_completions', { method: 'POST', body: {
                     workout_id: workoutId, group_id: groupId,
                     user_id: user.id, comment: exercisesLogged.map(e => e.name + ' ' + (e.sets||'') + 'x' + (e.reps||'')).join(', '),
-                    photo_url: photoUrl || null
+                    photo_url: photoUrl || null,
+                    exercises_logged: exercisesLogged
                 }});
                 // If post to feed, create a workout entry tagged with group
                 if (postToFeed && groupId) {
@@ -6168,7 +6361,7 @@
                     }});
                 }
                 closeLogCompletion();
-                await loadGroupFeed(groupId, null);
+                await loadGroupFeed(groupId, window._currentUserRole || null);
             } catch(e) {
                 alert('Error: ' + e.message);
             } finally {
@@ -6188,15 +6381,25 @@
                 const profiles = await sb('profiles?id=in.(' + userIds.join(',') + ')&select=id,full_name,initials,username');
                 const profileMap = {};
                 (profiles || []).forEach(p => profileMap[p.id] = p);
+                const isCompeteGrp = window._currentGroupData && window._currentGroupData.group_type === 'compete';
+                const myId = window._sbUserId;
                 el.innerHTML = members.map(m => {
                     const p = profileMap[m.user_id] || {};
                     const initials = p.initials || '??';
                     const name     = p.full_name || p.username || 'Unknown';
+                    const isMe = m.user_id === myId;
+                    const uid_safe = m.user_id;
+                    const name_safe = name.replace(/'/g, '');
+                    const compareBtn = (isCompeteGrp && !isMe)
+                        ? '<button data-uid="' + uid_safe + '" data-name="' + name_safe + '" onclick="openHeadToHead(this.dataset.uid, this.dataset.name)" style="background:transparent;border:1px solid var(--primary);color:var(--primary);padding:6px 14px;font-family:Oswald,sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;white-space:nowrap;">⚔️ Compare</button>'
+                        : (isMe ? '<span style="font-size:11px;color:var(--primary);font-family:Oswald,sans-serif;letter-spacing:1px;">YOU</span>' : '');
                     return '<div class="member-item">' +
                         '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,cursive;font-size:18px;flex-shrink:0;">' + initials + '</div>' +
                         '<div style="flex:1;"><div style="font-size:15px;font-weight:600;">' + name + '</div>' +
                         '<div style="font-size:12px;color:#666;font-family:Roboto Mono,monospace;">@' + (p.username||'') + '</div></div>' +
-                        '<span class="member-role-badge ' + m.role + '">' + m.role.toUpperCase() + '</span></div>';
+                        '<div style="display:flex;align-items:center;gap:10px;">' +
+                        '<span class="member-role-badge ' + m.role + '">' + m.role.toUpperCase() + '</span>' +
+                        compareBtn + '</div></div>';
                 }).join('');
             } catch(e) { el.innerHTML = '<div style="padding:30px;text-align:center;color:#f87171;">Error: ' + e.message + '</div>'; }
         }
@@ -6234,7 +6437,7 @@
                     .sort((a, b) => b.count - a.count);
 
                 const myId = window._sbUserId;
-                const medals = ['🥇', '🥈', '🥉'];
+                const medals = ['1', '2', '3'];
 
                 el.innerHTML = '<div style="padding:20px 0;">' +
                     '<h3 style="font-family:Bebas Neue,cursive;font-size:28px;letter-spacing:2px;color:var(--primary);margin-bottom:4px;padding:0 4px;">Leaderboard</h3>' +
@@ -6246,7 +6449,7 @@
                         const init = p.initials || name.slice(0,2).toUpperCase();
                         const rank = i + 1;
                         const medalOrNum = rank <= 3
-                            ? '<span style="font-size:22px;">' + medals[i] + '</span>'
+                            ? '<span style="font-family:Bebas Neue,cursive;font-size:18px;color:var(--primary);">' + medals[i] + '</span>'
                             : '<span style="font-family:Bebas Neue,cursive;font-size:22px;color:#444;width:32px;text-align:center;">' + rank + '</span>';
                         return '<div style="display:flex;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid #1a1a1a;' + (isMe ? 'background:rgba(255,107,53,0.05);margin:0 -4px;padding:14px 8px;' : '') + '">' +
                             '<div style="width:32px;text-align:center;flex-shrink:0;">' + medalOrNum + '</div>' +
@@ -6284,35 +6487,84 @@
                 const profileMap = {};
                 (profiles || []).forEach(p => profileMap[p.id] = p);
                 // Get all completions for this group
-                const completions = await sb('group_completions?group_id=eq.' + groupId + '&select=workout_id,user_id,comment,photo_url');
+                const completions = await sb('group_completions?group_id=eq.' + groupId + '&select=workout_id,user_id,comment,photo_url,exercises_logged');
                 // Build completion map: workoutId -> Set of userIds
                 const compMap = {};
                 (completions || []).forEach(c => {
                     if (!compMap[c.workout_id]) compMap[c.workout_id] = {};
                     compMap[c.workout_id][c.user_id] = c;
                 });
-                // Render each workout as a roster table
-                el.innerHTML = workouts.map(w => {
+                // Render each workout with collapsible member cards
+                el.innerHTML = workouts.map(function(w) {
                     const wComps = compMap[w.id] || {};
                     const doneCount = Object.keys(wComps).length;
                     const pct = members && members.length ? Math.round(doneCount / members.length * 100) : 0;
-                    const rows = userIds.map(uid => {
+                    const pctColor = pct >= 80 ? '#4ade80' : pct >= 50 ? 'var(--accent)' : 'var(--primary)';
+                    const dueHtml = w.due_date ? '<span style="font-size:12px;color:#666;font-family:Roboto Mono,monospace;margin-left:10px;">Due ' + new Date(w.due_date).toLocaleDateString('en-US',{month:'short',day:'numeric'}) + '</span>' : '';
+
+                    const memberCards = userIds.map(function(uid, uidIdx) {
                         const p    = profileMap[uid] || {};
                         const comp = wComps[uid];
-                        const note = comp ? (comp.comment || '') : '';
-                        return '<tr><td><strong>' + (p.full_name || p.username || 'Unknown') + '</strong></td>' +
-                            '<td style="text-align:center;">' + (comp ? '<span class="roster-check">✓</span>' : '<span class="roster-miss">—</span>') + '</td>' +
-                            '<td style="color:#888;font-size:11px;">' + note + '</td>' +
-                            '<td style="color:#666;">' + (comp && comp.photo_url ? '📷' : '') + '</td></tr>';
+                        const name = p.full_name || p.username || 'Unknown';
+                        const initials = p.initials || name.slice(0,2).toUpperCase();
+                        const cardId = 'dash_' + w.id.replace(/-/g,'').slice(0,8) + '_' + uidIdx;
+
+                        if (!comp) {
+                            // Not completed
+                            return '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--iron);border:1px solid #222;margin-bottom:6px;">'
+                                + '<div style="width:36px;height:36px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,cursive;font-size:15px;color:#555;flex-shrink:0;">' + initials + '</div>'
+                                + '<div style="flex:1;font-size:14px;color:#555;">' + name + '</div>'
+                                + '<span style="color:#555;font-size:18px;">—</span>'
+                                + '</div>';
+                        }
+
+                        const exLogged = comp.exercises_logged || [];
+                        const topLine = exLogged.length > 0
+                            ? exLogged.slice(0,2).map(function(e) { return (e.weight||'?') + 'lbs'; }).join(' · ')
+                            : '✓ Done';
+
+                        return '<div style="border:1px solid #2a2a2a;margin-bottom:6px;overflow:hidden;">'
+                            // Summary row - tappable
+                            + '<div data-cid="' + cardId + '" onclick="toggleDashCard(this.dataset.cid)" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--iron);cursor:pointer;">'
+                            +   '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,cursive;font-size:15px;flex-shrink:0;">' + initials + '</div>'
+                            +   '<div style="flex:1;">'
+                            +     '<div style="font-size:14px;font-weight:600;">' + name + '</div>'
+                            +     '<div style="font-size:12px;color:#888;margin-top:2px;font-family:Roboto Mono,monospace;">' + topLine + '</div>'
+                            +   '</div>'
+                            +   '<div style="display:flex;align-items:center;gap:8px;">'
+                            +     (comp.photo_url ? '<span style="font-size:16px;">📷</span>' : '')
+                            +     '<span style="color:#4ade80;font-size:18px;">✓</span>'
+                            +     '<span id="' + cardId + '_arrow" style="color:#555;font-size:12px;transition:transform 0.2s;">▼</span>'
+                            +   '</div>'
+                            + '</div>'
+                            // Expanded detail - hidden by default
+                            + '<div id="' + cardId + '" style="display:none;padding:16px;background:#111;border-top:1px solid #222;">'
+                            + (comp.photo_url ? '<img src="' + comp.photo_url + '" style="width:100%;max-height:280px;object-fit:cover;margin-bottom:14px;border:1px solid #333;">' : '')
+                            + (exLogged.length > 0
+                                ? '<div style="margin-bottom:12px;">'
+                                +   '<div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Logged Weights</div>'
+                                +   exLogged.map(function(e) {
+                                        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--iron);border-left:3px solid var(--primary);margin-bottom:4px;">'
+                                            + '<span style="font-size:13px;font-weight:600;">' + e.name + '</span>'
+                                            + '<span style="font-family:Bebas Neue,cursive;font-size:18px;color:var(--primary);">' + (e.weight||'?') + ' lbs</span>'
+                                            + '<span style="font-size:12px;color:#666;font-family:Roboto Mono,monospace;">' + (e.sets||'?') + '×' + (e.reps||'?') + '</span>'
+                                            + '</div>';
+                                    }).join('')
+                                + '</div>'
+                                : '')
+                            + (comp.comment ? '<div style="font-size:13px;color:#aaa;font-style:italic;padding:8px 0;">&ldquo;' + comp.comment + '&rdquo;</div>' : '')
+                            + '</div>'
+                            + '</div>';
                     }).join('');
-                    return '<div style="margin-bottom:28px;">' +
-                        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:0 4px;">' +
-                        '<h3 style="font-family:Bebas Neue,cursive;font-size:20px;letter-spacing:1px;">' + w.name.toUpperCase() + '</h3>' +
-                        '<span style="font-family:Bebas Neue,cursive;font-size:20px;color:' + (pct >= 80 ? '#4ade80' : pct >= 50 ? 'var(--accent)' : 'var(--primary)') + ';">' + pct + '%</span>' +
-                        '</div>' +
-                        '<div style="height:4px;background:#222;border-radius:2px;margin-bottom:12px;"><div style="height:100%;width:' + pct + '%;background:var(--primary);border-radius:2px;"></div></div>' +
-                        '<table class="admin-roster-table"><thead><tr><th>Member</th><th style="text-align:center;">Done</th><th>Logged Weights</th><th>Date</th></tr></thead>' +
-                        '<tbody>' + rows + '</tbody></table></div>';
+
+                    return '<div style="margin-bottom:32px;">'
+                        + '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;padding:0 4px;">'
+                        +   '<div><h3 style="font-family:Bebas Neue,cursive;font-size:22px;letter-spacing:1px;display:inline;">' + w.name.toUpperCase() + '</h3>' + dueHtml + '</div>'
+                        +   '<span style="font-family:Bebas Neue,cursive;font-size:22px;color:' + pctColor + ';">' + pct + '%</span>'
+                        + '</div>'
+                        + '<div style="height:4px;background:#222;border-radius:2px;margin-bottom:14px;"><div style="height:100%;width:' + pct + '%;background:var(--primary);border-radius:2px;transition:width 0.5s ease;"></div></div>'
+                        + memberCards
+                        + '</div>';
                 }).join('');
             } catch(e) { el.innerHTML = '<div style="padding:30px;text-align:center;color:#f87171;">Error: ' + e.message + '</div>'; }
         }
@@ -6619,8 +6871,34 @@
                 }
                 feed.appendChild(card);
             });
+            // Load likes and comments for profile workout cards
+            loadLikesAndComments(feed);
         }
 
+        function loadLikesAndComments(feedEl) {
+            const cards = feedEl.querySelectorAll('[data-workout-id]');
+            if (!cards.length) return;
+            const workoutIds = Array.from(cards).map(function(c) { return c.dataset.workoutId; }).filter(Boolean);
+            if (!workoutIds.length) return;
+            const idList = workoutIds.join(',');
+            Promise.all([
+                sb('workout_likes?workout_id=in.(' + idList + ')&select=workout_id,user_id').catch(function() { return []; }),
+                sb('workout_comments?workout_id=in.(' + idList + ')&select=workout_id').catch(function() { return []; })
+            ]).then(function(res) {
+                const likes = res[0]||[], cmts = res[1]||[], myId = window._sbUserId;
+                const likeMap={}, cMap={}, likedByMe=new Set();
+                likes.forEach(function(l) { likeMap[l.workout_id]=(likeMap[l.workout_id]||0)+1; if(l.user_id===myId) likedByMe.add(l.workout_id); });
+                cmts.forEach(function(c) { cMap[c.workout_id]=(cMap[c.workout_id]||0)+1; });
+                feedEl.querySelectorAll('[data-workout-id]').forEach(function(card) {
+                    const wid = card.dataset.workoutId; if(!wid) return;
+                    const lb=card.querySelector('.like-btn'), lc=card.querySelector('.like-count');
+                    const cb=card.querySelector('.comment-count');
+                    if(lb && likedByMe.has(wid)) lb.classList.add('liked');
+                    if(lc) lc.textContent = (likeMap[wid]||0);
+                    if(cb) cb.textContent = (cMap[wid]||0);
+                });
+            }).catch(function() {});
+        }
 
         function refreshAchievements(user) {
             const grid = document.getElementById('achievementsGrid');
@@ -6861,7 +7139,7 @@
         // ── PROGRESS ──────────────────────────────────────────────────────
 
         window._exerciseMap = {};
-        window._activeProgressTab = 'chart';
+        window._activeProgressTab = 'history';
 
         function switchProgressTab(tab, btn) {
             window._activeProgressTab = tab;
@@ -6872,6 +7150,7 @@
             if (pane) pane.classList.add('active');
             const user = getCurrentUser();
             if (!user) return;
+            if (tab === 'history')  renderHistoryTab();
             if (tab === 'prs')      renderPRBoard(user.workouts || []);
             if (tab === 'insights') renderInsights(user.workouts || []);
             if (tab === 'goals')    renderGoals(user.workouts || []);
@@ -6907,6 +7186,20 @@
             });
             Object.values(exMap).forEach(e => e.entries.sort((a, b) => new Date(a.date) - new Date(b.date)));
             window._exerciseMap = exMap;
+
+            // Also populate history tab dropdown
+            const histDropdown = document.getElementById('historyExerciseSelect');
+            if (histDropdown) {
+                const keys2 = Object.keys(exMap);
+                if (keys2.length === 0) {
+                    histDropdown.innerHTML = '<option value="">No weighted exercises logged yet</option>';
+                    histDropdown.disabled = true;
+                } else {
+                    histDropdown.innerHTML = '<option value="">Select an exercise...</option>' +
+                        keys2.sort().map(k => '<option value="' + k + '">' + exMap[k].displayName + '</option>').join('');
+                    histDropdown.disabled = false;
+                }
+            }
 
             const keys = Object.keys(exMap);
             const dropdown = document.getElementById('exerciseSelect');
@@ -7129,7 +7422,7 @@
                 return;
             }
 
-            const rankSymbols = ['🥇', '🥈', '🥉'];
+            const rankSymbols = ['1', '2', '3'];
             const powerScore = calcStrengthScore(workouts);
 
             content.innerHTML = `
@@ -7247,7 +7540,7 @@
 
             content.innerHTML = plateaus.map(p => `
                 <div class="plateau-warning">
-                    <div class="plateau-warning-title">⚠️ Plateau Detected: ${p.name}</div>
+                    <div class="plateau-warning-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;margin-right:5px;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Plateau Detected: ${p.name}</div>
                     <div class="plateau-warning-body">No improvement in the last ${p.weeks} weeks. Consider a deload or variation.</div>
                 </div>`).join('') +
 
@@ -7438,7 +7731,7 @@
         // ── COMPETE GATE CHECK ─────────────────────────────────────────────
         function checkCompeteGate(contentId) {
             const sub = window._userSubscription;
-            const hasCompete = sub && (sub.tier === 'compete' || sub.tier === 'team') && sub.status === 'active';
+            const hasCompete = sub && (sub.tier === 'compete' || sub.tier === 'team' || sub.tier === 'coach' || sub.tier === 'teams');
             if (!hasCompete) {
                 const el = document.getElementById(contentId);
                 if (el) el.innerHTML = `
@@ -7467,6 +7760,35 @@
                 }
             } catch(e) { console.warn('Subscription load failed:', e.message); }
         }
+
+        async function recheckSubscription() {
+            const btn = event.target;
+            btn.textContent = 'Checking...';
+            await loadSubscription();
+            const sub = window._userSubscription;
+            if (sub && sub.tier) {
+                closeUpgradeModal();
+                showToast('🎉 Subscription activated! Welcome to ' + sub.tier.charAt(0).toUpperCase() + sub.tier.slice(1) + '!');
+
+            } else {
+                btn.textContent = 'No active subscription found yet. Try again in a moment.';
+                setTimeout(function() { btn.textContent = 'Already paid? Tap here to unlock'; }, 3000);
+            }
+        }
+
+        // Recheck subscription when app comes back into focus (after Stripe redirect)
+        document.addEventListener('visibilitychange', async function() {
+            if (document.visibilityState === 'visible' && window._sbUserId) {
+                const before = window._userSubscription ? window._userSubscription.tier : null;
+                await loadSubscription();
+                const after = window._userSubscription ? window._userSubscription.tier : null;
+                if (after && after !== before) {
+                    closeUpgradeModal();
+                    showToast('🎉 Subscription activated! Welcome to ' + after.charAt(0).toUpperCase() + after.slice(1) + '!');
+
+                }
+            }
+        });
 
         // Works in both WKWebView and regular browser
         function openStripeLink(url) {
@@ -7648,7 +7970,7 @@
 
         // ── INIT ──────────────────────────────────────────────────────────
         (async function init() {
-            // Check session from localStorage SYNCHRONOUSLY — no network needed
+            // Check session from localStorage
             let hasSession = false;
             try {
                 const stored = localStorage.getItem('sb_session');
@@ -7667,7 +7989,6 @@
                 return;
             }
 
-            // Show feed immediately with skeletons
             navigateToFeed();
             showFeedSkeletons();
 
@@ -7689,6 +8010,8 @@
                 await loadSubscription();
             } catch(e) {
                 console.error('Profile load failed:', e.message, e);
+                const _f2 = document.getElementById('mainFeed');
+                if (_f2) _f2.innerHTML += '<div style="padding:10px;color:#f87171;font-family:monospace;font-size:12px;">Profile error: ' + e.message + '</div>';
             }
 
             // Step 2: load feed workouts separately (simpler query, no join)
@@ -7699,7 +8022,1139 @@
                 window._allFeedWorkouts = [];
                 renderFeed(window._activeFeedFilter);
             }
-        })();
+
+        })(); // end init
+
+        // ── Compete Group Leaderboard ─────────────────────────────
+        async function loadCompeteLeaderboard(groupId, userRole) {
+            const feed = document.getElementById('groupWorkoutFeed');
+            feed.innerHTML = '<div style="padding:40px;text-align:center;color:#555;">Loading leaderboard...</div>';
+
+            const adminTab = document.querySelector('.admin-only-tab');
+            if (adminTab) adminTab.style.display = 'none';
+
+            // Hide post workout button for compete groups
+            const actionsEl = document.getElementById('groupDetailActions');
+            if (actionsEl) actionsEl.innerHTML = '';
+
+            try {
+                const members = await sb('group_members?group_id=eq.' + groupId + '&select=user_id,role,joined_at');
+                if (!members || members.length === 0) {
+                    feed.innerHTML = '<div style="padding:40px;text-align:center;color:#555;">No members yet. Share the group so others can join!</div>';
+                    return;
+                }
+                const userIds = members.map(function(m) { return m.user_id; });
+
+                const profiles = await sb('profiles?id=in.(' + userIds.join(',') + ')&select=id,full_name,initials,username');
+                const profileMap = {};
+                (profiles || []).forEach(function(p) { profileMap[p.id] = p; });
+
+                const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+                const workouts = await sb('workouts?user_id=in.(' + userIds.join(',') + ')&created_at=gte.' + since + '&order=created_at.desc&select=*');
+                const allWorkouts = workouts || [];
+
+                const statsMap = {};
+                userIds.forEach(function(uid) {
+                    statsMap[uid] = { workoutCount: 0, totalVolume: 0, totalMinutes: 0, recentWorkouts: [] };
+                });
+                allWorkouts.forEach(function(w) {
+                    if (!statsMap[w.user_id]) return;
+                    const s = statsMap[w.user_id];
+                    s.workoutCount++;
+                    s.totalMinutes += w.duration || 0;
+                    (w.exercises || []).forEach(function(ex) {
+                        const vol = (parseFloat(ex.sets)||0) * (parseFloat(ex.reps)||0) * (parseFloat(ex.weight)||0);
+                        s.totalVolume += vol;
+                    });
+                    if (s.recentWorkouts.length < 3) s.recentWorkouts.push(w);
+                });
+
+                const ranked = userIds.slice().sort(function(a, b) {
+                    const sa = statsMap[a], sb2 = statsMap[b];
+                    if (sb2.workoutCount !== sa.workoutCount) return sb2.workoutCount - sa.workoutCount;
+                    return sb2.totalVolume - sa.totalVolume;
+                });
+
+                const medals = ['1', '2', '3'];
+                const myId = window._sbUserId;
+
+                let html = '<div style="margin-bottom:24px;">'
+                    + '<div style="font-family:\'Bebas Neue\',cursive;font-size:32px;letter-spacing:2px;color:var(--primary);margin-bottom:4px;">🏆 LEADERBOARD</div>'
+                    + '<div style="color:#555;font-size:13px;">Ranked by workouts logged in the last 90 days</div>'
+                    + '</div>';
+
+                ranked.forEach(function(uid, i) {
+                    const p = profileMap[uid] || { full_name: 'Unknown', initials: '??', username: '' };
+                    const s = statsMap[uid];
+                    const isMe = uid === myId;
+                    const medal = medals[i] !== undefined ? medals[i] : '#' + (i + 1);
+                    const borderColor = isMe ? 'var(--primary)' : '#333';
+                    const bgColor = isMe ? 'rgba(255,107,53,0.08)' : 'rgba(0,0,0,0.2)';
+                    const youBadge = isMe ? ' <span style="font-size:11px;color:var(--primary);font-family:\'Roboto Mono\',monospace;">YOU</span>' : '';
+                    const volK = Math.round(s.totalVolume / 1000);
+
+                    let recentHtml = '';
+                    if (s.recentWorkouts.length === 0) {
+                        recentHtml = '<div style="color:#555;font-size:13px;padding:10px 0;">No workouts yet</div>';
+                    } else {
+                        s.recentWorkouts.forEach(function(w) {
+                            const dateStr = new Date(w.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            recentHtml += '<div style="background:var(--iron);padding:10px 14px;margin-bottom:6px;border-left:3px solid #333;display:flex;justify-content:space-between;align-items:center;">'
+                                + '<div>'
+                                + '<div style="font-size:13px;font-weight:600;">' + w.name + '</div>'
+                                + '<div style="font-size:11px;color:#555;margin-top:2px;">' + (w.exercises||[]).length + ' exercises · ' + (w.duration||0) + ' min</div>'
+                                + '</div>'
+                                + '<div style="font-size:11px;color:#555;">' + dateStr + '</div>'
+                                + '</div>';
+                        });
+                    }
+
+                    html += '<div style="background:var(--steel);border:1px solid ' + borderColor + ';margin-bottom:16px;overflow:hidden;">'
+                        + '<div style="display:flex;align-items:center;gap:16px;padding:20px 24px;background:' + bgColor + ';">'
+                        + '<div style="font-family:Bebas Neue,cursive;font-size:22px;color:var(--primary);min-width:36px;text-align:center;">' + medal + '</div>'
+                        + '<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:\'Bebas Neue\',cursive;font-size:20px;flex-shrink:0;">' + p.initials + '</div>'
+                        + '<div style="flex:1;">'
+                        + '<div style="font-size:16px;font-weight:600;">' + p.full_name + youBadge + '</div>'
+                        + '<div style="font-size:12px;color:#555;margin-top:2px;">@' + (p.username || '') + '</div>'
+                        + '</div>'
+                        + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;">'
+                        + '<div><div style="font-family:\'Bebas Neue\',cursive;font-size:22px;color:var(--primary);">' + s.workoutCount + '</div><div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;">Workouts</div></div>'
+                        + '<div><div style="font-family:\'Bebas Neue\',cursive;font-size:22px;color:var(--primary);">' + s.totalMinutes + '</div><div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;">Minutes</div></div>'
+                        + '<div><div style="font-family:\'Bebas Neue\',cursive;font-size:22px;color:var(--primary);">' + volK + 'k</div><div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;">Volume</div></div>'
+                        + '</div>'
+                        + '</div>'
+                        + '<div style="padding:12px 24px 16px;border-top:1px solid #222;">'
+                        + '<div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Recent Workouts</div>'
+                        + recentHtml
+                        + '</div>'
+                        + '</div>';
+                });
+
+                feed.innerHTML = html;
+
+            } catch(e) {
+                feed.innerHTML = '<div style="padding:40px;text-align:center;color:#f87171;">Error loading leaderboard: ' + e.message + '</div>';
+            }
+        }
+
+
+        // ── Edit / Delete Group ───────────────────────────────────
+        function openEditGroup() {
+            const g = window._currentGroupData;
+            if (!g) { alert('Error: group data not found. Please go back and re-open the group.'); return; }
+            const modal = document.createElement('div');
+            modal.id = 'editGroupModal';
+            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;';
+            modal.innerHTML = `
+                <div style="background:#2a2a2a;border:2px solid var(--primary);padding:32px;width:100%;max-width:500px;margin:auto;">
+                    <button onclick="document.getElementById('editGroupModal').remove()" style="float:right;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer;">&#215;</button>
+                    <h2 style="font-family:Bebas Neue,cursive;font-size:32px;letter-spacing:2px;color:var(--primary);margin-bottom:24px;">Edit Group</h2>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Group Name</label>
+                        <input id="editGroupName" value="${g.name}" style="width:100%;padding:12px;background:#1a1a1a;border:2px solid #333;color:#fff;font-family:Oswald,sans-serif;font-size:16px;">
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Description</label>
+                        <textarea id="editGroupDesc" rows="3" style="width:100%;padding:12px;background:#1a1a1a;border:2px solid #333;color:#fff;font-family:Oswald,sans-serif;font-size:16px;">${g.description || ''}</textarea>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Group Photo</label>
+                        ${g.image_url ? '<img id="editGroupImgPreview" src="' + g.image_url + '" style="width:100%;max-height:180px;object-fit:cover;margin-bottom:8px;border:1px solid #333;">' : '<div id="editGroupImgPreview" style="display:none;"></div>'}
+                        <input type="file" id="editGroupPhotoInput" accept="image/*" onchange="previewEditGroupPhoto()" style="width:100%;padding:10px;background:#1a1a1a;border:2px solid #333;color:#999;font-family:Oswald,sans-serif;font-size:13px;">
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">New Password (leave blank to keep current)</label>
+                        <input id="editGroupPassword" type="text" placeholder="Leave blank to keep current" style="width:100%;padding:12px;background:#1a1a1a;border:2px solid #333;color:#fff;font-family:Oswald,sans-serif;font-size:16px;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+                    </div>
+                    ${g.group_type === 'compete' ? `
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Who Can Post Challenges</label>
+                        <select id="editGroupChallengePosting" style="width:100%;padding:12px;background:#1a1a1a;border:2px solid #333;color:#fff;font-family:Oswald,sans-serif;font-size:16px;">
+                            <option value="anyone" ${(g.challenge_posting||'anyone')==='anyone'?'selected':''}>Anyone in the group</option>
+                            <option value="admin_only" ${g.challenge_posting==='admin_only'?'selected':''}>Admin only</option>
+                        </select>
+                    </div>` : ''}
+                    <button onclick="saveEditGroup('${g.id}')" style="width:100%;padding:14px;background:var(--primary);border:none;color:#fff;font-family:Oswald,sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:2px;cursor:pointer;margin-top:8px;">Save Changes</button>
+                </div>`;
+            document.body.appendChild(modal);
+        }
+
+        function previewEditGroupPhoto() {
+            const file = document.getElementById('editGroupPhotoInput').files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('editGroupImgPreview');
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                preview.tagName === 'DIV' && (preview.outerHTML = '<img id="editGroupImgPreview" src="' + e.target.result + '" style="width:100%;max-height:180px;object-fit:cover;margin-bottom:8px;border:1px solid #333;">');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function saveEditGroup(groupId) {
+            const name = document.getElementById('editGroupName').value.trim();
+            const desc = document.getElementById('editGroupDesc').value.trim();
+            const password = document.getElementById('editGroupPassword').value.trim().toUpperCase();
+            if (!name) { alert('Group name required.'); return; }
+            // Handle photo
+            let imageUrl = window._currentGroupData.image_url || null;
+            const photoFile = document.getElementById('editGroupPhotoInput').files[0];
+            if (photoFile) {
+                imageUrl = await new Promise(res => {
+                    const r = new FileReader();
+                    r.onload = e => res(e.target.result);
+                    r.readAsDataURL(photoFile);
+                });
+            }
+            const updates = { name, description: desc, image_url: imageUrl };
+            if (password) updates.password = password;
+            const cpEl = document.getElementById('editGroupChallengePosting');
+            if (cpEl) updates.challenge_posting = cpEl.value;
+            try {
+                await sb('groups?id=eq.' + groupId, { method: 'PATCH', body: updates, prefer: 'return=minimal' });
+                document.getElementById('editGroupModal').remove();
+                showToast('Group updated!');
+                openGroupDetail(groupId);
+            } catch(e) { alert('Error: ' + e.message); }
+        }
+
+        async function confirmDeleteGroup() {
+            const g = window._currentGroupData;
+            if (!g) { alert('Error: group data not found. Please go back and re-open the group.'); return; }
+            const confirmed = await new Promise(function(resolve) {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+                overlay.innerHTML = '<div style="background:#1e1e1e;border:2px solid #f87171;padding:32px;max-width:340px;width:100%;text-align:center;">'
+                    + '<div style="font-family:Bebas Neue,cursive;font-size:24px;letter-spacing:2px;color:#f87171;margin-bottom:12px;">DELETE GROUP?</div>'
+                    + '<p style="color:#ccc;font-size:14px;margin-bottom:24px;line-height:1.6;">This will remove all workouts and members. This cannot be undone.</p>'
+                    + '<div style="display:flex;gap:12px;">'
+                    + '<button id="delCancelBtn" style="flex:1;padding:14px;background:transparent;border:2px solid #444;color:#999;font-family:Oswald,sans-serif;font-size:14px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Cancel</button>'
+                    + '<button id="delConfirmBtn" style="flex:1;padding:14px;background:#f87171;border:none;color:#fff;font-family:Oswald,sans-serif;font-size:14px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;">Delete</button>'
+                    + '</div></div>';
+                document.body.appendChild(overlay);
+                document.getElementById('delConfirmBtn').onclick = function() { overlay.remove(); resolve(true); };
+                document.getElementById('delCancelBtn').onclick = function() { overlay.remove(); resolve(false); };
+            });
+            if (!confirmed) return;
+            try {
+                alert('Step 1: deleting group ' + g.id);
+                const gwRows = await sb('group_workouts?group_id=eq.' + g.id + '&select=id').catch(() => []);
+                alert('Step 2: found ' + (gwRows ? gwRows.length : 0) + ' workouts');
+                if (gwRows && gwRows.length) {
+                    const ids = gwRows.map(r => r.id).join(',');
+                    await sb('group_completions?group_workout_id=in.(' + ids + ')', { method: 'DELETE', prefer: 'return=minimal' }).catch(() => {});
+                }
+                await sb('group_workouts?group_id=eq.' + g.id, { method: 'DELETE', prefer: 'return=minimal' }).catch(() => {});
+                alert('Step 3: workouts deleted');
+                await sb('group_members?group_id=eq.' + g.id, { method: 'DELETE', prefer: 'return=minimal' }).catch(() => {});
+                alert('Step 4: members deleted, deleting group now');
+                await sb('groups?id=eq.' + g.id, { method: 'DELETE', prefer: 'return=minimal' });
+                alert('Step 5: group deleted!');
+                closeGroupDetail();
+                showToast('Group deleted.');
+                loadUserGroups('teams');
+            } catch(e) { alert('Error deleting group: ' + e.message); }
+        }
+
+        // ── Edit / Delete Group Workout ───────────────────────────
+        async function openEditGroupWorkout(workoutId) {
+            try {
+                const rows = await sb('group_workouts?id=eq.' + workoutId + '&select=*');
+                const w = rows && rows[0];
+                if (!w) return;
+                const exercises = w.exercises || [];
+
+                const modal = document.createElement('div');
+                modal.id = 'editWorkoutModal';
+                modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;';
+
+                // Build exercise rows HTML
+                const inputStyle = 'padding:12px;background:#1a1a1a;border:2px solid #333;color:#fff;font-family:Oswald,sans-serif;font-size:15px;width:100%;box-sizing:border-box;';
+                let exRowsHtml = exercises.length > 0
+                    ? exercises.map(ex =>
+                        '<div class="ewExRow" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;">'
+                        + '<input class="ew-ex-name" placeholder="Exercise" value="' + (ex.name||'') + '" style="' + inputStyle + '">'
+                        + '<input class="ew-ex-sets" placeholder="Sets" type="number" value="' + (ex.sets||'') + '" style="' + inputStyle + '">'
+                        + '<input class="ew-ex-reps" placeholder="Reps" type="number" value="' + (ex.reps||'') + '" style="' + inputStyle + '">'
+                        + '<input class="ew-ex-weight" placeholder="Weight" value="' + (ex.weight||'') + '" style="' + inputStyle + '">'
+                        + '</div>'
+                    ).join('')
+                    : '<div class="ewExRow" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;">'
+                        + '<input class="ew-ex-name" placeholder="Exercise" style="' + inputStyle + '">'
+                        + '<input class="ew-ex-sets" placeholder="Sets" type="number" style="' + inputStyle + '">'
+                        + '<input class="ew-ex-reps" placeholder="Reps" type="number" style="' + inputStyle + '">'
+                        + '<input class="ew-ex-weight" placeholder="Weight" style="' + inputStyle + '">'
+                        + '</div>';
+
+                modal.innerHTML =
+                    '<div style="background:#2a2a2a;border:2px solid var(--primary);padding:32px;width:100%;max-width:560px;margin:auto;">'
+                    + '<button onclick="closeEditWorkoutModal()" style="float:right;background:transparent;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">&#215;</button>'
+                    + '<h2 style="font-family:Bebas Neue,cursive;font-size:32px;letter-spacing:2px;color:var(--primary);margin-bottom:24px;">Edit Workout</h2>'
+                    + '<div style="margin-bottom:16px;">'
+                    +   '<label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Workout Name</label>'
+                    +   '<input id="editWName" value="' + w.name + '" style="' + inputStyle + '">'
+                    + '</div>'
+                    + '<div style="margin-bottom:16px;">'
+                    +   '<label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Notes (optional)</label>'
+                    +   '<textarea id="editWNotes" rows="2" style="' + inputStyle + 'resize:vertical;">' + (w.notes||'') + '</textarea>'
+                    + '</div>'
+                    + '<div style="margin-bottom:8px;">'
+                    +   '<label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Exercises</label>'
+                    +   '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:6px;">'
+                    +     '<div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;">Exercise</div>'
+                    +     '<div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;text-align:center;">Sets</div>'
+                    +     '<div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;text-align:center;">Reps</div>'
+                    +     '<div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px;text-align:center;">Weight</div>'
+                    +   '</div>'
+                    +   '<div id="editWExContainer">' + exRowsHtml + '</div>'
+                    +   '<button onclick="addEditWExRow()" style="width:100%;padding:10px;background:transparent;border:2px dashed #ff9966;color:#ff9966;font-family:Oswald,sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-top:4px;">+ Add Exercise</button>'
+                    + '</div>'
+                    + '<button onclick="saveEditGroupWorkout(\'' + workoutId + '\')" style="width:100%;padding:16px;background:var(--primary);border:none;color:#fff;font-family:Oswald,sans-serif;font-size:17px;font-weight:600;text-transform:uppercase;letter-spacing:2px;cursor:pointer;margin-top:16px;">Save Workout</button>'
+                    + '</div>';
+
+                document.body.appendChild(modal);
+            } catch(e) { alert('Error: ' + e.message); }
+        }
+
+        function addEditWExRow() {
+            const inputStyle = 'padding:12px;background:#1a1a1a;border:2px solid #333;color:#fff;font-family:Oswald,sans-serif;font-size:15px;width:100%;box-sizing:border-box;';
+            const row = document.createElement('div');
+            row.className = 'ewExRow';
+            row.style.cssText = 'display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;';
+            row.innerHTML = '<input class="ew-ex-name" placeholder="Exercise" style="' + inputStyle + '">'
+                + '<input class="ew-ex-sets" placeholder="Sets" type="number" style="' + inputStyle + '">'
+                + '<input class="ew-ex-reps" placeholder="Reps" type="number" style="' + inputStyle + '">'
+                + '<input class="ew-ex-weight" placeholder="Weight" style="' + inputStyle + '">';
+            document.getElementById('editWExContainer').appendChild(row);
+        }
+
+        async function saveEditGroupWorkout(workoutId) {
+            const name = document.getElementById('editWName').value.trim();
+            const notes = document.getElementById('editWNotes').value.trim();
+            const exercises = [];
+            document.querySelectorAll('#editWExContainer .ewExRow').forEach(function(row) {
+                const n = row.querySelector('.ew-ex-name').value.trim();
+                if (n) exercises.push({
+                    name: n,
+                    sets: row.querySelector('.ew-ex-sets').value || '',
+                    reps: row.querySelector('.ew-ex-reps').value || '',
+                    weight: row.querySelector('.ew-ex-weight').value || ''
+                });
+            });
+            if (!name) { alert('Workout name required.'); return; }
+            try {
+                await sb('group_workouts?id=eq.' + workoutId, { method: 'PATCH', body: { name, notes: notes || null, exercises }, prefer: 'return=minimal' });
+                document.getElementById('editWorkoutModal').remove();
+                showToast('Workout updated!');
+                await loadGroupFeed(window._currentGroupId, 'admin');
+            } catch(e) { alert('Error: ' + e.message); }
+        }
+
+        async function deleteGroupWorkout(workoutId) {
+            if (!confirm('Delete this workout? Completions will also be removed.')) return;
+            try {
+                await sb('group_completions?group_workout_id=eq.' + workoutId, { method: 'DELETE', prefer: 'return=minimal' }).catch(() => {});
+                await sb('group_workouts?id=eq.' + workoutId, { method: 'DELETE', prefer: 'return=minimal' });
+                showToast('Workout deleted.');
+                await loadGroupFeed(window._currentGroupId, 'admin');
+            } catch(e) { alert('Error: ' + e.message); }
+        }
+
+
+        // ── Session History Tab (free) ────────────────────────────
+        function renderHistoryTab() {
+            const sel = document.getElementById('historyExerciseSelect');
+            if (sel && sel.value) {
+                selectHistoryExercise(sel.value);
+            }
+        }
+
+        function selectHistoryExercise(key) {
+            const noMsg = document.getElementById('historyNoExMsg');
+            const content = document.getElementById('historyContent');
+            const tbody = document.getElementById('historyTabBody');
+            if (!key) {
+                if (noMsg) noMsg.style.display = 'block';
+                if (content) content.style.display = 'none';
+                return;
+            }
+            const exMap = window._exerciseMap || {};
+            const ex = exMap[key];
+            if (!ex || !ex.entries.length) {
+                if (noMsg) noMsg.style.display = 'block';
+                if (content) content.style.display = 'none';
+                return;
+            }
+            if (noMsg) noMsg.style.display = 'none';
+            if (content) content.style.display = 'block';
+
+            // Sort newest first for display
+            const entries = ex.entries.slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+            if (tbody) {
+                tbody.innerHTML = entries.map(function(e, i) {
+                    const volume = e.sets * e.reps * e.weight;
+                    const est1rm = e.reps === 1 ? e.weight : Math.round(e.weight * (1 + e.reps / 30));
+                    const prev = entries[i + 1];
+
+                    const dateStr = new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    return '<tr>'
+                        + '<td style="color:#999;font-family:Roboto Mono,monospace;font-size:13px;">' + dateStr + '</td>'
+                        + '<td style="font-family:Bebas Neue,cursive;font-size:18px;color:var(--primary);">' + e.weight + ' lbs</td>'
+                        + '<td style="font-family:Roboto Mono,monospace;font-size:13px;">' + e.sets + '×' + e.reps + '</td>'
+                        + '<td style="font-family:Roboto Mono,monospace;font-size:13px;">' + volume.toLocaleString() + ' lbs</td>'
+                        + '<td style="font-family:Roboto Mono,monospace;font-size:13px;">' + est1rm + ' lbs</td>'
+                        + '</tr>';
+                }).join('');
+            }
+        }
+
+
+        // ══════════════════════════════════════════════════════════
+        // COMPETE GROUP — CHALLENGE SYSTEM
+        // ══════════════════════════════════════════════════════════
+
+        async function loadGroupChallenges(groupId) {
+            const feed = document.getElementById('groupChallengesFeed');
+            if (!feed) return;
+            feed.innerHTML = '<div style="padding:40px;text-align:center;color:#555;">Loading challenges...</div>';
+
+            try {
+                const group = window._currentGroupData;
+                const user = getCurrentUser();
+                const userRole = window._currentUserRole;
+                // Default to allowing everyone to post if group data unavailable
+                const challengePosting = group ? (group.challenge_posting || 'anyone') : 'anyone';
+                const canPost = challengePosting === 'anyone' || userRole === 'admin';
+
+                // Build post button
+                let postBtn = '';
+                if (canPost) {
+                    postBtn = '<button onclick="openPostChallenge()" style="width:100%;padding:14px;background:var(--primary);border:none;color:#fff;font-family:Oswald,sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:2px;cursor:pointer;margin-bottom:24px;">+ Post Challenge</button>';
+                }
+
+                // Load challenges
+                const challenges = await sb('group_challenges?group_id=eq.' + groupId + '&order=created_at.desc&select=*');
+
+                if (!challenges || challenges.length === 0) {
+                    feed.innerHTML = postBtn + '<div style="text-align:center;padding:60px 20px;">'
+                        + '<div style="font-size:56px;margin-bottom:16px;">🏆</div>'
+                        + '<h3 style="font-family:Bebas Neue,cursive;font-size:28px;color:var(--primary);letter-spacing:2px;margin-bottom:8px;">No Challenges Yet</h3>'
+                        + '<p style="color:#555;font-size:14px;">' + (canPost ? 'Be the first to post a challenge!' : 'Waiting for a challenge to be posted.') + '</p>'
+                        + '</div>';
+                    return;
+                }
+
+                // Get poster profiles
+                const creatorIds = [...new Set(challenges.map(c => c.creator_id))];
+                const profiles = await sb('profiles?id=in.(' + creatorIds.join(',') + ')&select=id,full_name,initials').catch(() => []);
+                const profileMap = {};
+                (profiles || []).forEach(function(p) { profileMap[p.id] = p; });
+
+                // Get all completions for these challenges
+                const cIds = challenges.map(c => c.id).filter(Boolean);
+                let completions = [];
+                if (cIds.length) {
+                    completions = await sb('group_challenge_attempts?challenge_id=in.(' + cIds.join(',') + ')&select=*').catch(() => []);
+                }
+                const attemptsMap = {};
+                (completions || []).forEach(function(a) {
+                    if (!attemptsMap[a.challenge_id]) attemptsMap[a.challenge_id] = [];
+                    attemptsMap[a.challenge_id].push(a);
+                });
+
+                let cardsHtml = '';
+                challenges.forEach(function(c) {
+                    try {
+                        cardsHtml += renderChallengeCard(c, profileMap[c.creator_id], attemptsMap[c.id] || [], user, userRole);
+                    } catch(cardErr) {
+                        cardsHtml += '<div style="padding:12px;color:#f87171;font-size:12px;">Error rendering challenge: ' + cardErr.message + '</div>';
+                    }
+                });
+                feed.innerHTML = postBtn + (cardsHtml || '<div style="color:#555;text-align:center;padding:20px;">No challenges yet.</div>');
+
+            } catch(e) {
+                feed.innerHTML = '<button onclick="openPostChallenge()" style="width:100%;padding:14px;background:var(--primary);border:none;color:#fff;font-family:Oswald,sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:2px;cursor:pointer;margin-bottom:24px;">+ Post Challenge</button>'
+                    + '<div style="padding:20px;text-align:center;color:#f87171;font-size:13px;">Error: ' + e.message + '</div>';
+            }
+        }
+
+        function renderChallengeCard(c, poster, attempts, user, userRole) {
+            const now = new Date();
+            const expired = c.expires_at && new Date(c.expires_at) < now;
+            const myId = window._sbUserId;
+            const myAttempt = attempts.find(function(a) { return a.user_id === myId; });
+            const isCreator = c.creator_id === myId;
+            const isAdmin = userRole === 'admin';
+
+            // Sort attempts by weight desc
+            const sorted = attempts.slice().sort(function(a, b) { return (b.weight || 0) - (a.weight || 0); });
+            const medals = ['1', '2', '3'];
+
+            const timeLeft = c.expires_at ? getTimeLeft(c.expires_at) : null;
+            const expiryHtml = expired
+                ? '<span style="font-size:11px;color:#f87171;font-family:Roboto Mono,monospace;">EXPIRED</span>'
+                : (timeLeft ? '<span style="font-size:11px;color:#999;font-family:Roboto Mono,monospace;">⏱ ' + timeLeft + '</span>' : '');
+
+            const targetHtml = c.target_lift
+                ? '<div style="border-left:3px solid var(--primary);padding:10px 14px;margin:12px 0;font-family:Roboto Mono,monospace;font-size:13px;background:rgba(255,107,53,0.05);">'
+                  + 'TARGET: <span style="color:var(--primary);font-weight:700;">' + c.target_weight + ' LBS</span> — ' + c.target_lift.toUpperCase()
+                  + '</div>'
+                : '';
+            const attemptBtn = myAttempt
+                ? '<div style="font-size:12px;color:#4ade80;font-family:Roboto Mono,monospace;padding:8px 0;letter-spacing:1px;">YOUR ATTEMPT: ' + myAttempt.weight + ' LBS ' + (myAttempt.sets && myAttempt.reps ? myAttempt.sets + 'x' + myAttempt.reps : '') + '</div>'
+                : (expired ? '' : '<button data-cid="' + c.id + '" data-lift="' + (c.target_lift||'') + '" onclick="openLogAttempt(this.dataset.cid, this.dataset.lift)" style="padding:10px 20px;background:var(--primary);border:none;color:#fff;font-family:Oswald,sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin:8px 0;">Log Attempt</button>');
+            const deleteBtn = (isCreator || isAdmin)
+                ? '<button data-cid="' + c.id + '" onclick="deleteChallenge(this.dataset.cid)" style="background:transparent;border:none;color:#f87171;font-family:Oswald,sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;padding:0;">Delete</button>'
+                : '';
+
+            const attemptsHtml = sorted.length > 0
+                ? '<div style="margin-top:16px;border-top:1px solid #2a2a2a;padding-top:16px;">'
+                  + '<div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;font-family:Oswald,sans-serif;margin-bottom:12px;">Attempts (' + sorted.length + ')</div>'
+                  + sorted.map(function(a, i) {
+                      const beatIt = c.target_weight && a.weight >= c.target_weight;
+                      const isVid = a.photo_url && a.photo_url.startsWith('data:video'); const photoHtml = a.photo_url ? (isVid ? '<video src="' + a.photo_url + '" controls style="width:100%;max-height:320px;display:block;margin:10px 0;"></video>' : '<img src="' + a.photo_url + '" style="width:100%;max-height:320px;object-fit:cover;display:block;margin:10px 0;">') : '';
+                      const captionHtml = a.caption ? '<div style="font-size:14px;color:#ddd;padding:4px 0 10px;line-height:1.5;font-style:italic;">&ldquo;' + a.caption + '&rdquo;</div>' : '';
+                      const isMyAttempt = a.user_id === window._sbUserId;
+                      return '<div style="background:var(--iron);border:1px solid #2a2a2a;margin-bottom:12px;overflow:hidden;">'
+                          + '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(0,0,0,0.2);">'
+                          + '<div style="font-family:Bebas Neue,cursive;font-size:18px;color:var(--primary);min-width:28px;">' + (medals[i] || (i+1)) + '</div>'
+                          + '<div style="flex:1;"><div style="font-size:15px;font-weight:600;">' + (a.display_name || 'Unknown') + '</div>'
+                          + '<div style="font-size:11px;color:#555;margin-top:2px;font-family:Roboto Mono,monospace;">' + new Date(a.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'}) + '</div></div>'
+                          + '<div style="text-align:right;"><div style="font-family:Bebas Neue,cursive;font-size:24px;color:var(--primary);">' + (a.weight || '?') + ' lbs</div>'
+                          + (a.sets && a.reps ? '<div style="font-size:11px;color:#666;font-family:Roboto Mono,monospace;">' + a.sets + '×' + a.reps + '</div>' : '') + '</div>'
+                          + (beatIt ? '<div style="background:#4ade80;color:#000;font-family:Oswald,sans-serif;font-size:11px;font-weight:700;padding:4px 8px;letter-spacing:1px;text-transform:uppercase;margin-left:8px;">✓ Beat it!</div>' : '')
+                          + (isMyAttempt ? '<div style="margin-left:8px;display:flex;gap:8px;">' + '<button data-aid="' + a.id + '" onclick="deleteAttempt(this.dataset.aid)" style="background:transparent;border:none;color:#f87171;font-family:Oswald,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;padding:0;">Delete</button>' + '</div>' : '')
+                          + '</div>'
+                          + ((photoHtml || captionHtml) ? '<div style="padding:0 16px 14px;">' + photoHtml + captionHtml + '</div>' : '')
+                          + '</div>';
+                  }).join('')
+                  + '</div>'
+                : '<div style="color:#555;font-size:13px;padding-top:8px;">No attempts yet. Be the first!</div>';
+
+            const cardId = 'challenge_' + c.id.replace(/-/g,'').slice(0,8);
+            const attemptsCount = sorted.length;
+            return '<div style="background:var(--steel);border:1px solid #333;margin-bottom:20px;overflow:hidden;">'
+                + '<div data-card="' + cardId + '" onclick="toggleChallengeCard(this.dataset.card)" style="padding:16px 20px;background:rgba(255,107,53,0.06);border-bottom:1px solid #2a2a2a;display:flex;align-items:flex-start;justify-content:space-between;cursor:pointer;">'
+                +   '<div>'
+                +     '<div style="font-family:Bebas Neue,cursive;font-size:22px;letter-spacing:2px;">' + c.title + '</div>'
+                +     '<div style="font-size:12px;color:#555;margin-top:2px;">Posted by ' + (poster ? poster.full_name : 'Unknown') + ' · ' + new Date(c.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'}) + '</div>'
+                +   '</div>'
+                +   '<div style="display:flex;align-items:center;gap:8px;">' + expiryHtml + deleteBtn
+                +   (attemptsCount > 0 ? '<span style="font-size:11px;color:#555;font-family:Roboto Mono,monospace;">' + attemptsCount + ' attempts</span>' : '')
+                +   '</div>'
+                + '</div>'
+                + '<div id="' + cardId + '" style="display:none;padding:16px 20px;">'
+                +   (c.description ? '<p style="color:#ccc;font-size:14px;line-height:1.6;margin-bottom:12px;">' + c.description + '</p>' : '')
+                +   targetHtml
+                +   attemptBtn
+                +   attemptsHtml
+                + '</div>'
+                + '</div>';
+        }
+
+        function getTimeLeft(expiresAt) {
+            const diff = new Date(expiresAt) - new Date();
+            if (diff <= 0) return null;
+            const days = Math.floor(diff / 86400000);
+            const hours = Math.floor((diff % 86400000) / 3600000);
+            if (days > 0) return days + 'd ' + hours + 'h left';
+            const mins = Math.floor((diff % 3600000) / 60000);
+            if (hours > 0) return hours + 'h ' + mins + 'm left';
+            return mins + 'm left';
+        }
+
+        // ── Post Challenge Modal ──────────────────────────────────
+        function openPostChallenge() {
+            const modal = document.createElement('div');
+            modal.id = 'postChallengeModal';
+            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;';
+            const inputStyle = 'width:100%;padding:12px;background:#1a1a1a;border:2px solid #333;color:#fff;font-family:Oswald,sans-serif;font-size:15px;box-sizing:border-box;';
+            modal.innerHTML = '<div style="background:#2a2a2a;border:2px solid var(--primary);padding:32px;width:100%;max-width:500px;margin:auto;">'
+                + '<button onclick="closePostChallenge()" style="float:right;background:transparent;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">&#215;</button>'
+                + '<h2 style="font-family:Bebas Neue,cursive;font-size:32px;letter-spacing:2px;color:var(--primary);margin-bottom:24px;">Post Challenge</h2>'
+                + '<div style="margin-bottom:16px;">'
+                +   '<label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Challenge Title</label>'
+                +   '<input id="challTitle" placeholder="e.g. Beat my bench PR!" style="' + inputStyle + '">'
+                + '</div>'
+                + '<div style="margin-bottom:16px;">'
+                +   '<label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Description (optional)</label>'
+                +   '<textarea id="challDesc" rows="2" placeholder="Add some trash talk..." style="' + inputStyle + 'resize:vertical;"></textarea>'
+                + '</div>'
+                + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">'
+                +   '<div>'
+                +     '<label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Target Lift (optional)</label>'
+                +     '<input id="challLift" placeholder="e.g. Bench Press" style="' + inputStyle + '">'
+                +   '</div>'
+                +   '<div>'
+                +     '<label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Target Weight (lbs)</label>'
+                +     '<input id="challWeight" type="number" placeholder="225" style="' + inputStyle + '">'
+                +   '</div>'
+                + '</div>'
+                + '<div style="margin-bottom:16px;">'
+                +   '<label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Deadline (optional)</label>'
+                +   '<input id="challExpiry" type="date" style="' + inputStyle + '">'
+                + '</div>'
+                + '<button onclick="submitChallenge()" style="width:100%;padding:16px;background:var(--primary);border:none;color:#fff;font-family:Oswald,sans-serif;font-size:17px;font-weight:600;text-transform:uppercase;letter-spacing:2px;cursor:pointer;margin-top:8px;">Post Challenge 🏆</button>'
+                + '</div>';
+            document.body.appendChild(modal);
+        }
+
+        function closePostChallenge() {
+            const m = document.getElementById('postChallengeModal');
+            if (m) m.remove();
+        }
+
+        async function submitChallenge() {
+            const title = document.getElementById('challTitle').value.trim();
+            const desc = document.getElementById('challDesc').value.trim();
+            const lift = document.getElementById('challLift').value.trim();
+            const weight = document.getElementById('challWeight').value;
+            const expiry = document.getElementById('challExpiry').value;
+            const user = getCurrentUser();
+            const groupId = window._currentGroupId;
+            if (!title) { alert('Challenge title is required.'); return; }
+            if (!user || !groupId) { alert('Error: not logged in or no group selected.'); return; }
+            try {
+                await sb('group_challenges', { method: 'POST', body: {
+                    group_id: groupId,
+                    creator_id: user.id,
+                    title: title,
+                    description: desc || null,
+                    target_lift: lift || null,
+                    target_weight: weight ? parseFloat(weight) : null,
+                    expires_at: expiry ? new Date(expiry).toISOString() : null,
+                    created_at: new Date().toISOString()
+                }});
+                closePostChallenge();
+                showToast('Challenge posted! 🏆');
+                await loadGroupChallenges(groupId);
+            } catch(e) { alert('Error: ' + e.message); }
+        }
+
+        async function deleteChallenge(challengeId) {
+            const confirmed = await new Promise(function(resolve) {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+                overlay.innerHTML = '<div style="background:#1e1e1e;border:2px solid #f87171;padding:32px;max-width:320px;width:100%;text-align:center;">'
+                    + '<div style="font-family:Bebas Neue,cursive;font-size:22px;color:#f87171;margin-bottom:10px;">Delete Challenge?</div>'
+                    + '<p style="color:#ccc;font-size:14px;margin-bottom:20px;">This will remove the challenge and all attempts.</p>'
+                    + '<div style="display:flex;gap:10px;">'
+                    + '<button id="dcCancel" style="flex:1;padding:12px;background:transparent;border:2px solid #444;color:#999;font-family:Oswald,sans-serif;cursor:pointer;text-transform:uppercase;">Cancel</button>'
+                    + '<button id="dcConfirm" style="flex:1;padding:12px;background:#f87171;border:none;color:#fff;font-family:Oswald,sans-serif;cursor:pointer;text-transform:uppercase;">Delete</button>'
+                    + '</div></div>';
+                document.body.appendChild(overlay);
+                document.getElementById('dcConfirm').onclick = function() { overlay.remove(); resolve(true); };
+                document.getElementById('dcCancel').onclick = function() { overlay.remove(); resolve(false); };
+            });
+            if (!confirmed) return;
+            try {
+                await sb('group_challenge_attempts?challenge_id=eq.' + challengeId, { method: 'DELETE', prefer: 'return=minimal' }).catch(() => {});
+                await sb('group_challenges?id=eq.' + challengeId, { method: 'DELETE', prefer: 'return=minimal' });
+                showToast('Challenge deleted.');
+                await loadGroupChallenges(window._currentGroupId);
+            } catch(e) { alert('Error: ' + e.message); }
+        }
+
+        // ── Log Attempt Modal ─────────────────────────────────────
+        function openLogAttempt(challengeId, targetLift) {
+            window._attemptPhotoData = null;
+            window._currentChallengeId = challengeId;
+            const modal = document.createElement('div');
+            modal.id = 'logAttemptModal';
+            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;';
+            const S = 'width:100%;padding:12px;background:#1a1a1a;border:2px solid #333;color:#fff;font-family:Oswald,sans-serif;font-size:15px;box-sizing:border-box;';
+            modal.innerHTML = '<div style="background:#2a2a2a;border:2px solid var(--primary);padding:28px;width:100%;max-width:480px;margin:auto;">'
+                + '<button onclick="closeLogAttemptModal()" style="float:right;background:transparent;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">&#215;</button>'
+                + '<h2 style="font-family:Bebas Neue,cursive;font-size:28px;letter-spacing:2px;color:var(--primary);margin-bottom:20px;">Log Attempt</h2>'
+                + (targetLift ? '<div style="font-size:12px;color:#999;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;background:rgba(255,107,53,0.08);padding:8px 12px;border-left:3px solid var(--primary);">🎯 ' + targetLift + '</div>' : '')
+                + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">'
+                +   '<div><label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:6px;">Weight (lbs)</label><input id="attemptWeight" type="number" placeholder="225" style="' + S + '"></div>'
+                +   '<div><label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:6px;">Sets</label><input id="attemptSets" type="number" placeholder="3" style="' + S + '"></div>'
+                +   '<div><label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:6px;">Reps</label><input id="attemptReps" type="number" placeholder="5" style="' + S + '"></div>'
+                + '</div>'
+                + '<div style="margin-bottom:16px;">'
+                +   '<label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:6px;">Caption (optional)</label>'
+                +   '<textarea id="attemptCaption" rows="2" placeholder="Crushed it! 💪" style="' + S + 'resize:vertical;"></textarea>'
+                + '</div>'
+                + '<div style="margin-bottom:16px;">'
+                +   '<label style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#ccc;margin-bottom:8px;">Photo / Video (optional)</label>'
+                +   '<div id="attemptPhotoZone" onclick="triggerAttemptPhoto()" style="border:2px dashed rgba(255,107,53,0.3);padding:20px;text-align:center;background:rgba(255,107,53,0.04);cursor:pointer;position:relative;">'
+                +     '<div id="attemptPhotoPlaceholder"><div style="font-size:32px;margin-bottom:6px;">📸</div><div style="font-size:12px;color:#666;text-transform:uppercase;letter-spacing:1px;">Tap to add photo or video</div></div>'
+                +     '<img id="attemptPhotoPreview" style="display:none;width:100%;max-height:250px;object-fit:cover;" alt="">'
+                +     '<button id="attemptPhotoRemove" onclick="event.stopPropagation();removeAttemptPhoto()" style="display:none;position:absolute;top:8px;right:8px;background:var(--primary);color:#fff;border:none;width:28px;height:28px;border-radius:50%;font-size:16px;cursor:pointer;line-height:1;">×</button>'
+                +   '</div>'
+                +   '<input type="file" id="attemptPhotoInput" accept="image/*,video/*" style="display:none;" onchange="previewAttemptPhoto()">'
+                + '</div>'
+                + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:12px;background:rgba(255,107,53,0.05);border:1px solid rgba(255,107,53,0.15);">'
+                +   '<input type="checkbox" id="attemptPostToFeed" style="width:18px;height:18px;accent-color:var(--primary);cursor:pointer;">'
+                +   '<label for="attemptPostToFeed" style="font-size:13px;color:#ccc;cursor:pointer;font-family:Oswald,sans-serif;letter-spacing:1px;text-transform:uppercase;">Also post to my activity feed</label>'
+                + '</div>'
+                + '<button onclick="submitAttempt()" id="submitAttemptBtn" style="width:100%;padding:14px;background:var(--primary);border:none;color:#fff;font-family:Oswald,sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:2px;cursor:pointer;">Submit Attempt 🏆</button>'
+                + '</div>';
+            document.body.appendChild(modal);
+        }
+
+        function closeLogAttemptModal() {
+            const m = document.getElementById('logAttemptModal');
+            if (m) m.remove();
+            window._attemptPhotoData = null;
+        }
+
+        function previewAttemptPhoto() {
+            const file = document.getElementById('attemptPhotoInput').files[0];
+            if (!file) return;
+            const isVideo = file.type.startsWith('video/');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                window._attemptPhotoData = e.target.result;
+                window._attemptIsVideo = isVideo;
+                const placeholder = document.getElementById('attemptPhotoPlaceholder');
+                const removeBtn = document.getElementById('attemptPhotoRemove');
+                const zone = document.getElementById('attemptPhotoZone');
+                if (placeholder) placeholder.style.display = 'none';
+                if (removeBtn) removeBtn.style.display = 'flex';
+                // Remove old preview if any
+                const oldPreview = document.getElementById('attemptPhotoPreview');
+                if (oldPreview) oldPreview.remove();
+                if (isVideo) {
+                    const video = document.createElement('video');
+                    video.id = 'attemptPhotoPreview';
+                    video.src = e.target.result;
+                    video.controls = true;
+                    video.style.cssText = 'width:100%;max-height:250px;display:block;';
+                    zone.insertBefore(video, removeBtn);
+                } else {
+                    const img = document.createElement('img');
+                    img.id = 'attemptPhotoPreview';
+                    img.src = e.target.result;
+                    img.style.cssText = 'width:100%;max-height:250px;object-fit:cover;display:block;';
+                    zone.insertBefore(img, removeBtn);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeAttemptPhoto() {
+            window._attemptPhotoData = null;
+            const preview = document.getElementById('attemptPhotoPreview');
+            const placeholder = document.getElementById('attemptPhotoPlaceholder');
+            const removeBtn = document.getElementById('attemptPhotoRemove');
+            const input = document.getElementById('attemptPhotoInput');
+            if (preview) { preview.src = ''; preview.style.display = 'none'; }
+            if (placeholder) placeholder.style.display = 'block';
+            if (removeBtn) removeBtn.style.display = 'none';
+            if (input) input.value = '';
+        }
+
+        async function submitAttempt(challengeId) {
+            challengeId = challengeId || window._currentChallengeId;
+            const weight = parseFloat(document.getElementById('attemptWeight').value);
+            const sets = document.getElementById('attemptSets').value;
+            const reps = document.getElementById('attemptReps').value;
+            const caption = document.getElementById('attemptCaption').value.trim();
+            const postToFeed = document.getElementById('attemptPostToFeed').checked;
+            const photoData = window._attemptPhotoData || null;
+            const user = getCurrentUser();
+            if (!weight) { alert('Please enter a weight.'); return; }
+            if (!user) { alert('Not logged in.'); return; }
+            const btn = document.querySelector('#logAttemptModal button:last-child');
+            if (btn) { btn.textContent = 'Submitting...'; btn.disabled = true; }
+            try {
+                await sb('group_challenge_attempts', { method: 'POST', body: {
+                    challenge_id: challengeId,
+                    user_id: user.id,
+                    display_name: user.full_name || user.fullName || 'Unknown',
+                    weight: weight,
+                    sets: sets ? parseInt(sets) : null,
+                    reps: reps ? parseInt(reps) : null,
+                    caption: caption || null,
+                    photo_url: photoData || null,
+                    created_at: new Date().toISOString()
+                }});
+                // Optionally post to main feed
+                if (postToFeed) {
+                    const challenge = await sb('group_challenges?id=eq.' + challengeId + '&select=title,target_lift').catch(() => []);
+                    const cTitle = challenge && challenge[0] ? challenge[0].title : 'Challenge';
+                    const cLift = challenge && challenge[0] ? challenge[0].target_lift : null;
+                    await sb('workouts', { method: 'POST', body: {
+                        user_id: user.id,
+                        name: 'CHALLENGE: ' + cTitle.toUpperCase(),
+                        caption: (caption || ('Logged ' + weight + ' lbs' + (cLift ? ' on ' + cLift : '') + ' 🏆')),
+                        exercises: [{ name: cLift || 'Challenge Lift', sets: sets || '1', reps: reps || '1', weight: String(weight) }],
+                        photo_url: photoData || null,
+                        duration: 0,
+                        created_at: new Date().toISOString()
+                    }}).catch(function(e) { console.warn('Feed post failed:', e.message); });
+                }
+                closeLogAttemptModal();
+                showToast('Attempt logged! 💪');
+                await loadGroupChallenges(window._currentGroupId);
+            } catch(e) {
+                if (btn) { btn.textContent = 'Submit Attempt 🏆'; btn.disabled = false; }
+                alert('Error: ' + e.message);
+            }
+        }
+
+        // ── Beat My PR — prompt after logging a workout ───────────
+        async function checkForNewPRs(exercises, workoutId) {
+            const user = getCurrentUser();
+            if (!user || !exercises || !exercises.length) return;
+            const exMap = window._exerciseMap || {};
+            const newPRs = [];
+            exercises.forEach(function(ex) {
+                if (!ex.name || !ex.weight) return;
+                const key = ex.name.trim().toLowerCase();
+                const prev = exMap[key];
+                const w = parseFloat(ex.weight);
+                if (!prev || w > Math.max.apply(null, prev.entries.map(function(e) { return e.weight; }))) {
+                    newPRs.push({ name: ex.name, weight: w });
+                }
+            });
+            if (!newPRs.length) return;
+            // Show PR prompt for each new PR
+            for (let i = 0; i < newPRs.length; i++) {
+                const pr = newPRs[i];
+                await new Promise(function(resolve) {
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+                    overlay.innerHTML = '<div style="background:#1e1e1e;border:2px solid var(--primary);padding:32px;max-width:360px;width:100%;text-align:center;">'
+                        + '<div style="font-size:48px;margin-bottom:12px;">🔥</div>'
+                        + '<div style="font-family:Bebas Neue,cursive;font-size:28px;letter-spacing:2px;color:var(--primary);margin-bottom:8px;">NEW PR!</div>'
+                        + '<div style="font-size:16px;margin-bottom:6px;font-weight:600;">' + pr.name + '</div>'
+                        + '<div style="font-family:Bebas Neue,cursive;font-size:36px;color:var(--primary);margin-bottom:16px;">' + pr.weight + ' LBS</div>'
+                        + '<p style="color:#ccc;font-size:14px;margin-bottom:20px;line-height:1.6;">Share this PR to your feed and challenge your compete group to beat it?</p>'
+                        + '<div style="display:flex;flex-direction:column;gap:10px;">'
+                        + '<button id="prShare" style="padding:14px;background:var(--primary);border:none;color:#fff;font-family:Oswald,sans-serif;font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:1px;cursor:pointer;">🏆 Share & Challenge Group</button>'
+                        + '<button id="prSkip" style="padding:12px;background:transparent;border:1px solid #444;color:#999;font-family:Oswald,sans-serif;font-size:14px;cursor:pointer;text-transform:uppercase;">Skip</button>'
+                        + '</div></div>';
+                    document.body.appendChild(overlay);
+                    document.getElementById('prShare').onclick = async function() {
+                        overlay.remove();
+                        await sharePRChallenge(pr.name, pr.weight);
+                        resolve();
+                    };
+                    document.getElementById('prSkip').onclick = function() { overlay.remove(); resolve(); };
+                });
+            }
+        }
+
+        async function sharePRChallenge(liftName, weight) {
+            const user = getCurrentUser();
+            if (!user) return;
+            // Post to main feed
+            try {
+                await sb('workouts', { method: 'POST', body: {
+                    user_id: user.id,
+                    name: 'NEW PR: ' + liftName.toUpperCase(),
+                    caption: 'I just hit a new PR on ' + liftName + ': ' + weight + ' lbs! Can you beat it? 🔥',
+                    exercises: [{ name: liftName, sets: '1', reps: '1', weight: String(weight) }],
+                    duration: 0,
+                    created_at: new Date().toISOString()
+                }});
+            } catch(e) { console.warn('Feed post failed:', e.message); }
+
+            // Post challenge to all compete groups user is in
+            try {
+                const memberships = await sb('group_members?user_id=eq.' + user.id + '&select=group_id');
+                if (!memberships || !memberships.length) return;
+                const groupIds = memberships.map(function(m) { return m.group_id; });
+                const competeGroups = await sb('groups?id=in.(' + groupIds.join(',') + ')&group_type=eq.compete&select=id,name');
+                if (!competeGroups || !competeGroups.length) return;
+                for (let i = 0; i < competeGroups.length; i++) {
+                    const g = competeGroups[i];
+                    await sb('group_challenges', { method: 'POST', body: {
+                        group_id: g.id,
+                        creator_id: user.id,
+                        title: 'Beat my ' + liftName + ' PR!',
+                        description: 'I just hit ' + weight + ' lbs on ' + liftName + '. Can anyone in ' + g.name + ' beat it? 🔥',
+                        target_lift: liftName,
+                        target_weight: weight,
+                        created_at: new Date().toISOString()
+                    }}).catch(function() {});
+                }
+                showToast('PR shared to feed and compete groups! 🔥');
+            } catch(e) { console.warn('Challenge post failed:', e.message); }
+        }
+
+
+        // ── Head-to-Head Comparison ───────────────────────────────
+        async function openHeadToHead(opponentId, opponentName) {
+            const user = getCurrentUser();
+            if (!user) return;
+            const myId = window._sbUserId;
+
+            // Show modal immediately with loading state
+            const modal = document.createElement('div');
+            modal.id = 'h2hModal';
+            modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;';
+            modal.innerHTML = '<div style="background:#1a1a1a;border:2px solid var(--primary);padding:28px;width:100%;max-width:600px;margin:auto;">'
+                + '<button onclick="document.getElementById(\'h2hModal\').remove()" style="float:right;background:transparent;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">&#215;</button>'
+                + '<h2 style="font-family:Bebas Neue,cursive;font-size:28px;letter-spacing:2px;color:var(--primary);margin-bottom:24px;">⚔️ HEAD TO HEAD</h2>'
+                + '<div id="h2hContent" style="text-align:center;padding:40px;color:#555;">Loading stats...</div>'
+                + '</div>';
+            document.body.appendChild(modal);
+
+            try {
+                // Fetch both users' workouts (last 90 days)
+                const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+                const [myWorkouts, theirWorkouts, myProfile, theirProfile] = await Promise.all([
+                    sb('workouts?user_id=eq.' + myId + '&created_at=gte.' + since + '&select=*'),
+                    sb('workouts?user_id=eq.' + opponentId + '&created_at=gte.' + since + '&select=*'),
+                    sb('profiles?id=eq.' + myId + '&select=full_name,initials'),
+                    sb('profiles?id=eq.' + opponentId + '&select=full_name,initials')
+                ]);
+
+                const me = (myProfile && myProfile[0]) || { full_name: user.full_name || 'You', initials: user.initials || '??' };
+                const them = (theirProfile && theirProfile[0]) || { full_name: opponentName, initials: opponentName.slice(0,2).toUpperCase() };
+
+                const myWs = myWorkouts || [];
+                const theirWs = theirWorkouts || [];
+
+                // Build stats
+                function buildStats(ws) {
+                    let totalVol = 0, totalMins = 0, prMap = {};
+                    ws.forEach(function(w) {
+                        totalMins += w.duration || 0;
+                        (w.exercises || []).forEach(function(ex) {
+                            if (!ex.name || !ex.weight) return;
+                            const wt = parseFloat(ex.weight);
+                            const key = ex.name.trim().toLowerCase();
+                            totalVol += (parseInt(ex.sets)||1) * (parseInt(ex.reps)||1) * wt;
+                            if (!prMap[key] || wt > prMap[key].weight) prMap[key] = { name: ex.name, weight: wt };
+                        });
+                    });
+                    return { count: ws.length, totalVol: Math.round(totalVol), totalMins, prMap };
+                }
+
+                const mySt = buildStats(myWs);
+                const thSt = buildStats(theirWs);
+
+                // Find common lifts
+                const myKeys = new Set(Object.keys(mySt.prMap));
+                const thKeys = new Set(Object.keys(thSt.prMap));
+                const common = [...myKeys].filter(k => thKeys.has(k));
+
+                function winColor(a, b) {
+                    if (a > b) return 'color:#4ade80;';
+                    if (a < b) return 'color:#f87171;';
+                    return 'color:#999;';
+                }
+
+                function statRow(label, myVal, thVal, suffix) {
+                    suffix = suffix || '';
+                    const mW = winColor(myVal, thVal);
+                    const tW = winColor(thVal, myVal);
+                    return '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #222;">'
+                        + '<div style="text-align:right;font-family:Bebas Neue,cursive;font-size:22px;' + mW + '">' + myVal.toLocaleString() + suffix + '</div>'
+                        + '<div style="text-align:center;font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;min-width:80px;">' + label + '</div>'
+                        + '<div style="text-align:left;font-family:Bebas Neue,cursive;font-size:22px;' + tW + '">' + thVal.toLocaleString() + suffix + '</div>'
+                        + '</div>';
+                }
+
+                const prRows = common.length > 0
+                    ? common.map(function(k) {
+                        const myPR = mySt.prMap[k].weight;
+                        const thPR = thSt.prMap[k].weight;
+                        return statRow(mySt.prMap[k].name, myPR, thPR, ' lbs');
+                    }).join('')
+                    : '<div style="color:#555;font-size:13px;text-align:center;padding:20px 0;">No common lifts logged yet.</div>';
+
+                const myWins = common.filter(k => mySt.prMap[k].weight > thSt.prMap[k].weight).length;
+                const thWins = common.filter(k => thSt.prMap[k].weight > mySt.prMap[k].weight).length;
+                const overallWinner = myWins > thWins ? me.full_name : (thWins > myWins ? them.full_name : null);
+
+                const headerHtml = '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid var(--primary);">'
+                    + '<div style="text-align:center;">'
+                    +   '<div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,cursive;font-size:22px;margin:0 auto 6px;">' + me.initials + '</div>'
+                    +   '<div style="font-size:14px;font-weight:600;">' + (me.full_name || 'You') + '</div>'
+                    +   '<div style="font-size:11px;color:var(--primary);font-family:Oswald,sans-serif;letter-spacing:1px;">YOU</div>'
+                    + '</div>'
+                    + '<div style="text-align:center;font-family:Bebas Neue,cursive;font-size:32px;color:#444;">VS</div>'
+                    + '<div style="text-align:center;">'
+                    +   '<div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#4ade80,#22c55e);display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,cursive;font-size:22px;margin:0 auto 6px;">' + them.initials + '</div>'
+                    +   '<div style="font-size:14px;font-weight:600;">' + them.full_name + '</div>'
+                    + '</div>'
+                    + '</div>';
+
+                const overallHtml = overallWinner
+                    ? '<div style="text-align:center;background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);padding:12px;margin-bottom:20px;">'
+                    +   '<div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Leading on shared lifts</div>'
+                    +   '<div style="font-family:Bebas Neue,cursive;font-size:24px;color:var(--primary);">🏆 ' + overallWinner + '</div>'
+                    +   '<div style="font-size:12px;color:#666;margin-top:4px;">' + Math.max(myWins, thWins) + ' of ' + common.length + ' lifts</div>'
+                    + '</div>'
+                    : '';
+
+                const sectionTitle = function(t) {
+                    return '<div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;margin:20px 0 8px;padding-bottom:6px;border-bottom:1px solid #222;">' + t + '</div>';
+                };
+
+                document.getElementById('h2hContent').innerHTML =
+                    headerHtml
+                    + overallHtml
+                    + sectionTitle('Last 90 Days — Overview')
+                    + statRow('Workouts', mySt.count, thSt.count)
+                    + statRow('Total Volume', mySt.totalVol, thSt.totalVol, ' lbs')
+                    + statRow('Total Minutes', mySt.totalMins, thSt.totalMins)
+                    + (common.length > 0 ? sectionTitle('PR Comparison') + prRows : '');
+
+            } catch(e) {
+                const c = document.getElementById('h2hContent');
+                if (c) c.innerHTML = '<div style="color:#f87171;text-align:center;padding:20px;">Error: ' + e.message + '</div>';
+            }
+        }
+
+
+        function toggleDashCard(cardId) {
+            const card = document.getElementById(cardId);
+            const arrow = document.getElementById(cardId + '_arrow');
+            if (!card) return;
+            const isOpen = card.style.display !== 'none';
+            card.style.display = isOpen ? 'none' : 'block';
+            if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+        }
+
+
+        function toggleChallengeCard(cardId) {
+            const body = document.getElementById(cardId);
+            const arrow = document.getElementById(cardId + '_arrow');
+            if (!body) return;
+            const isOpen = body.style.display !== 'none';
+            body.style.display = isOpen ? 'none' : 'block';
+            if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+        }
+
+
+        async function deleteAttempt(attemptId) {
+            const confirmed = await new Promise(function(resolve) {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+                overlay.innerHTML = '<div style="background:#1e1e1e;border:2px solid #f87171;padding:28px;max-width:300px;width:100%;text-align:center;">'
+                    + '<div style="font-family:Bebas Neue,cursive;font-size:22px;color:#f87171;margin-bottom:10px;">Delete Attempt?</div>'
+                    + '<div style="display:flex;gap:10px;margin-top:16px;">'
+                    + '<button id="daCancel" style="flex:1;padding:12px;background:transparent;border:2px solid #444;color:#999;font-family:Oswald,sans-serif;cursor:pointer;text-transform:uppercase;">Cancel</button>'
+                    + '<button id="daConfirm" style="flex:1;padding:12px;background:#f87171;border:none;color:#fff;font-family:Oswald,sans-serif;cursor:pointer;text-transform:uppercase;">Delete</button>'
+                    + '</div></div>';
+                document.body.appendChild(overlay);
+                document.getElementById('daConfirm').onclick = function() { overlay.remove(); resolve(true); };
+                document.getElementById('daCancel').onclick = function() { overlay.remove(); resolve(false); };
+            });
+            if (!confirmed) return;
+            try {
+                await sb('group_challenge_attempts?id=eq.' + attemptId, { method: 'DELETE', prefer: 'return=minimal' });
+                showToast('Attempt deleted.');
+                await loadGroupChallenges(window._currentGroupId);
+            } catch(e) { alert('Error: ' + e.message); }
+        }
+
+
+        // ── Native Share Sheet ────────────────────────────────────
+        async function triggerShare(title, text, url) {
+            url = url || 'https://splitshare.app';
+            if (navigator.share) {
+                try { await navigator.share({ title: title, text: text, url: url }); } catch(e) {}
+            } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.share) {
+                window.webkit.messageHandlers.share.postMessage({ title: title, text: text, url: url });
+            }
+        }
+
+        function showSharePrompt(title, message, shareTitle, shareText) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:flex-end;justify-content:center;padding:20px;';
+            overlay.innerHTML = '<div style="background:#1e1e1e;border:1px solid #333;padding:28px;width:100%;max-width:500px;margin-bottom:calc(env(safe-area-inset-bottom) + 70px);">'
+                + '<div style="font-family:Bebas Neue,cursive;font-size:22px;letter-spacing:2px;color:var(--primary);margin-bottom:6px;">' + title + '</div>'
+                + '<div style="font-size:14px;color:#999;margin-bottom:20px;">' + message + '</div>'
+                + '<div style="display:flex;gap:10px;">'
+                + '<button id="shareSkipBtn" style="flex:1;padding:12px;background:transparent;border:1px solid #333;color:#666;font-family:Oswald,sans-serif;font-size:14px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Not Now</button>'
+                + '<button id="shareGoBtn" style="flex:1;padding:12px;background:var(--primary);border:none;color:#fff;font-family:Oswald,sans-serif;font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">Share</button>'
+                + '</div></div>';
+            document.body.appendChild(overlay);
+            document.getElementById('shareGoBtn').onclick = function() { overlay.remove(); triggerShare(shareTitle, shareText); };
+            document.getElementById('shareSkipBtn').onclick = function() { overlay.remove(); };
+            overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+        }
+
+
+        function shareGroup() {
+            const g = window._currentGroupData;
+            if (!g) return;
+            const isPrivate = !g.is_public && g.password;
+            const title = 'Join ' + g.name + ' on SplitShare!';
+            const text = isPrivate
+                ? 'Join my group "' + g.name + '" on SplitShare! Search for it in Discover and use the password: ' + g.password + ' 💪'
+                : 'Join my group "' + g.name + '" on SplitShare! Search for it in Discover and join for free 💪';
+            triggerShare(title, text, 'https://splitshare.app');
+        }
+
+        // Export functions to window so inline onclick handlers can reach them
+        window.saveGroupWorkout = saveGroupWorkout;
+        window.openEditGroup = openEditGroup;
+        window.toggleGroupMenu = function() {
+            const menu = document.getElementById('groupDotsMenu');
+            if (!menu) return;
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                // Show menu with full-screen overlay to catch outside taps
+                menu.style.display = 'block';
+                let overlay = document.getElementById('groupMenuOverlay');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.id = 'groupMenuOverlay';
+                    overlay.style.cssText = 'position:fixed;inset:0;z-index:9998;background:transparent;';
+                    overlay.onclick = function() { menu.style.display = 'none'; overlay.remove(); };
+                    document.body.appendChild(overlay);
+                }
+                // Ensure menu is above overlay
+                menu.style.zIndex = '9999';
+                menu.style.position = 'absolute';
+            } else {
+                menu.style.display = 'none';
+                const overlay = document.getElementById('groupMenuOverlay');
+                if (overlay) overlay.remove();
+            }
+        };
+        window.previewEditGroupPhoto = previewEditGroupPhoto;
+        window.saveEditGroup = saveEditGroup;
+        window.confirmDeleteGroup = confirmDeleteGroup;
+        window.openEditGroupWorkout = openEditGroupWorkout;
+        window.saveEditGroupWorkout = saveEditGroupWorkout;
+        window.addEditWExRow = addEditWExRow;
+        window.closeEditWorkoutModal = function() {
+            var m = document.getElementById('editWorkoutModal');
+            if (m) m.remove();
+        };
+        window.deleteGroupWorkout = deleteGroupWorkout;
+        window.recheckSubscription = recheckSubscription;
+        window.openHeadToHead = openHeadToHead;
+        window.toggleDashCard = toggleDashCard;
+        window.toggleChallengeCard = toggleChallengeCard;
+        window.deleteAttempt = deleteAttempt;
+        window.loadGroupChallenges = loadGroupChallenges;
+        window.triggerShare = triggerShare;
+        window.shareGroup = shareGroup;
+        window.showSharePrompt = showSharePrompt;
+        window.openPostChallenge = openPostChallenge;
+        window.closePostChallenge = closePostChallenge;
+        window.submitChallenge = submitChallenge;
+        window.deleteChallenge = deleteChallenge;
+        window.openLogAttempt = openLogAttempt;
+        window.closeLogAttemptModal = closeLogAttemptModal;
+        window.previewAttemptPhoto = previewAttemptPhoto;
+        window.removeAttemptPhoto = removeAttemptPhoto;
+        window.triggerAttemptPhoto = function() {
+            var inp = document.getElementById('attemptPhotoInput');
+            if (inp) inp.click();
+        };
+        window.submitAttempt = submitAttempt;
+        window.checkForNewPRs = checkForNewPRs;
+        window.sharePRChallenge = sharePRChallenge;
+        window.selectHistoryExercise = selectHistoryExercise;
+        window.renderHistoryTab = renderHistoryTab;
+        window.openPostGroupWorkout = openPostGroupWorkout;
+        window.closePostGroupWorkout = closePostGroupWorkout;
+        window.addGWExercise = addGWExercise;
+        window.openLogCompletion = openLogCompletion;
+        window.closeLogCompletion = closeLogCompletion;
+        window.openGroupDetail = openGroupDetail;
 
         function showFeedSkeletons() {
             const feed = document.getElementById('mainFeed');
@@ -8001,6 +9456,74 @@
             if (tc) tc.classList.add('active');
         };
         window.navigateToPage = navigateToPage;
+        window.saveGroupWorkout = saveGroupWorkout;
+        window.openEditGroup = openEditGroup;
+        window.toggleGroupMenu = function() {
+            const menu = document.getElementById('groupDotsMenu');
+            if (!menu) return;
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                // Show menu with full-screen overlay to catch outside taps
+                menu.style.display = 'block';
+                let overlay = document.getElementById('groupMenuOverlay');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.id = 'groupMenuOverlay';
+                    overlay.style.cssText = 'position:fixed;inset:0;z-index:9998;background:transparent;';
+                    overlay.onclick = function() { menu.style.display = 'none'; overlay.remove(); };
+                    document.body.appendChild(overlay);
+                }
+                // Ensure menu is above overlay
+                menu.style.zIndex = '9999';
+                menu.style.position = 'absolute';
+            } else {
+                menu.style.display = 'none';
+                const overlay = document.getElementById('groupMenuOverlay');
+                if (overlay) overlay.remove();
+            }
+        };
+        window.previewEditGroupPhoto = previewEditGroupPhoto;
+        window.saveEditGroup = saveEditGroup;
+        window.confirmDeleteGroup = confirmDeleteGroup;
+        window.openEditGroupWorkout = openEditGroupWorkout;
+        window.saveEditGroupWorkout = saveEditGroupWorkout;
+        window.addEditWExRow = addEditWExRow;
+        window.closeEditWorkoutModal = function() {
+            var m = document.getElementById('editWorkoutModal');
+            if (m) m.remove();
+        };
+        window.deleteGroupWorkout = deleteGroupWorkout;
+        window.recheckSubscription = recheckSubscription;
+        window.openHeadToHead = openHeadToHead;
+        window.toggleDashCard = toggleDashCard;
+        window.toggleChallengeCard = toggleChallengeCard;
+        window.deleteAttempt = deleteAttempt;
+        window.loadGroupChallenges = loadGroupChallenges;
+        window.triggerShare = triggerShare;
+        window.shareGroup = shareGroup;
+        window.showSharePrompt = showSharePrompt;
+        window.openPostChallenge = openPostChallenge;
+        window.closePostChallenge = closePostChallenge;
+        window.submitChallenge = submitChallenge;
+        window.deleteChallenge = deleteChallenge;
+        window.openLogAttempt = openLogAttempt;
+        window.closeLogAttemptModal = closeLogAttemptModal;
+        window.previewAttemptPhoto = previewAttemptPhoto;
+        window.removeAttemptPhoto = removeAttemptPhoto;
+        window.triggerAttemptPhoto = function() {
+            var inp = document.getElementById('attemptPhotoInput');
+            if (inp) inp.click();
+        };
+        window.submitAttempt = submitAttempt;
+        window.checkForNewPRs = checkForNewPRs;
+        window.sharePRChallenge = sharePRChallenge;
+        window.selectHistoryExercise = selectHistoryExercise;
+        window.renderHistoryTab = renderHistoryTab;
+        window.openLogCompletion = openLogCompletion;
+        window.closeLogCompletion = closeLogCompletion;
+        window.openGroupDetail = openGroupDetail;
+        window.openPostGroupWorkout = openPostGroupWorkout;
+        window.closePostGroupWorkout = closePostGroupWorkout;
+        window.addGWExercise = addGWExercise;
         window.selectProgressExercise = selectProgressExercise;
         window.toggleFollow = toggleFollow;
         window.handleSignup = handleSignup;
