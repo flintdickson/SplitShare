@@ -4334,7 +4334,7 @@
     </div>
 
     <!-- Signup Page -->
-    <div class="auth-page" id="signupPage">
+    <div class="auth-page active" id="signupPage">
         <div class="auth-container">
             <div class="auth-logo">
                 <div class="auth-logo-text">SPLITSHARE</div>
@@ -4628,10 +4628,11 @@
                 feed.innerHTML = '<div style="padding:20px;color:#f87171;font-size:13px;font-family:monospace;">JS Error: ' + msg + ' (line ' + line + ')</div>';
             }
         };
-        // Clear session when loaded from file (not from app)
-        if (window.location.protocol === 'file:') {
-            try { localStorage.removeItem('sb_session'); } catch(e) {}
-        }
+        // Clear session when NOT loaded from the native app
+        try {
+            const isApp = window.webkit && window.webkit.messageHandlers;
+            if (!isApp) { localStorage.removeItem('sb_session'); }
+        } catch(e) {}
         console.log('=== SPLITSHARE v3.2 - SAMPLE DATA REMOVED ===');
         
         // ── CONFIG ────────────────────────────────────────────────────────
